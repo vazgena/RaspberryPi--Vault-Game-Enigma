@@ -1916,7 +1916,8 @@ def hack_check_func(app_id):
 #     global count_hack
 #     count_hack += 1
 #     hack_check = "clean"
-#     if count_hack > 20:
+#     count_mpd = count_hack % 40
+#     if count_mpd > 20:
 #         hack_check = "hacked"
 #     print(count_hack)
 #     return render_template('hackCheck.html', hackCheck=hack_check)
