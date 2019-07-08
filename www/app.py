@@ -353,7 +353,7 @@ def audio_station(app_id):
             elapsed_time = time_now - time_deployed
             if 30 > int(elapsed_time.total_seconds()) > 10:
                 elapsed_time_reverse = (int(elapsed_time.total_seconds()) - 30) * (-1)
-                message_bomb_20_sec = "Blast incoming in  {0} seconds.".format(str(elapsed_time_reverse))
+                message_bomb_20_sec = "BLAST INCOMING IN {n} SECONDS.".format(str(elapsed_time_reverse))
 
     time_doubler = time_doubler_check(station)
     message_bomb = looser_check()

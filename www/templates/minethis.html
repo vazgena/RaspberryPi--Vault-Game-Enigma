@@ -21,34 +21,34 @@
                 <div style="position: absolute; top: 400px; right: 0; width:100%; text-align: center "><h1>
                 {% if room == "1" and station == "MTR1" %}
                     {% if this_room_collected == "yes" %}
-                        You harvested 1 Energy from your room.  More energy available to harvest soon!
+                        YOU HARVESTED 1 ENERGY. MORE ENERGY AVAILABLE SOON!
                     {% else %}
-                        Your opponent harvested Energy from your room.
+                        YOUR OPPONENT HARVESTED ENERGY HERE.
                     {% endif %}
                 {% elif room == "1" and station == "MOR1" %}
                     {% if this_room_collected == "no" %}
-                            Your opponent harvested Energy from their room.
+                            YOUR OPPONENT HARVESTED ENERGY FROM THEIR ROOM.
                     {% elif this_room_collected == "yes" %}
-                            You stole 2 Energy from their room. More energy available to harvest soon!
+                            YOU STOLE 2 ENERGY FROM YOUR OPPONENT'S ROOM. MORE ENERGY AVAILABLE SOON!
                     {% endif %}
                 {% elif room == "2" and station == "MTR2" %}
                     {% if this_room_collected == "yes" %}
-                        You harvested 1 Energy from your room.  More energy available to harvest soon!
+                        YOU HARVESTED 1 ENERGY. MORE ENERGY AVAILABLE SOON!
                     {% else %}
-                        Your opponent harvested Energy from your room.
+                        YOUR OPPONENT HARVESTED ENERGY HERE.
                     {% endif %}
                 {% elif room == "2" and station == "MOR2" %}
                     {% if this_room_collected == "no" %}
-                        Your opponent harvested Energy from their room.
+                        YOUR OPPONENT HARVESTED ENERGY FROM THEIR ROOM.
                     {% elif this_room_collected == "yes" %}
-                        You stole 2 Energy from their room.  More energy available to harvest soon!
+                        YOU STOLE 2 ENERGY FROM YOUR OPPONENT'S ROOM. MORE ENERGY AVAILABLE SOON!
                     {% endif %}
                 {% endif %}
                 </h1></div>
             {% else %}
 
                 <div style="position: absolute; top: 400px; right: 0; width:100%; text-align: center "><h1>
-                The station you selected had no Energy to harvest.
+                THE STATION YOU SELECTED HAD NO ENERGY TO HARVEST.
                 </h1></div>
 
                 <script>
@@ -72,16 +72,16 @@
                 var textset2 = "NO";
                 {% if is_available == "No" %}
                     {% if station == "MTR1" %}
-                        var texttoset = "Pick which station here is glowing {{ color }} for 1 Energy.";
+                        var texttoset = "PICK WHICH STATION HERE IS FLASHING {{ color }} FOR 1 ENERGY.";
                         text_set(texttoset, "background_upper2");
                     {% elif station == "MOR1" %}
-                        var texttoset = "Pick which of your opponent’s stations is glowing {{ color }} for 2 Energy.";
+                        var texttoset = "PICK WHICH OF YOUR OPPONENT'S STATIONS IS GLOWING {{ color }} FOR 2 ENERGY.";
                         text_set(texttoset, "background_upper2");
                     {% elif station == "MTR2" %}
-                        var texttoset = "Pick which station here is glowing {{ color }} for 1 Energy.";
+                        var texttoset = "PICK WHICH STATION HERE IS FLASHING {{ color }} FOR 1 ENERGY.";
                         text_set(texttoset, "background_upper2");
                     {% elif station == "MOR2" %}
-                        var texttoset = "Pick which of your opponent’s stations is glowing {{ color }} for 2 Energy.";
+                        var texttoset = "PICK WHICH OF YOUR OPPONENT'S STATIONS IS GLOWING {{ color }} FOR 2 ENERGY.";
                         text_set(texttoset, "background_upper2");
                     {% endif %}
                 {% endif %}
@@ -105,16 +105,16 @@
             var textset2 = "NO";
             {% if is_available == "No" %}
                 {% if station == "MTR1" %}
-                        var texttoset = "Pick which station here is glowing {{ color }} for 1 Energy.";
+                        var texttoset = "PICK WHICH STATION HERE IS FLASHING {{ color }} FOR 1 ENERGY.";
                         text_set(texttoset, "background_upper2");
                     {% elif station == "MOR1" %}
-                        var texttoset = "Pick which of your opponent’s stations is glowing {{ color }} for 2 Energy.";
+                        var texttoset = "PICK WHICH OF YOUR OPPONENT'S STATIONS IS GLOWING {{ color }} FOR 2 ENERGY.";
                         text_set(texttoset, "background_upper2");
                     {% elif station == "MTR2" %}
-                        var texttoset = "Pick which station here is glowing {{ color }} for 1 Energy.";
+                        var texttoset = "PICK WHICH STATION HERE IS FLASHING {{ color }} FOR 1 ENERGY.";
                         text_set(texttoset, "background_upper2");
                     {% elif station == "MOR2" %}
-                        var texttoset = "Pick which of your opponent’s stations is glowing {{ color }} for 2 Energy.";
+                        var texttoset = "PICK WHICH OF YOUR OPPONENT'S STATIONS IS GLOWING {{ color }} FOR 2 ENERGY.";
                         text_set(texttoset, "background_upper2");
                     {% endif %}
             {% endif %}
