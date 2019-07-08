@@ -515,6 +515,16 @@ body {
     font-size: 24px;
 
 }
+
+body.hack{
+    background-image: url("/static/images/18_Enigma_Vault_Bkgd_Screen_4_FINAL.jpg");
+   background-size: 100% 100%;
+    color:black;
+    padding: 0;
+    margin: 0;
+    font-size: 24px;
+}
+
 p {
     padding: 0;
     margin: 0;

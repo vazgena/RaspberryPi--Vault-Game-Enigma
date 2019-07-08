@@ -824,7 +824,8 @@ def camera_station(app_id, room):
 @app.route('/hacktemplate/<app_id>')
 def hack_template(app_id):
     room = app_id
-    return render_template('hacktemplate.html', room=room)
+    response = render_template('hacktemplate.html', room=room)
+    return response
 
 
 # Hack station data
