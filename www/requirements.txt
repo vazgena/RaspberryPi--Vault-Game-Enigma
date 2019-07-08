@@ -1,0 +1,10 @@
+flask
+pymysql
+RPi.GPIO
+requests
+lxml
+serial
+netifaces
+beacontools
+statistics
+paho-mqtt
