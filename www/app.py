@@ -1908,6 +1908,20 @@ def hack_check_func(app_id):
     return render_template('hackCheck.html', hackCheck=hack_check)
 
 
+# count_hack = 0
+# # TODO: test check
+# # hack_check_func checks is stations are hacked it is used on all stations
+# @app.route('/hackCheck/<app_id>')
+# def hack_check_func(app_id):
+#     global count_hack
+#     count_hack += 1
+#     hack_check = "clean"
+#     if count_hack > 20:
+#         hack_check = "hacked"
+#     print(count_hack)
+#     return render_template('hackCheck.html', hackCheck=hack_check)
+
+
 # sremove removes hacks from stations
 @app.route('/sRemove/', methods=['GET', 'POST'])
 def sremove():

@@ -113,7 +113,6 @@
     ------>
     
     <script>
-        $('body').addClass('hack');
         $(document).ready(function(){
             $(window).on('touchmove',function(e){e.preventDefault();});
         });
@@ -189,6 +188,8 @@
                 hackcheck = "ON";
                 textset1 = "NO";
                 textset2 = "NO";
+
+                $('body').addClass('hack');
 
                 var texttoset = "PRESS ACTIVATION BUTTONS WHEN THEY APPEAR.";
                 text_set(texttoset, "background_upper2");
