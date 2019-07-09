@@ -84,6 +84,10 @@
                         var texttoset = "PICK WHICH OF YOUR OPPONENT'S STATIONS IS FLASHING {{ color }} FOR 2 ENERGY.";
                         text_set(texttoset, "background_upper2");
                     {% endif %}
+                {% else %}
+                   var texttoset = "";
+                   text_set(texttoset, "background_upper2");
+
                 {% endif %}
             }
 
@@ -117,6 +121,9 @@
                         var texttoset = "PICK WHICH OF YOUR OPPONENT'S STATIONS IS FLASHING {{ color }} FOR 2 ENERGY.";
                         text_set(texttoset, "background_upper2");
                     {% endif %}
+            {% else %}
+                   var texttoset = "";
+                   text_set(texttoset, "background_upper2");
             {% endif %}
 
             var timeDoubler = parent.timeDoubler;

@@ -353,7 +353,7 @@ def audio_station(app_id):
             elapsed_time = time_now - time_deployed
             if 30 > int(elapsed_time.total_seconds()) > 10:
                 elapsed_time_reverse = (int(elapsed_time.total_seconds()) - 30) * (-1)
-                message_bomb_20_sec = "BLAST INCOMING IN {n} SECONDS.".format(str(elapsed_time_reverse))
+                message_bomb_20_sec = "BLAST INCOMING IN {0} SECONDS.".format(str(elapsed_time_reverse))
 
     time_doubler = time_doubler_check(station)
     message_bomb = looser_check()
@@ -1542,6 +1542,56 @@ def mine_this(app_id):
                            y_list=y_list, image_list=image_list, bh_list=bh_list,
                            bw_list=bw_list, br_list=br_list, color_list=color_list,
                            color_selected_list=color_selected_list)
+
+
+
+# count_hack = 0
+# # Harvest station data
+# @app.route('/minethis/<app_id>', methods=['GET', 'POST'])
+# def mine_this(app_id):
+#     connection = data_connect()
+#     c = connection.cursor()
+#     room = app_id
+#     names = []
+#     spelled = []
+#     height_list = []
+#     width_list = []
+#     x_list = []
+#     y_list = []
+#     image_list = []
+#     bh_list = []
+#     bw_list = []
+#     br_list = []
+#     color_selected_list = []
+#     color_list = []
+#     this_room_collected = "no"
+#     collected_mine = "no"
+#     color = "Red"
+#     station = ""
+#     currency = 0
+#     is_available = "Yes"
+#
+#     global count_hack
+#     count_hack += 1
+#     count_mpd = count_hack % 40
+#     if count_mpd > 20:
+#         is_available = "No"
+#
+#     if room == "1":
+#         station = "MTR1"
+#     if room == "2":
+#         station = "MTR2"
+#     time_doubler = time_doubler_check(station)
+#     message_bomb = looser_check()
+#     return render_template('minethis.html', color=color, time_doubler=time_doubler,
+#                                       is_available=is_available, collected_mine=collected_mine,
+#                                       stationListed=names, spelled=spelled, station=station,
+#                                       message_bomb=message_bomb, room=room,
+#                                       this_room_collected=this_room_collected,
+#                                       width_list=width_list, height_list=height_list, x_list=x_list,
+#                                       y_list=y_list, image_list=image_list, bh_list=bh_list,
+#                                       bw_list=bw_list, br_list=br_list, color_list=color_list,
+#                                       color_selected_list=color_selected_list)
 
 
 # Harvest station template
