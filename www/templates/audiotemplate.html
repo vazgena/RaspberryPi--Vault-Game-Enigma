@@ -108,6 +108,8 @@
                 textset1 = "NO";
                 textset2 = "NO";
 
+                $('body').addClass('hack');
+
                 var texttoset = "PRESS ACTIVATION BUTTONS WHEN THEY APPEAR.";
                 text_set(texttoset, "background_upper2");
 
@@ -124,6 +126,9 @@
                 hackcheck = "OFF";
                 textset1 = "NO";
                 textset2 = "NO";
+
+                $('body').removeClass('hack');
+
                 document.getElementById("hack").style.display = "none";
                 document.getElementById("wrapper").style.display = "block";
                 var texttoset2 = "";

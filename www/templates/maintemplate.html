@@ -139,6 +139,8 @@
                 textset1main = "NO";
                 textset2main = "NO";
 
+                $('body').addClass('hack');
+
                 var texttoset = "PRESS ACTIVATION BUTTONS WHEN THEY APPEAR.";
                 text_set2(texttoset, "background_upper2main");
 
@@ -152,6 +154,8 @@
                 hackcheck = "OFF";
                 document.getElementById("hack").style.display = "none";
                 document.getElementById("main_loader").style.display = "block";
+
+                $('body').removeClass('hack');
 
                 if (stationlock2 === "OFF"){
 
