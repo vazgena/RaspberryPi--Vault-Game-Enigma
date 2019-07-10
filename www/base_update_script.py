@@ -64,14 +64,14 @@ def update_09_07_2019():
     ]
     remove_rows(con, removes)
 
-    # insertes =[(table, fields, values)]
-    insertes = [
-        ('market', ['text', 'cost', 'multipleAllowed'],
-         ["Launch a Fake Blast. It won\\'t hurt them, but it will scare them!", 1, "2"]),
-        ('market', ['text', 'cost', 'multipleAllowed'],
-         ['3 Stations get hacked at random.', 4, "1"])
-    ]
-    insert_rows(con, insertes)
+    # # insertes =[(table, fields, values)]
+    # insertes = [
+    #     ('market', ['text', 'cost', 'multipleAllowed'],
+    #      ["Launch a Fake Blast. It won\\'t hurt them, but it will scare them!", 1, "2"]),
+    #     ('market', ['text', 'cost', 'multipleAllowed'],
+    #      ['3 Stations get hacked at random.', 4, "1"])
+    # ]
+    # insert_rows(con, insertes)
 
     connection.close()
 

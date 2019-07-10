@@ -816,6 +816,7 @@ def camera_station(app_id, room):
         cams_available = "0"
     # Close database connection.
     connection.close()
+    # TODO: added timer check and add value for render_template, timer from counted_market
     return render_template('cameraStation.html', cams_available=cams_available,
                            time_doubler=time_doubler, message_bomb=message_bomb, station=station)
 
