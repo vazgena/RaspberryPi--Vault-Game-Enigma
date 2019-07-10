@@ -1,0 +1,8 @@
+C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Startup
+
+"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" --kiosk "http://10.255.1.254:8080/maintemplate/1" --disable-pinch ?overscroll-history-navigation=0 --no-user-gesture-required --autoplay-policy=no-user-gesture-required ?incognito 
+
+
+chrome://flags/
+
+disable overscroll history

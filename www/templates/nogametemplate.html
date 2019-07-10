@@ -1,0 +1,134 @@
+{% block body %}
+    <head>
+        <meta name="viewport" content="user-scalable=no, width=device-width" />
+    </head>
+    <style>
+        #message{
+
+        }
+        audio {
+           display:none;
+        }
+        #startText{
+            font-family: Futura;
+            font-size: 50px;
+            color: black;
+        }
+        #startTextHolder{
+            left: 0;
+            line-height: 200px;
+            margin-top: -100px;
+            position: absolute;
+            text-align: center;
+            top: 50%;
+            width: 100%;
+        }
+        #counter{
+            font-family: Futura;
+            font-size: 125px;
+            color: white;
+        }
+    </style>
+    <script src="/static/js/jquery1.8.2.min.js"></script>
+    <script src="/static/js/in_house.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/hack.js"></script>
+    <script src="/static/js/curved_text.js"></script>
+    <link rel='stylesheet prefetch' href='/static/css/roboto.css'>
+    <link rel='stylesheet prefetch' href='/static/css/font-awesome.min.css'>
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/inhouse.css?version=.01.4" rel="stylesheet">
+
+    <script>
+        var status = "";
+        var redirect_url = "";
+    </script>
+    {# redirect to url if change #}
+    <div id="noload"></div>
+
+    <div id="startTextHolder">
+        <div id="startText"></div>
+        <div id="counter"></div>
+    </div>
+
+    <audio id='gameover' src="/static/audio/gameover.wav" type="audio/wav" preload="auto"  ></audio>
+    <audio id='gamewon' src="/static/audio/gamewon.wav" type="audio/wav" preload="auto"  ></audio>
+
+    <script>
+        $(document).ready(function(){
+            $(window).on('touchmove',function(e){e.preventDefault();});
+        });
+        var seconds = 11;
+        var runonce = "No";
+        var gameover = document.getElementById('gameover');
+        var gamewon = document.getElementById('gamewon');
+        var playOnce = "0";
+        var station = "{{ station }}";
+        setInterval(auto_load,1000);
+        function auto_load() {
+            $.ajax({
+                url: "/nogame/{{ station }}",
+                success: function (data) {
+                    $("#noload").html(data);
+                }
+            });
+
+            if (status === "off") {
+                document.body.style.background = "#000";
+                document.body.style.backgroundImage = "";
+            } else if (status === "win") {
+                if (station === "MAN1") {
+                    if (playOnce === "0") {
+                        gamewon.play();
+                        playOnce = "1"
+                    }
+                }
+                if (station === "MAN2") {
+                    if (playOnce === "0") {
+                        gamewon.play();
+                        playOnce = "1"
+                    }
+                }
+                document.body.style.background = "#055";
+                document.body.style.backgroundImage = "url('/static/images/win.jpg')";
+            } else if (status === "lose") {
+                if (station === "MAN1") {
+                    if (playOnce === "0") {
+                        gameover.play();
+                        playOnce = "1"
+                    }
+                }
+                if (station === "MAN2") {
+                    if (playOnce === "0") {
+                        gameover.play();
+                        playOnce = "1"
+                    }
+                }
+                document.body.style.background = "#500";
+                document.body.style.backgroundImage = "url('/static/images/lose.jpg')";
+            } else if (status === "redirect") {
+                if (runonce === "No") {
+                    runonce = "Yes";
+                    countdown();
+                } else {
+
+                }
+            }
+        }
+
+        function countdown() {
+            seconds = seconds - 1;
+            if (seconds < 0) {
+                // Chnage your redirection link here
+                $(location).attr('href', redirect_url)
+            } else {
+                document.getElementById("counter").innerHTML = seconds;
+                document.getElementById("startText").innerHTML = "Game will start in";
+                window.setTimeout("countdown()", 1000);
+            }
+        }
+
+
+    </script>
+
+{% endblock %}

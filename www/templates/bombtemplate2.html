@@ -1,0 +1,335 @@
+{% block body %}
+    <head>
+        <meta name="viewport" content="user-scalable=no, width=device-width" />
+    </head>
+    <link rel='stylesheet prefetch' href='/static/css/roboto.css'>
+    <link rel='stylesheet prefetch' href='/static/css/font-awesome.min.css'>
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/inhouse.css?version=.01.4" rel="stylesheet">
+<script src="/static/js/jquery1.8.2.min.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/hack.js"></script>
+
+
+<div id="wrapper">
+
+    <div id="activate"> <h1>Press Activation Buttons When They Appear</h1><br>
+        <br><p style="display: inline-block;">Please wait to activate stage 1. </p>
+        <br><br><div id="activationButton1"><button id="activateButton1" onclick=activateBomb1(stationToDeployAgainst)> Activate Stage 2 </button></div>
+    </div>
+
+
+    <div id="activate2" ><br>
+        <br><p style="display: inline-block;">Please wait to activate stage 2. </p>
+        <br><br><div id="activationButton2"><button id="activateButton2" onclick=activateBomb2(stationToDeployAgainst)> Activate Stage 3 </button></div>
+    </div>
+
+    <div id="activate3" ><br>
+        <br><p style="display: inline-block;">Please wait to deploy new bomb. <div style="display: inline-block;"></div></p>
+        <br><br><div id="deployingNow"><button id="deployNow" onclick=deployNow(stationToDeployAgainst)> Deploy bomb now. </button></div>
+    </div>
+
+    <div id="bombsdDeloying" ><br>
+        <p style="display: inline-block;" >Bomb will detonate in <div style="display: inline-block;"></div><div id="timerAct4" style="display: inline-block;"></div> seconds </p>
+    </div>
+
+    <div id="bombsAntiDep">
+        <br>
+         <div style="display: inline-block;">Bombs deploying against you in </div> <div style="display: inline-block;"></div> <div id="timerOpp" style="display: inline-block;"></div> seconds. </p>
+        <br>
+    </div>
+
+    <div id="bmbtime">
+        <p style="display: inline-block;">Your bomb is deploying in <div style="display: inline-block;"></div> <div id="bmbtimer" style="display: inline-block;"></div> seconds. </p>
+
+    </div>
+
+    <div id=topText" >
+        <br>
+        <div style="display: inline-block;">
+            You have </div> <div style="display: inline-block;"> </div> <div id="credits" style="display: inline-block;"> </div> <div style="display: inline-block;"> energy.</div>
+        <div style="display: inline-block;">  Bombs currently cost </div> <div style="display: inline-block;"> </div> <div id="bombCost" style="display: inline-block;"></div> <div style="display: inline-block;"> energy.</div>
+        <div style="display: inline-block;" id="topleft">  Please select a station to bomb you have </div> <div style="display: inline-block;"> </div> <div id="bombcount" style="display: inline-block;"> </div> <div style="display: inline-block;"> available.</div>
+        </p>
+        <br>
+    </div>
+
+    <div id="main_loader" >
+
+        <div id="bombload">
+
+        </div>
+
+    </div>
+
+    <div id="isAlive">
+    </div>
+
+    <div id="currencyCheck">
+    </div>
+    <div id="hackBackCheck">
+    </div>
+
+</div>
+    <p id="not_enough_message">
+        You don't have enough for this purchase.
+    </p>
+    <div id="lower_left_text">
+        <p id="bmb_message">
+        </p>
+        <p id="dbl_message">
+        </p>
+    </div>
+
+    <div id="hackCheck">
+
+    </div>
+
+    <div id="hack_load">
+
+    </div>
+
+<script>
+        $(document).ready(function(){
+            $(window).on('touchmove',function(e){e.preventDefault();});
+        });
+    $(document).ready( function() {
+        $("#hack_load").load("/hack_load/");
+    });
+    new CircleType(document.getElementById('topleft')).radius(384);
+    document.getElementById("not_enough_message").style.display = "none";
+
+    if ( self !== top ) {
+        document.body.style.backgroundImage = "none";
+        document.body.style.background = "none transparent";
+    }
+    var station = "BMB{{room}}";
+    var min = 6;
+    var max = 12;
+    var stationToDeployAgainst = "";
+    var ttdset = "false";
+    setInterval(auto_load3,250);
+    setInterval(currency_load,1000);
+    setInterval(auto_load,1000);
+
+
+    function deployNow(stationToDeploy){
+                document.getElementById("bombButtons").style.display = "none";
+                document.getElementById("activate3").style.display = "none";
+                activateBomb3(stationToDeploy)
+            }
+
+    function activateBomb2(stationToDeploy) {
+        document.getElementById("deployingNow").style.display = "none";
+        document.getElementById("activate2").style.display = "none";
+        document.getElementById("activate3").style.display = "block";
+        var seconds_left = Math.floor(Math.random() * (max - min) + min);
+        var interval = setInterval(function () {
+            --seconds_left;
+            if (timeDoubler == "yes") {
+                --seconds_left
+            }
+            if (seconds_left <= 0) {
+                document.getElementById("deployingNow").style.display = "block";
+                clearInterval(interval);
+            }
+        }, 1000);
+    }
+
+    function activateBomb1(stationToDeploy){
+        document.getElementById("activationButton2").style.display = "none";
+        document.getElementById("activate").style.display = "none";
+        document.getElementById("activate2").style.display = "block";
+
+        var seconds_left = Math.floor(Math.random() * (max - min) + min);
+            var interval = setInterval(function() {
+                --seconds_left;
+                if (timeDoubler == "yes") {
+                    --seconds_left
+                }
+                if (seconds_left <= 0) {
+                    document.getElementById("activationButton2").style.display = "block";
+                    clearInterval(interval);
+                }
+            }, 1000);
+    }
+
+    function deployBomb(stationToDeploy) {
+        if (currency >= bombCost) {
+            document.getElementById("not_enough_message").style.display = "none";
+            var redirect = '/bombStation2/{{room}}';
+            $.ajax({
+                type: 'POST',
+                url: redirect,
+                data: {
+                    station: stationToDeploy
+                }
+            });
+        }
+        else if (bombs >= 1) {
+            document.getElementById("not_enough_message").style.display = "none";
+            var redirect = '/bombStation2/{{room}}';
+            $.ajax({
+                type: 'POST',
+                url: redirect,
+                data: {
+                    station: stationToDeploy
+                }
+            });
+        }
+        else{
+            document.getElementById("not_enough_message").style.display = "block";
+        }
+    }
+
+    function deployBomb2(stationToDeploy) {
+
+            stationToDeployAgainst = stationToDeploy
+            {
+                document.getElementById("activationButton1").style.display = "none";
+                document.getElementById("bombButtons").style.display = "none";
+                document.getElementById("activate").style.display = "block";
+                var seconds_left = Math.floor(Math.random() * (max - min) + min);
+                var interval = setInterval(function () {
+                    --seconds_left;
+                    if (timeDoubler == "yes") {
+                        --seconds_left
+                    }
+                    if (seconds_left <= 0) {
+                        document.getElementById("activationButton1").style.display = "block";
+                        clearInterval(interval);
+                    }
+                }, 1000);
+
+            }
+        }
+
+    function oppCountdown(time){
+        document.getElementById("activate3").style.display = "block";
+        var seconds_left = time;
+            document.getElementById("bombButtons").style.display = "none";
+
+            var interval = setInterval(function() {
+                document.getElementById('timerOpp').innerHTML = --seconds_left;
+            if (seconds_left <= 0) {
+            //document.getElementById("bombButtons").style.display = "block";
+            }
+        }, 1000);
+    }
+
+    function activateBomb3(stationToDeploy) {
+        var redirect = '/bombStation2/{{room}}';
+        $.ajax({
+            type: 'POST',
+            url: redirect,
+            data: {
+                station: stationToDeploy
+            }
+        });
+    }
+
+    $.extend(
+    {
+        redirectPost: function(location, args)
+        {
+            var form = '';
+            $.each( args, function( key, value ) {
+                value = value.split('"').join('\"')
+                form += '<input type="hidden" name="'+key+'" value="'+value+'">';
+            });
+            $('<form action="' + location + '" method="POST">' + form + '</form>').appendTo($(document.body)).submit();
+        }
+    });
+
+    function sleep_ms(millisecs) {
+        var initiation = new Date().getTime();
+        while ((new Date().getTime() - initiation) < millisecs)
+            nothingness ="";
+    }
+
+    function hackOn() {
+        if ( self == top ) {
+            document.getElementById("main_loader").style.display = "none";
+            document.getElementById("hack").style.display = "block";
+        }
+    }
+
+    function hackOff() {
+        if ( self == top ) {
+            document.getElementById("hack").style.display = "none";
+            document.getElementById("main_loader").style.display = "block";
+        }
+    }
+
+    function auto_load3(){
+        $.ajax({
+          url: "/bombStation2/{{room}}",
+          success: function(data){
+             $("#bombload").html(data);
+          }
+    });}
+
+    function auto_load2(){
+        var pass = pass
+    }
+
+    function auto_load(){
+        if ( self == top ) {
+            $.ajax({
+                url: "/hackCheck/BMB{{room}}",
+                success: function (data) {
+                    $("#hackCheck").html(data);
+                }
+            });
+        }
+    }
+
+    function currency_load(){
+        $.ajax({
+          url: "/currency/{{room}}",
+          success: function(data){
+             $("#currencyCheck").html(data);
+             document.getElementById('credits').innerHTML = currency;
+             document.getElementById('bombcount').innerHTML = bombs;
+             document.getElementById('bombCost').innerHTML = bombCost;
+          }
+    });}
+
+    $(document).ready(function(){
+    auto_load();
+    });
+
+    function ttd(ttdtime) {
+        if (ttdset == "false") {
+            if (ttdtime > 0) {
+            document.getElementById('bmbtimer').innerHTML = ttdtime;
+            //document.getElementById("bombButtons").style.display = "none";
+            document.getElementById("bmbtime").style.display = "block";
+            //put bomb code here
+            ttdset = "true"
+            }
+            if (ttdtime <= 0) {
+            document.getElementById("bombButtons").style.display = "block";
+            document.getElementById("bmbtime").style.display = "none";
+            }
+        }
+
+        if (ttdset == "true") {
+            if (ttdtime <= 0) {
+                //document.getElementById("bombButtons").style.display = "block";
+                document.getElementById("bmbtime").style.display = "none";
+                ttdset = "false"
+            }
+            if (ttdtime > 0) {
+                document.getElementById('bmbtimer').innerHTML = ttdtime;
+                //document.getElementById("bombButtons").style.display = "none";
+                document.getElementById("bmbtime").style.display = "block";
+                //put bomb code here
+            }
+        }
+
+    }
+
+</script>
+
+{% endblock %}

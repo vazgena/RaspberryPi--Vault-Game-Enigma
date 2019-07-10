@@ -1,0 +1,25 @@
+{% block body %}
+
+{% if mineAvailable == "yes": %}
+    mined successfully
+    <script>
+        setTimeout("location.href = '/{{referrer}}';",1000);
+    </script>
+{% elif mineAvailable == "no": %}
+    mined unsuccessfully
+    <script>
+        setTimeout("location.href = '/{{referrer}}';",20000);
+    </script>
+
+{% else: %}
+    mined unsuccessfully
+    <script>
+        setTimeout("location.href = '/{{referrer}}';",20000);
+    </script>
+
+{% endif %}
+
+
+{% endblock %}
+
+

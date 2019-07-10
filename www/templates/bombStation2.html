@@ -1,0 +1,55 @@
+
+<script>
+
+        {% if deploy_now == "yes" %}
+            deployBomb2("deploynow");
+        {% else %}
+
+        {% endif %}
+
+        {% if redirect_page_1 == "True" %}
+            window.location.replace("/bombtemplate/{{room}}");
+        {% endif %}
+
+         var bombCost = {{bombCost}};
+
+    </script>
+
+<div id="buttonHolderInner" style="display: inline-block;">
+    {% for i in names %}
+        {% if i in stations_deployable %}
+                    <button class="button" onclick='deployBomb("{{i}}")' style="background-color:{{color_list[loop.index0]}}; position: absolute; top: {{x_list[loop.index0]}}px; left: {{y_list[loop.index0]}}px; width: {{bh_list[loop.index0]}}px; height: {{bw_list[loop.index0]}}px; border-radius: {{br_list[loop.index0]}}px;">
+                           <img src="/static/images/{{image_list[loop.index0]}}" style="width:{{width_list[loop.index0]}}px;height:{{height_list[loop.index0]}}px; " alt="none">
+                    </button>
+        {% else %}
+                    <button class="button" style="background-color:{{color_selected_list[loop.index0]}}; position: absolute; top: {{x_list[loop.index0]}}px; left: {{y_list[loop.index0]}}px; width: {{bw_list[loop.index0]}}px; height: {{bh_list[loop.index0]}}px; border-radius: {{br_list[loop.index0]}}px;">
+                            <img src="/static/images/{{image_list[loop.index0]}}" style="width:{{width_list[loop.index0]}}px;height:{{height_list[loop.index0]}}px; " alt="none">
+                    </button>
+        {% endif%}
+    {% endfor %}
+
+</div>
+
+<script>
+    if ( self === top ) {
+        {% if time_doubler == "yes" %}
+            var timeDoubler = "yes";
+        {% else %}
+            var timeDoubler = "no";
+        {% endif %}
+        var bomb_message = "{{ message_bomb }}";
+        if (bomb_message === "exit") {
+            redirect_url ="http://10.255.1.254:8080/nogametemplate/{{ station }}"
+            $(location).attr('href', redirect_url)
+        }
+    }
+    if (self !== top){
+        var timeDoubler = parent.timeDoubler;
+    }
+    var message_bomb_20_sec = "{{ message_bomb_20_sec }}";
+    document.getElementById("message_bomb_20_sec_p").innerHTML = message_bomb_20_sec;
+</script>
+
+<p id="message_bomb_20_sec_p">
+
+</p>

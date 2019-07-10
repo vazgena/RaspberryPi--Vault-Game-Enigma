@@ -1,0 +1,30 @@
+
+{% block body %}
+
+<p>Market List</p>
+
+{% for i in marketApplett%}
+
+    <p>id {{i[0]}} title {{i[1]}} cost {{i[2]}} number allowed {{i[3]}}</p>
+
+{% endfor %}
+
+{% endblock %}
+
+<script>
+    function auto_loaddata(){
+    $.ajax({
+      url: "marketroom1",
+      success: function(data){
+         $('#dataload').load('/marketroom1');
+
+      }
+    });
+  }
+  $(document).ready(function(){
+    auto_load();
+  });
+
+  setInterval(auto_loaddata,1000);
+
+</script>

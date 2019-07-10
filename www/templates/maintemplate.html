@@ -1,0 +1,385 @@
+{% block body %}
+    <head>
+        <meta name="viewport" content="user-scalable=no, width=device-width" />
+    </head>
+    <style>
+    audio {
+       display:none;
+    }
+    </style>
+    <script src="/static/js/jquery1.8.2.min.js"></script>
+    <script src="/static/js/in_house.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/hack.js"></script>
+    <script src="/static/js/curved_text.js"></script>
+    <link rel='stylesheet prefetch' href='/static/css/roboto.css'>
+    <link rel='stylesheet prefetch' href='/static/css/font-awesome.min.css'>
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/inhouse.css?version=.01.4" rel="stylesheet">
+
+
+
+    <div id="background_upper2main">
+
+    </div>
+    <div id="background_lower2main">
+
+    </div>
+
+    <div id="stationLoader" style="position:absolute; left:0; top:0;">
+
+        <iframe scrolling="no" id="master_frame" style="float: left; display: none; position:absolute; left:0; top:0;">
+
+        </iframe>
+
+        <div id="hider_div">
+
+            <h1>
+                <div id="countdowntimerholder">
+
+                </div>
+            </h1>
+
+            <button id="gobackButton" style="background: none; z-index: 999999;" onclick=backButtonLoader()>
+
+                <img src="/static/images/left_button.png" style="height: 200px; width: 200px" alt="NONE" border="none">
+                Switch Station to Mirror
+            </button>
+
+        </div>
+
+    </div>
+
+    <div id="wrapper">
+        <div id="main_loader">
+            <div id="manLoad">
+
+            </div>
+        </div>
+    </div>
+
+    <div id="hackCheck">
+
+    </div>
+
+    <div id="hack_load">
+
+    </div>
+
+<div id="audioplay">
+<audio id='assist' src="/static/audio/assist.wav" type="audio/wav" preload="auto"  ></audio>
+<audio id='blastlaunch' src="/static/audio/blastlaunch.wav" type="audio/wav" preload="auto"  ></audio>
+<audio id='bombdroppingnew' src="/static/audio/bombdroppingnew.wav" type="audio/wav" preload="auto"  ></audio>
+<audio id='charge' src="/static/audio/charge.wav" type="audio/wav" preload="auto"  ></audio>
+<audio id='steal' src="/static/audio/steal.wav" type="audio/wav" preload="auto"  ></audio>
+<audio id='gameover' src="/static/audio/gameover.wav" type="audio/wav" preload="auto"  ></audio>
+<audio id='gamewon' src="/static/audio/gamewon.wav" type="audio/wav" preload="auto"  ></audio>
+<audio id='hackinitiated' src="/static/audio/hackinitiated.wav" type="audio/wav" preload="auto"  ></audio>
+<audio id='unhack' src="/static/audio/unhack.wav" type="audio/wav" preload="auto"  ></audio>
+<audio id='upgrade' src="/static/audio/upgrade.wav" type="audio/wav" preload="auto"  ></audio>
+<audio id='youwerehacked' src="/static/audio/youwerehacked.wav" type="audio/wav" preload="auto"  ></audio>
+<audio id='allclearstub' src="/static/audio/allclearstub.wav" type="audio/wav" preload="auto"  ></audio>
+</div>
+<div id="audio_check">
+
+</div>
+
+    <script>
+        $(document).ready(function(){
+            $(window).on('touchmove',function(e){e.preventDefault();});
+        });
+        $(document).ready( function() {
+            $("#hack_load").load("/hack_load/");
+        });
+
+        var hackcheck = "OFF";
+        let stationlock2 = "OFF";
+        var min = 6;
+        var max = 12;
+        var deactivate_dblr;
+        setInterval(auto_load,250);
+        var room = {{ room }};
+        var station = "MAN{{ room }}";
+
+        function loadIframe(iframeName, url) {
+            var $iframe = $('#' + iframeName);
+
+            if ( $iframe.length ) {
+                $iframe.attr('src',url);
+                return false;
+            }
+            return true;
+        }
+
+        if (stationlock2 === "OFF") {
+            textset1main = "NO";
+            textset2main = "NO";
+
+            var texttoset = "SELECT WHICH STATION TO MIRROR.";
+            text_set2(texttoset, "background_upper2main");
+
+            var texttoset2 = "";
+            text_set2(texttoset2, "background_lower2main");
+            
+            if (self !== top) {
+                document.body.style.backgroundImage = "none";
+                document.body.style.background = "none transparent";
+
+            }
+
+        }
+
+        document.getElementById("stationLoader").style.display = "none";
+
+        function hackOn() {
+            if ( self === top ) {
+                hackcheck = "ON";
+                document.getElementById("main_loader").style.display = "none";
+                document.getElementById("hack").style.display = "block";
+                textset1main = "NO";
+                textset2main = "NO";
+
+                var texttoset = "PRESS ACTIVATION BUTTONS WHEN THEY APPEAR.";
+                text_set2(texttoset, "background_upper2main");
+
+                var texttoset2 = "YOU’VE BEEN HACKED!";
+                text_set2(texttoset2, "background_lower2main");
+            }
+        }
+
+        function hackOff() {
+            if ( self === top ) {
+                hackcheck = "OFF";
+                document.getElementById("hack").style.display = "none";
+                document.getElementById("main_loader").style.display = "block";
+
+                if (stationlock2 === "OFF"){
+
+
+                    textset1main = "NO";
+                    textset2main = "NO";
+        
+                    var texttoset = "SELECT WHICH STATION TO MIRROR.";
+                    text_set2(texttoset, "background_upper2main");
+        
+                    var texttoset2 = "";
+                    text_set2(texttoset2, "background_lower2main");
+                }
+
+                if (stationlock2 === "ON"){
+                    document.getElementById("master_frame").style.display = "block";
+                    textset1main = "NO";
+                    textset2main = "NO";
+        
+                    var texttoset = "";
+                    text_set2(texttoset, "background_upper2main");
+        
+                    var texttoset2 = "";
+                    text_set2(texttoset2, "background_lower2main");
+                }
+            }
+        }
+
+        function countdownstart() {
+            var timelefttoreturn = 60;
+            document.getElementById("countdowntimerholder").style.display = "block";
+            document.getElementById("gobackButton").style.display = "none";
+            var downloadTimer = setInterval(function () {
+                timelefttoreturn--;
+                document.getElementById("countdowntimerholder").textContent = "YOU CAN CHANGE STATIONS IN " + timelefttoreturn;
+                if (timelefttoreturn <= 0) {
+                    clearInterval(downloadTimer);
+                    document.getElementById("countdowntimerholder").textContent = "";
+                    document.getElementById("countdowntimerholder").style.display = "none";
+                    document.getElementById("gobackButton").style.display = "block";
+                }
+            }, 1000);
+        }
+        var whattoplay = "";
+
+        function playAudio(whattoplay){
+            var assist = document.getElementById('assist');
+            var blastlaunch = document.getElementById('blastlaunch');
+            var bombdroppingnew = document.getElementById('bombdroppingnew');
+            var charge = document.getElementById('charge');
+            var steal = document.getElementById('steal');
+            var gameover = document.getElementById('gameover');
+            var gamewon = document.getElementById('gamewon');
+            var hackinitiated = document.getElementById('hackinitiated');
+            var unhack = document.getElementById('unhack');
+            var upgrade = document.getElementById('upgrade');
+            var youwerehacked = document.getElementById('youwerehacked');
+            var allclearstub = document.getElementById('allclearstub');
+
+            if (whattoplay === "assist"){
+                assist.play();
+            }
+            else if (whattoplay === "blastlaunch"){
+                blastlaunch.play();
+            }
+            else if (whattoplay === "bombdroppingnew"){
+                bombdroppingnew.play();
+            }
+            else if (whattoplay === "charge"){
+                charge.play();
+            }
+            else if (whattoplay === "steal"){
+                steal.play();
+            }
+            else if (whattoplay === "gameover"){
+                gameover.play();
+            }
+            else if (whattoplay === "gamewon"){
+                gamewon.play();
+            }
+            else if (whattoplay === "hackinitiated"){
+                hackinitiated.play();
+            }
+            else if (whattoplay === "unhack"){
+                unhack.play();
+            }
+            else if (whattoplay === "upgrade"){
+                upgrade.play();
+            }
+            else if (whattoplay === "youwerehacked"){
+                youwerehacked.play();
+            }
+            else if (whattoplay === "allclearstub"){
+                allclearstub.play();
+            }
+        }
+        function auto_load(){
+            $.ajax({
+                  url: "/mainstation/{{room}}",
+                  success: function(data){
+                     $("#manLoad").html(data);
+                  }
+            });
+            $.ajax({
+                  url: "/audiocheck/{{room}}",
+                  success: function(data){
+                     $("#audio_check").html(data);
+                  }
+            });
+
+            $.ajax({
+              url: "/hackCheck/MAN{{room}}",
+              success: function(data){
+                 $("#hackCheck").html(data);
+              }
+        });
+        }
+
+        function auto_load2() {
+
+        }
+
+        function loadStation(frameToLoad){
+            stationlock2 = "ON";
+            textset1main = "NO";
+            textset2main = "NO";
+
+            var texttoset = "";
+            text_set2(texttoset, "background_upper2main");
+
+            var texttoset2 = "";
+            text_set2(texttoset2, "background_lower2main");
+
+            document.getElementById("stationLoader").style.display = "block";
+            document.getElementById("manLoad").style.display = "none";
+            switchFrame(frameToLoad);
+        }
+
+        function backButtonLoader(){
+            stationlock2 = "OFF";
+            document.getElementById("manLoad").style.display = "block";
+            document.getElementById("stationLoader").style.display = "none";
+        }
+
+        function switchFrame(frameToLoad) {
+            if (frameToLoad === "CS11"){
+                document.getElementById("master_frame").style.display = "block";
+                loadIframe('master_frame', "/cameraTemplate/CS11/" + room);
+
+            }
+            else if (frameToLoad === "MAS1"){
+                document.getElementById("master_frame").style.display = "block";
+                loadIframe('master_frame', "/mastertemplate/" + room);
+
+            }
+            else if (frameToLoad === "BMB1"){
+                document.getElementById("master_frame").style.display = "block";
+                loadIframe('master_frame', "/bombtemplate/" + room);
+
+            }
+            else if (frameToLoad === "HAC1"){
+                document.getElementById("master_frame").style.display = "block";
+                loadIframe('master_frame', "/hacktemplate/" + room);
+
+            }
+            else if (frameToLoad === "MKP1"){
+                document.getElementById("master_frame").style.display = "block";
+                loadIframe('master_frame', "/markettemplate/" + room);
+
+            }
+            else if (frameToLoad === "MTR1"){
+                document.getElementById("master_frame").style.display = "block";
+                loadIframe('master_frame', "/minethistemplate/" + room);
+
+            }
+            else if (frameToLoad === "MOR1"){
+                document.getElementById("master_frame").style.display = "block";
+                loadIframe('master_frame', "/mineothertemplate/" + room);
+            }
+            else if (frameToLoad === "CS12"){
+                loadIframe('master_frame', "/cameraTemplate/CS12/" + room);
+                document.getElementById("master_frame").style.display = "block";
+
+            }
+            else if (frameToLoad === "MAS2"){
+                document.getElementById("master_frame").style.display = "block";
+                loadIframe('master_frame', "/mastertemplate/" + room);
+            }
+            else if (frameToLoad === "BMB2"){
+                document.getElementById("master_frame").style.display = "block";
+                loadIframe('master_frame', "/bombtemplate/" + room);
+            }
+            else if (frameToLoad === "HAC2"){
+                document.getElementById("master_frame").style.display = "block";
+                loadIframe('master_frame', "/hacktemplate/" + room);
+            }
+            else if (frameToLoad === "MKP2"){
+                document.getElementById("master_frame").style.display = "block";
+                loadIframe('master_frame', "/markettemplate/" + room);
+            }
+            else if (frameToLoad === "MTR2"){
+                document.getElementById("master_frame").style.display = "block";
+                loadIframe('master_frame', "/minethistemplate/" + room);
+            }
+            else if (frameToLoad === "MOR2"){
+                document.getElementById("master_frame").style.display = "block";
+                loadIframe('master_frame', "/mineothertemplate/" + room);
+            }
+            countdownstart();
+        }
+
+        function ttd(time_to_detonate){
+
+        }
+
+        setInterval(currency_load,1000);
+        function currency_load(){
+            $.ajax({
+              url: "/currency/{{room}}",
+              success: function(data){
+                 $("#currencyCheck").html(data);
+              }
+        });}
+
+    </script>
+
+    <div id="currencyCheck">
+
+    </div>
+
+{% endblock %}

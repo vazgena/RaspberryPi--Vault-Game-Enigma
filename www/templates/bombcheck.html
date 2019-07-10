@@ -1,0 +1,23 @@
+{% block body %}
+    {% if request_method == 'POST' %}
+            {% if bomb_located == "true" %}
+                Bomb located at {{ location }}.
+            {% elif bomb_located == "false" %}
+                Bomb not located at {{ location }}.
+            {% elif bomb_located == "oot" %}
+                No bombs are being deployed now.
+            {% endif %}
+    {% else %}
+        {% if button_active == "true" %}
+            <button onclick=checkbomb()>Check</button>
+        {% else %}
+            <p>You have been locked out</p>
+        {% endif %}
+    {% endif %}
+
+
+
+
+
+
+{% endblock %}

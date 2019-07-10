@@ -1,0 +1,496 @@
+{% block body %}
+<head>
+        <meta name="viewport" content="user-scalable=no, width=device-width" />
+    </head>
+    <script src="/static/js/jquery1.8.2.min.js"></script>
+    <script src="/static/js/in_house.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/hack.js"></script>
+    <script src="/static/js/curved_text.js"></script>
+    <link rel='stylesheet prefetch' href='/static/css/roboto.css'>
+    <link rel='stylesheet prefetch' href='/static/css/font-awesome.min.css'>
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/inhouse.css?version=.01.4" rel="stylesheet">
+
+    <div id="background_upper2">
+
+    </div>
+    <div id="background_lower2">
+
+    </div>
+
+    <div id="currencyCheck">
+
+    </div>
+
+    <div id="wrapper">
+        <!----
+
+        Activate ends here
+
+        ------>
+        <div id="activate_back"></div>
+        <div id="activate" >
+                <div style="position: absolute; top: 150px; left: 245px">
+                    <img src="/static/images/18_Enigma_S1_Button_FINAL.png" style="width: 300px; height: 300px;" alt="NONE">
+                </div>
+
+                <iframe id="arrows0" src="/static/html/arrows.html" style="width: 650px; height:200px; border: none; display: none; position: absolute; top: 200px; left: 540px;">
+
+                </iframe>
+
+                <div id="activationButton1" style="position: absolute; top: 150px; left: 950px;">
+
+                    <button id="activateButton1" onclick=activateBomb1(stationToDeployAgainst)>
+
+                        <img src="/static/images/18_Enigma_S2_Button_FINAL.png" style="width: 300px; height: 300px;" alt="NONE">
+
+                    </button>
+
+                </div>
+
+                <iframe id="arrows1" src="/static/html/arrows.html" style="width: 650px; height:200px; border: none; display: none; position: absolute; top: 380px; left: 380px; transform: rotate(155deg);">
+
+                </iframe>
+
+        </div>
+
+        <div id="activate2_back"></div>
+
+        <div id="activate2" >
+                <iframe id="arrows2" src="/static/html/arrows.html" style="width: 700px; height:200px; border: none; display: none; position: absolute; top: 570px; left: 520px; ">
+
+                </iframe>
+                <div id="activationButton2">
+                    <button id="activateButton2" style="position: absolute; top: 460px; left: 5px;" onclick=activateBomb2(stationToDeployAgainst)>
+                        <img src="/static/images/18_Enigma_S3_Button_FINAL.png" style="width: 300px; height: 300px;" alt="NONE">
+                    </button>
+                </div>
+        </div>
+
+        <div id="activate3_back"></div>
+
+        <div id="activate3" >
+
+                <div id="deployingNow"><button id="deployNow" style="position: absolute; top: 465px; left: 780px;" onclick=deployNow(stationToDeployAgainst) > <img src="/static/images/18_Enigma_Launch_Button_v3.png" style="width: 300px; height: 300px;" alt="NONE"> </button></div>
+        </div>
+
+        <div id="activate4">
+            <strong style="display: inline-block;"><span id="itemtext"></span> </strong>
+            <p>Successfully Activated.</p>
+        </div>
+        <!----
+
+        Activate ends here
+
+        ------>
+
+        <div id="main_loader">
+            <div id="station_load">
+
+            </div>
+        </div>
+    </div>
+
+
+    <div id="hackCheck">
+
+    </div>
+
+    <div id="hack_load">
+
+    </div>
+    <div id="bmb_message">
+
+    </div>
+
+<script>
+
+
+    $(document).ready(function(){
+        $(window).on('touchmove',function(e){e.preventDefault();});
+    });
+
+    $(document).ready( function() {
+        $("#hack_load").load("/hack_load/");
+    });
+    var room = {{ room }};
+    var currency = 0;
+    var hackcheck = "OFF";
+    var station = "BMB{{room}}";
+    var min = 6;
+    var max = 12;
+    var stationToDeployAgainst = "";
+    var ttdset = "false";
+    setInterval(currency_load,1000);
+    setInterval(auto_load,1000);
+    var stationlock = "OFF";
+    var stationToDeploy = "";
+    var bombs = 0;
+    var bombCost = 8;
+    var seconds_left;
+    if (stationlock === "OFF") {
+        if (ttdset === "false") {
+
+            if (self !== top) {
+                document.body.style.backgroundImage = "none";
+                document.body.style.background = "none transparent";
+            }
+        }
+    }
+
+    function deployBomb(stationToDeploy) {
+
+
+        var interval;
+        var redirect;
+
+        stationToDeployAgainst = stationToDeploy;
+
+        if (currency >= bombCost)
+        {
+
+            document.getElementById("station_load").style.display = "none";
+            stationlock = "ON";
+            redirect = '/bombStation/{{room}}';
+            $.ajax({
+                type: 'POST',
+                url: redirect,
+                data: {
+                    station: "removecost"
+                }
+            });
+
+            if ( self !== top ) {
+                    parent.document.getElementById("main_loader").style.display = "none";
+            }
+
+
+            document.getElementById("arrows0").style.display = "block";
+            document.getElementById("activationButton1").style.display = "none";
+            document.getElementById("activationButton2").style.display = "none";
+            document.getElementById("deployingNow").style.display = "none";
+            document.getElementById("activate_back").style.display = "block";
+            document.getElementById("activate").style.display = "block";
+
+            if (hackcheck === "OFF") {
+                textset1 = "NO";
+                textset2 = "NO";
+
+                var texttoset = "PRESS ACTIVATION BUTTONS WHEN THEY APPEAR.";
+                text_set(texttoset, "background_upper2");
+
+                var texttoset2 = "BLAST INITIATED";
+                text_set(texttoset2, "background_lower2");
+
+            }
+
+            seconds_left = Math.floor(Math.random() * (max - min) + min);
+            interval = setInterval(function () {
+                --seconds_left;
+                if (timeDoubler === "yes") {
+                    --seconds_left
+                }
+                if (seconds_left <= 0) {
+                    document.getElementById("activationButton1").style.display = "block";
+                    clearInterval(interval);
+                }
+            }, 1000);
+        }
+
+        else if (bombs >= 1) {
+
+            if ( self !== top ) {
+                    parent.document.getElementById("main_loader").style.display = "none";
+            }
+
+            stationlock = "ON";
+            document.getElementById("station_load").style.display = "none";
+            redirect = '/bombStation/{{room}}';
+            $.ajax({
+                    type: 'POST',
+                    url: redirect,
+                    data: {
+                        station: "removecost"
+                    }
+                });
+                document.getElementById("activationButton1").style.display = "none";
+                document.getElementById("activate").style.display = "block";
+                document.getElementById("activate_back").style.display = "block";
+
+                textset1 = "NO";
+                textset2 = "NO";
+
+                var texttoset = "PRESS ACTIVATION BUTTONS WHEN THEY APPEAR.";
+                text_set(texttoset, "background_upper2");
+
+                var texttoset2 = "BLAST INITIATED";
+                text_set(texttoset2, "background_lower2");
+
+
+                seconds_left = Math.floor(Math.random() * (max - min) + min);
+                interval = setInterval(function () {
+                    --seconds_left;
+                    if (timeDoubler === "yes") {
+                        --seconds_left
+                    }
+                    if (seconds_left <= 0) {
+                        document.getElementById("activationButton1").style.display = "block";
+                        clearInterval(interval);
+                    }
+            }, 1000);}
+        else{
+
+        }
+    }
+
+    function activateBomb1(stationToDeploy){
+
+        var interval;
+
+        document.getElementById("arrows1").style.display = "block";
+        document.getElementById("activate2").style.display = "block";
+
+        seconds_left = Math.floor(Math.random() * (max - min) + min);
+        interval = setInterval(function () {
+            --seconds_left;
+            if (timeDoubler === "yes") {
+                    --seconds_left
+                }
+            if (seconds_left <= 0) {
+                document.getElementById("activationButton2").style.display = "block";
+                clearInterval(interval);
+            }
+        }, 1000);
+        return stationToDeploy;
+    }
+
+    function activateBomb2(stationToDeploy) {
+
+        var interval;
+
+        document.getElementById("arrows2").style.display = "block";
+        document.getElementById("activate3").style.display = "block";
+
+        seconds_left = Math.floor(Math.random() * (max - min) + min);
+        interval = setInterval(function () {
+            --seconds_left;
+            if (timeDoubler === "yes") {
+                    --seconds_left
+                }
+            if (seconds_left <= 0) {
+                document.getElementById("deployingNow").style.display = "block";
+                clearInterval(interval);
+            }
+        }, 1000);
+        return stationToDeploy;
+    }
+
+    function deployNow(stationToDeploy){
+                document.getElementById("activate_back").style.display = "none";
+                activateBomb3(stationToDeploy)
+            }
+
+    function activateBomb3(stationToDeploy) {
+            stationlock = "OFF";
+            document.getElementById("arrows0").style.display = "none";
+            document.getElementById("activationButton1").style.display = "none";
+            document.getElementById("activationButton2").style.display = "none";
+            document.getElementById("deployingNow").style.display = "none";
+            document.getElementById("activate_back").style.display = "none";
+            document.getElementById("activate").style.display = "none";
+            document.getElementById("arrows2").style.display = "none";
+            document.getElementById("activate3").style.display = "none";
+            document.getElementById("arrows1").style.display = "none";
+            document.getElementById("activate2").style.display = "none";
+            if ( self !== top ) {
+                    parent.document.getElementById("main_loader").style.display = "block";
+            }
+            var redirect = '/bombStation/{{room}}';
+            $.ajax({
+                type: 'POST',
+                url: redirect,
+                data: {
+                    station: stationToDeploy
+                }
+            });
+        }
+
+        $.extend(
+        {
+            redirectPost: function(location, args)
+            {
+                var form = '';
+                $.each( args, function( key, value ) {
+                    value = value.split('"').join('\"');
+                    form += '<input type="hidden" name="'+key+'" value="'+value+'">';
+                });
+                $('<form action="' + location + '" method="POST">' + form + '</form>').appendTo($(document.body)).submit();
+            }
+        });
+
+    function oppCountdown(){
+        document.getElementById("activate3").style.display = "block";
+        document.getElementById("activate3_back").style.display = "block";
+    }
+
+    function hackOn() {
+        if ( self === top ) {
+            hackcheck = "ON";
+            document.getElementById("wrapper").style.display = "none";
+            document.getElementById("hack").style.display = "block";
+
+            textset1 = "NO";
+            textset2 = "NO";
+
+            var texttoset = "PRESS ACTIVATION BUTTONS WHEN THEY APPEAR.";
+            text_set(texttoset, "background_upper2");
+
+            var texttoset2 = "YOU’VE BEEN HACKED!";
+            text_set(texttoset2, "background_lower2");
+
+        }
+    }
+
+    function hackOff() {
+        if ( self === top ) {
+            hackcheck = "OFF";
+            document.getElementById("hack").style.display = "none";
+            document.getElementById("wrapper").style.display = "block";
+
+            if (stationlock === "OFF") {
+                if (ttdset === "false") {
+                    if (currency >= bombCost) {
+
+                        textset1 = "NO";
+                        textset2 = "NO";
+
+                        var texttoset = "SELECT A STATION TO BLAST FOR 8 ENERGY.";
+                        text_set(texttoset, "background_upper2");
+
+                        var texttoset2 = "BLASTS COST 8 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; YOUR ENERGY " + currency;
+                        text_set(texttoset2, "background_lower2");
+
+                    }
+
+                    if (currency < bombCost) {
+                        textset1 = "NO";
+                        textset2 = "NO";
+
+                        var texttoset = "YOU DON’T HAVE ENOUGH ENERGY TO BLAST";
+                        text_set(texttoset, "background_upper2");
+
+                        var texttoset2 = "BLASTS COST 8 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; YOUR ENERGY " + currency;
+                        text_set(texttoset2, "background_lower2");
+
+                    }
+                }
+            }
+
+            if (stationlock === "ON") {
+                textset1 = "NO";
+                textset2 = "NO";
+
+                var texttoset = "PRESS ACTIVATION BUTTONS WHEN THEY APPEAR.";
+                text_set(texttoset, "background_upper2");
+
+                var texttoset2 = "BLAST INITIATED";
+                text_set(texttoset2, "background_lower2");
+
+            }
+        }
+    }
+
+    function auto_load(){
+        if ( self === top ) {
+            $.ajax({
+                url: "/hackCheck/BMB{{room}}",
+                success: function (data) {
+                    $("#hackCheck").html(data);
+                }
+            });
+        }
+        $.ajax({
+              url: "/bombStation/{{room}}",
+              success: function(data){
+                    $("#station_load").html(data);
+          }
+        });
+    }
+
+    function currency_load(){
+        $.ajax({
+            url: "/currency/{{room}}",
+            success: function(data) {
+                $("#currencyCheck").html(data);
+                if (stationlock === "OFF") {
+                    if (hackcheck === "OFF") {
+                        if (ttdset === "false") {
+                            textset2 = "NO";
+                            var texttoset2 = "BLASTS COST 8 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; YOUR ENERGY " + currency;
+                            text_set(texttoset2, "background_lower2");
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    function auto_load2() {
+
+    }
+
+    $(document).ready(function(){
+    auto_load();
+    });
+
+
+    function ttd(ttdtime) {
+        if (ttdset === "false") {
+            if (ttdtime > 0) {
+                if (hackcheck === "OFF") {
+                    document.getElementById("wrapper").style.display = "none";
+                    textset1 = "NO";
+                    textset2 = "NO";
+
+                    var texttoset = "YOUR BLAST IS DEPLOYING IN " + ttdtime;
+                    text_set(texttoset, "background_upper2");
+
+                    var texttoset2 = "";
+                    text_set(texttoset2, "background_lower2");
+
+                }
+                document.getElementById("main_loader").style.display = "block";
+                document.getElementById("station_load").style.display = "block";
+                ttdset = "true"
+            }
+            if (ttdtime <= 0) {
+
+            }
+        }
+
+        if (ttdset === "true") {
+            if (ttdtime <= 0) {
+                document.getElementById("main_loader").style.display = "block";
+                ttdset = "false"
+
+
+            }
+            if (ttdtime > 0) {
+                if (hackcheck === "OFF") {
+                    textset1 = "NO";
+                    textset2 = "NO";
+
+                    var texttoset = "YOUR BLAST IS DEPLOYING IN " + ttdtime;
+                    text_set(texttoset, "background_upper2");
+
+                    var texttoset2 = "";
+                    text_set(texttoset2, "background_lower2");
+                }
+            }
+        }
+    }
+
+</script>
+
+{% endblock %}

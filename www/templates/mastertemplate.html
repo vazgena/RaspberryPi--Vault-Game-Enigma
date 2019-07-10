@@ -1,0 +1,192 @@
+{% block body %}
+
+<div id="background_upper2">
+
+    </div>
+    <div id="background_lower2">
+
+    </div>
+
+    <div id="hack_load">
+
+    </div>
+    <div id="wrapper">
+        <div id="main_loader">
+            <div id="station_load">
+            </div>
+        </div>
+    </div>
+
+    <div id="currencyCheck">
+    </div>
+
+    <div id="hackBackCheck">
+    </div>
+
+    <div id="lower_left_text">
+        <p id="bmb_message">
+        </p>
+        <p id="dbl_message">
+        </p>
+    </div>
+
+    <div id="hackCheck">
+
+    </div>
+
+    <script src="/static/js/jquery1.8.2.min.js"></script>
+    <script src="/static/js/in_house.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/hack.js"></script>
+    <script src="/static/js/curved_text.js"></script>
+    <link rel='stylesheet prefetch' href='/static/css/roboto.css'>
+    <link rel='stylesheet prefetch' href='/static/css/font-awesome.min.css'>
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/inhouse.css?version=.01.4" rel="stylesheet">
+
+    <script>
+        $(document).ready(function(){
+            $(window).on('touchmove',function(e){e.preventDefault();});
+        });
+        if ( self !== top ) {
+            document.body.style.backgroundImage = "none";
+            document.body.style.background = "none transparent";
+        }
+
+        $(document).ready( function() {
+            $("#hack_load").load("/hack_load/");
+        });
+        var room = "{{ room }}";
+        var station = "MAS{{room}}";
+        var deactivate_dblr;
+        var hackcheck = "OFF";
+        textset1 = "NO";
+        textset2 = "NO";
+
+        var texttoset = "CHOOSE WHICH STATION HAS FASTER ACTIVATIONS.";
+        text_set(texttoset, "background_upper2");
+
+        var texttoset2 = "";
+        text_set(texttoset2, "background_lower2");
+
+        setInterval(auto_load,250);
+
+        function hackOn() {
+            if ( self === top ) {
+                hackcheck = "ON";
+                document.getElementById("main_loader").style.display = "none";
+                document.getElementById("hack").style.display = "block";
+
+                textset1 = "NO";
+                textset2 = "NO";
+
+                var texttoset = "PRESS ACTIVATION BUTTONS WHEN THEY APPEAR.";
+                text_set(texttoset, "background_upper2");
+
+                var texttoset2 = "YOU’VE BEEN HACKED!";
+                text_set(texttoset2, "background_lower2");
+
+            }
+        }
+
+        function hackOff() {
+            if ( self === top ) {
+                hackcheck = "OFF";
+                document.getElementById("hack").style.display = "none";
+                document.getElementById("main_loader").style.display = "block";
+
+
+                textset1 = "NO";
+                textset2 = "NO";
+
+                var texttoset = "CHOOSE WHICH STATION HAS FASTER ACTIVATIONS.";
+                text_set(texttoset, "background_upper2");
+
+                var texttoset2 = "";
+                text_set(texttoset2, "background_lower2");
+
+            }
+        }
+
+        function auto_load2() {
+
+        }
+
+         //Needed in all end
+        function auto_load(){
+
+            $.ajax({
+              url: "/masterStation/{{room}}",
+              success: function(data){
+                 $("#station_load").html(data);
+              }
+            });
+
+            if ( self == top ) {
+                $.ajax({
+                    url: "/hackCheck/MAS{{room}}",
+                    success: function (data) {
+                        $("#hackCheck").html(data);
+                    }
+                });
+            }
+         }
+
+        function activateDoubler(station) {
+            var redirectaudio2 = "/audioadd/" + room + "/", up_init = "assist";
+
+            $.ajax({
+                type: 'POST',
+                url: redirectaudio2,
+                data: {
+                    toplay: up_init
+                }
+            });
+
+            var redirect = '/masterStation/{{room}}';
+            $.ajax({
+                type: 'POST',
+                url: redirect,
+                data: {
+                    station: station
+                }
+            });
+            clearInterval(deactivate_dblr);
+            deactivate_dblr = setInterval(deactivate_doubler,30000);
+        }
+
+        function deactivate_doubler() {
+            clearInterval(deactivate_dblr);
+            var redirect = '/masterStation/{{room}}';
+            $.ajax({
+                type: 'POST',
+                url: redirect,
+                data: {
+                    station: 'none'
+                }
+            });
+        }
+
+        function ttd(time_to_detonate){
+
+        }
+
+        setInterval(currency_load,1000);
+
+        function currency_load(){
+            $.ajax({
+              url: "/currency/{{room}}",
+              success: function(data){
+                 $("#currencyCheck").html(data);
+
+              }
+        });}
+
+    </script>
+
+    <div id="currencyCheck">
+
+    </div>
+
+
+{% endblock %}

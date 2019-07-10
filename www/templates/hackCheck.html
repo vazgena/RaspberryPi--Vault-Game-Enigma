@@ -1,0 +1,17 @@
+{% block body %}
+{% if hackCheck == "hacked" %}
+    <script>
+        hackOn();
+    </script>
+{% elif hackCheck == "clean" %}
+    <script>
+        hackOff();
+    setInterval(auto_load2,1000);
+    </script>
+{% else: %}
+    <script>
+        hackOff();
+    setInterval(auto_load2,1000);
+    </script>
+{% endif %}
+{% endblock %}

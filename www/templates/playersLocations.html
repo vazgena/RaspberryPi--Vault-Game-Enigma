@@ -1,0 +1,30 @@
+{% block body %}
+
+{{ player_wins }} has won the game.
+
+{% for i in playersLocation %}
+    <p>{{ i[0] }} is at {{ i[1] }} with  a signal of {{ i[2] }}.</p>
+{% endfor %}
+
+<button onclick="endgame()">End Game</button>
+{% endblock %}
+
+<script>
+    function endgame() {
+        var redirect = "/playersLocations{{room}}";
+        var redirect2 = '/admin{{room}}';
+
+        {
+            $.ajax({
+                type: 'POST',
+                url: redirect,
+                data: {
+                    endgame: "true"
+                }
+            });
+            window.setTimeout(function () {
+                $(location).attr('href', redirect2)
+            }, 100);
+        }
+    }
+</script>

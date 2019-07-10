@@ -1,0 +1,46 @@
+{% block body %}
+
+
+    <div id="hack" >
+        <div id="hacktext" style="position: absolute; top: 50px; left: 100px; ">You have been hacked.</div>
+You Have Been Hacked! </div>
+
+    <div>
+        <h2>Mine self</h2>
+        <p>Mine your own room:</p>
+        <p>
+            <button class="button BlueButton" onclick="location.href='/mine/2minethis/blue';">Blue</button>
+            <button class="button RedButton" onclick="location.href='/mine/2minethis/red';">Red</button>
+        <br>
+            <button class="button YellowButton" onclick="location.href='/mine/2minethis/yellow';">Yellow</button>
+        <button class="button GreenButton" onclick="location.href='/mine/2minethis/green';">Green</button>
+        </p>
+    </div>
+    <script>
+        function hackOn() {
+            document.getElementById("hack").style.display = "block";
+        }
+        function hackOff() {
+            document.getElementById("hack").style.display = "none";
+        }
+    </script>
+<div id="hackCheck">
+    </div>
+       <script>
+          function auto_load(){
+            $.ajax({
+              url: "/hackCheck/minethis/2minethis",
+              success: function(data){
+                 $("#hackCheck").html(data);
+              }
+            });
+          }
+          $(document).ready(function(){
+            auto_load(); //Call auto_load() function when DOM is Ready
+          });
+          //Refresh auto_load() function after 10000 milliseconds
+          setInterval(auto_load,10000);
+
+       </script>
+
+{% endblock %}

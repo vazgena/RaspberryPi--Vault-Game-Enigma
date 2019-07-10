@@ -1,0 +1,123 @@
+{% block body %}
+
+    <script>
+        if (stationlock === true) {
+            if (hacksAvailable === true) {
+                if (stationlock === "OFF") {
+                    if (hacksAvailable >= 1) {
+                        if (hackcheck === "OFF") {
+                            textset1 = "NO";
+                            textset2 = "NO";
+                            var texttoset = "SELECT WHICH STATION TO HACK.";
+                            text_set(texttoset, "background_upper2");
+
+                            var texttoset2 = "HACKS LEFT " + hacksAvailable;
+                            text_set(texttoset2, "background_lower2");
+
+                            var elems = document.getElementsByClassName('button_pressable');
+                            for (var i = 0; i < elems.length; i += 1) {
+                                elems[i].style.display = 'block';
+                            }
+
+                            var elems2 = document.getElementsByClassName('button_unpressable');
+                            for (var i = 0; i < elems2.length; i += 1) {
+                                elems2[i].style.display = 'block';
+                            }
+                        }
+                    }
+
+                    if (hacksAvailable < 1) {
+                        if (hackcheck === "OFF") {
+                            textset1 = "NO";
+                            textset2 = "NO";
+                            var texttoset = "NO HACKS AVAILABLE, CHECK BACK SOON.";
+                            text_set(texttoset, "background_upper2");
+
+                            var texttoset2 = "HACKS LEFT " + hacksAvailable;
+                            text_set(texttoset2, "background_lower2");
+
+                            var elems = document.getElementsByClassName('button_pressable');
+                            for (var i = 0; i < elems.length; i += 1) {
+                                elems[i].style.display = 'none';
+                            }
+
+                            var elems2 = document.getElementsByClassName('button_unpressable');
+                            for (var i = 0; i < elems2.length; i += 1) {
+                                elems2[i].style.display = 'block';
+
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if ( self === top ) {
+            {% if time_doubler == "yes" %}
+                var timeDoubler = "yes";
+            {% else %}
+                var timeDoubler = "no";
+            {% endif %}
+            var bomb_message = "{{ message_bomb }}";
+            if (bomb_message === "exit") {
+                redirect_url ="http://10.255.1.254:8080/nogametemplate/{{ station }}"
+                $(location).attr('href', redirect_url)
+            }
+        }
+
+        if (self !== top){
+            var timeDoubler = parent.timeDoubler;
+        }
+
+        var check_sec = "{{ check_sec }}"
+        if ( self !== top ) {
+            if (stationlock === "OFF") {
+                if (hacksAvailable >= 1) {
+                    textset1 = "NO";
+                    textset2 = "NO";
+                    var texttoset = "SELECT WHICH STATION TO HACK.";
+                    text_set(texttoset, "background_upper2");
+
+                    var texttoset2 = "HACKS LEFT " + hacksAvailable;
+                    text_set(texttoset2, "background_lower2");
+                }
+                if (hacksAvailable < 1) {
+                    textset1 = "NO";
+                    textset2 = "NO";
+
+                    var texttoset = "NO HACKS AVAILABLE, CHECK BACK SOON.";
+                    text_set(texttoset, "background_upper2");
+
+                    var texttoset2 = "HACKS LEFT " + hacksAvailable;
+                    text_set(texttoset2, "background_lower2");
+                }
+            }
+        }
+
+    </script>
+
+    <div id="buttonHolderInner" style="display: inline-block;">
+        {% for i in stationListed %}
+            {% if i in roomsAvailable %}
+                <div class="button_pressable" >
+                    <button class="button" onclick='hackThis("{{i}}")' style="background-color:{{color_list[loop.index0]}}; position: absolute; top: {{x_list[loop.index0]}}px; left: {{y_list[loop.index0]}}px; width: {{bh_list[loop.index0]}}px; height: {{bw_list[loop.index0]}}px; border-radius: {{br_list[loop.index0]}}px;">
+                        <p>
+                            <img src="/static/images/{{image_list[loop.index0]}}" style="width:{{width_list[loop.index0]}}px;height:{{height_list[loop.index0]}}px; " alt="none">
+                        </p>
+                    </button>
+                </div>
+            {% else %}
+                <div class="button_unpressable" >
+                    <button class="button" style="background-color:{{color_selected_list[loop.index0]}}; position: absolute; top: {{x_list[loop.index0]}}px; left: {{y_list[loop.index0]}}px; width: {{bw_list[loop.index0]}}px; height: {{bh_list[loop.index0]}}px; border-radius: {{br_list[loop.index0]}}px;">
+                        <p>
+                            <img src="/static/images/{{image_list[loop.index0]}}" style="width:{{width_list[loop.index0]}}px;height:{{height_list[loop.index0]}}px; " alt="none">
+                        </p>
+                    </button>
+                </div>
+        {% endif %}
+
+        {% endfor %}
+    </div>
+
+{% endblock %}
+

@@ -1,0 +1,26 @@
+{% block body %}
+
+{% if activationStage == "Activated": %}
+    <script>
+        Activated();
+    </script>
+{% elif activationStage == "NotActivated": %}
+    <script>
+        NotActivated();
+    </script>
+{% elif activationStage == "3": %}
+    <script>
+        stage3();
+    </script>
+{% elif activationStage == "2": %}
+    <script>
+        stage2();
+    </script>
+{% elif activationStage == "1": %}
+    <script>
+        stage1();
+    </script>
+
+{% endif %}
+
+{% endblock %}

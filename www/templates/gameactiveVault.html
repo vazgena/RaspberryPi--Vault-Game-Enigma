@@ -1,0 +1,96 @@
+{% block body %}
+
+    <script src="/static/js/jquery1.8.2.min.js"></script>
+    <script src="/static/js/in_house.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/hack.js"></script>
+    <script src="/static/js/curved_text.js"></script>
+    <link rel='stylesheet prefetch' href='/static/css/roboto.css'>
+    <link rel='stylesheet prefetch' href='/static/css/font-awesome.min.css'>
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/inhouse.css?version=.01.4" rel="stylesheet">
+
+    <div id="playersLocations">
+
+    </div>
+
+    <div id="resettext">
+
+    </div>
+
+    <p>
+        <button onclick="reset_stations()">Reset Stations</button>
+    </p>
+
+    <p>
+        <button onclick="reset_trackers()">Reset Tracking</button>
+    </p>
+    <p>
+        <button onclick="reset_server()">Reset Server</button>
+    </p>
+
+    <script>
+
+        function reset_stations() {
+            $('#resettext').text("Stations Resetting");
+            var reset_site = "/resetallVault";
+
+            {
+                $.ajax({
+                    type: 'POST',
+                    url: reset_site,
+                    data: {
+                        endgame: "true"
+                    }
+                });
+
+            }
+        }
+
+        function reset_server() {
+            $('#resettext').text("Server Resetting Please Wait");
+            var reset_site = "/resetserver";
+
+            {
+                $.ajax({
+                    type: 'POST',
+                    url: reset_site,
+                    data: {
+                        reset: "True"
+                    }
+                });
+
+            }
+        }
+
+        function reset_trackers() {
+            $('#resettext').text("trackers reset");
+            var reset_site = "/resettrackVault";
+
+            {
+                $.ajax({
+                    type: 'POST',
+                    url: reset_site,
+                    data: {
+                        endgame: "true"
+                    }
+                });
+
+            }
+        }
+
+        function auto_load(){
+        $.ajax({
+              url: "/playercheckvault",
+              success: function(data){
+                 $("#playersLocations").html(data);
+              }
+        });
+    }
+
+    setInterval(auto_load,500);
+
+    </script>
+
+{% endblock %}
+
