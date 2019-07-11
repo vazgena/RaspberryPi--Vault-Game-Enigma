@@ -7,7 +7,7 @@
 # imports
 import os
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 from flask import Flask, render_template, redirect, url_for, request, send_from_directory
 from pymysql import InternalError, connect
 from random import choice
@@ -790,6 +790,7 @@ def camera_station(app_id, room):
     c = connection.cursor()
     station = app_id
     atkroom = "0"
+    timer_message = ""
 
     if room == "1":
         atkroom = "2"
@@ -814,11 +815,54 @@ def camera_station(app_id, room):
     counted_market = c.rowcount
     if counted_market != 0:
         cams_available = "0"
+        rows_bloks = list(c.fetchall())
+        time_bloks = max([row[7] for row in rows_bloks])
+        time_now = datetime.now()
+        time_left_sec = 300 - int((time_now - time_bloks).total_seconds())
+        timer_message = "YOUR CAMERAS HAVE BEEN SHUT DOWN. {0}:{1} UNTIL THEY ARE BACK ONLINE."\
+            .format(time_left_sec//60, time_left_sec%60)
     # Close database connection.
     connection.close()
     # TODO: added timer check and add value for render_template, timer from counted_market
     return render_template('cameraStation.html', cams_available=cams_available,
-                           time_doubler=time_doubler, message_bomb=message_bomb, station=station)
+                           time_doubler=time_doubler, message_bomb=message_bomb, station=station,
+                           timer_message=timer_message)
+
+# # Test code
+# # Watch station data
+# time_start = datetime.now()
+# @app.route('/cameraStation/<app_id>/<room>', methods=['GET', 'POST'])
+# def camera_station(app_id, room):
+#     try:
+#         station = app_id
+#         atkroom = "0"
+#         timer_message = ""
+#
+#         if room == "1":
+#             atkroom = "2"
+#         if room == "2":
+#             atkroom = "1"
+#
+#         time_doubler = time_doubler_check(station)
+#         message_bomb = looser_check()
+#
+#
+#         cams_available = "0"
+#         global time_start
+#         rows_bloks = [[time_start, ]*8 for i in range(2)]
+#         time_bloks = max([row[7] for row in rows_bloks])
+#         time_now = datetime.now()
+#         time_left_sec = 300 - int((time_now - time_bloks).total_seconds())
+#         timer_message = "YOUR CAMERAS HAVE BEEN SHUT DOWN. {0}:{1} UNTIL THEY ARE BACK ONLINE." \
+#             .format(time_left_sec//60, time_left_sec%60)
+#         # Close database connection.
+#     except:
+#         a = 1
+#
+#     # TODO: added timer check and add value for render_template, timer from counted_market
+#     return render_template('cameraStation.html', cams_available=cams_available,
+#                            time_doubler=time_doubler, message_bomb=message_bomb, station=station,
+#                            timer_message=timer_message)
 
 
 # Hack station template

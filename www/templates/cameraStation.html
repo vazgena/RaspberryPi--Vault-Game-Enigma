@@ -26,12 +26,24 @@
         var timeDoubler = parent.timeDoubler;
     }
         if (hackcheck === "OFF") {
-            var textset1 = "NO";
-            var textset2 = "NO";
-            var texttoset = "WATCH YOUR OPPONENTS.";
-            text_set(texttoset, "background_upper2");
-            var texttoset = "";
-            text_set(texttoset, "background_lower2");
+
+            {% if cams_available == "0" %}
+                var textset1 = "NO";
+                var textset2 = "NO";
+                var texttoset = "{{ timer_message }}";
+                text_set(texttoset, "background_upper2");
+                var texttoset = "";
+                text_set(texttoset, "background_lower2");
+                shutdown = "ON"
+            {% else %}
+                var textset1 = "NO";
+                var textset2 = "NO";
+                var texttoset = "WATCH YOUR OPPONENTS.";
+                text_set(texttoset, "background_upper2");
+                var texttoset = "";
+                text_set(texttoset, "background_lower2");
+                shutdown = "OFF"
+            {% endif %}
         }
         {# TODO: added timer #}
     </script>

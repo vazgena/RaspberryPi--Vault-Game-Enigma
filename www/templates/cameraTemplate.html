@@ -191,6 +191,7 @@
         var stationNameTemp = "";
         setInterval(auto_load,250);
         var hackcheck = "OFF";
+        var shutdown = "OFF"
         
 
         function auto_load(){
@@ -271,11 +272,13 @@
 
                 $('body').removeClass('hack');
 
-                var texttoset = "WATCH YOUR OPPONENTS.";
-                text_set(texttoset, "background_upper2");
+                if (shutdown == "OFF"){
+                    var texttoset = "WATCH YOUR OPPONENTS.";
+                    text_set(texttoset, "background_upper2");
 
-                var texttoset2 = "";
-                text_set(texttoset2, "background_lower2");
+                    var texttoset2 = "";
+                    text_set(texttoset2, "background_lower2");
+                }
 
             }
         }
