@@ -3,6 +3,13 @@ from time import sleep
 from random import randrange, choice
 from pymysql import InternalError, connect
 
+import logging
+
+# Test level
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+
+
 
 # Variables
 dbuser = 'game'
@@ -68,12 +75,13 @@ def loop():
 			rooms_selected = choice(station_list)
 			insert_color = "INSERT INTO currentColor (station, color, lightON, room) VALUES (%s, %s, %s, %s);"
 			c.execute(insert_color, (rooms_selected, timer_color, on, room))
+			logger.debug("Room {0} selected color {1} for station {2} ".format(room, timer_color, rooms_selected))
 		else:
 			pass
 
 		# check if the mine has been mined
-		get_color_mined_sql = "SELECT * FROM currentColor WHERE collected = %s"
-		c.execute(get_color_mined_sql, yes)
+		get_color_mined_sql = "SELECT * FROM currentColor WHERE collected = %s AND room = %s;"
+		c.execute(get_color_mined_sql, (yes, room))
 		row_count = c.rowcount
 		if row_count != 0:
 			sleep(randrange(10, 20))
@@ -83,11 +91,13 @@ def loop():
 			rooms_selected = choice(station_list)
 			insert_color = "INSERT INTO currentColor (station, color, lightON, room) VALUES (%s, %s, %s, %s);"
 			c.execute(insert_color, (rooms_selected, timer_color, on, room))
+			logger.debug("Room {0} selected color {1} for station {2} ".format(room, timer_color, rooms_selected))
 			timer_color = choice(colors)
 			rooms_selected = choice(station_list)
 			if c.rowcount == 0:
 				insert_color = "INSERT INTO currentColor (station, color, lightON, room) VALUES (%s, %s, %s, %s);"
 				c.execute(insert_color, (rooms_selected, timer_color, on, room))
+				logger.debug("Room {0} selected color {1} for station {2} ".format(room, timer_color, rooms_selected))
 
 		light_off = "UPDATE currentColor SET lightON  = %s WHERE room = %s;"
 		c.execute(light_off, (on, room))

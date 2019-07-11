@@ -1238,6 +1238,7 @@ def market(app_id):
                 c.execute(update_currency_sql, (str(hacks_added), room))
 
             elif str(request.form['itemID']) == "13":
+                # TODO: modify
                 station_remove = "DELETE FROM ignoreList WHERE room = %s LIMIT 1"
                 c.execute(station_remove, atkroom)
                 ten_sec = "INSERT INTO `10secdrop` (room) VALUES (%s);"
@@ -1408,7 +1409,12 @@ def masterstation(app_id):
         bh_list.append(i[12])
         bw_list.append(i[13])
         br_list.append(i[14])
-        color_selected_list.append(i[15])
+        if len(i) < 24:
+            # hot fix, can be deleted after making changes to the database
+            color_selected_list.append('#880000; border-style: none; background: transparent !important; border:0 '
+                                       '!important; filter: brightness(.50) hue-rotate(150deg)  saturate(5) !important;')
+        else:
+            color_selected_list.append(i[23])
         color_list.append(i[16])
         if i[1] in doubler_station:
             doubler_station_active = i[1]
