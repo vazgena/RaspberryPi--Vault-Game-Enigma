@@ -7,6 +7,34 @@
     <script src="/static/js/bootstrap.min.js"></script>
     <script src="/static/js/hack.js"></script>
     <script src="/static/js/curved_text.js"></script>
+
+    <script type="text/javascript">
+        var current_url = "";
+
+        function refresh() {
+            console.log('refresh');
+        };
+        function refresh1() {
+            console.log('refresh1');
+        };
+        function refresh2() {
+            console.log('refresh2');
+        };
+        function refresh3() {
+            console.log('refresh3');
+            if (current_url != ''){
+                   iframe.attr('src', current_ip);
+                   var cur_frame = $('#camframe');
+                   cur_frame.attr('src', current_url);
+                   console.log('refresh3_run');
+             }
+        };
+         function refresh4() {
+            console.log('refresh4');
+        };
+
+    </script>
+
     <link rel='stylesheet prefetch' href='/static/css/roboto.css'>
     <link rel='stylesheet prefetch' href='/static/css/font-awesome.min.css'>
     <link href="/static/css/bootstrap.min.css" rel="stylesheet">
@@ -24,7 +52,7 @@
         <div id="main_loader" >
             <div id="buttonHolder" style="text-align: left;">
                 <div scrolling="no" id="camholder" style="width:68%;">
-                        <iframe  id="camframe" style="float: left; display: block;"></iframe>
+                        <iframe  id="camframe" style="float: left; display: block;" onerror="refresh();" onautocompleteerror="refresh1();" oninvalid="refresh2();" onload="refresh3();" onstalled="refresh4();"></iframe>
 
                             <button class="button2" onclick="prevcam()" style="float: left; display: inline-block;">
                                <img src="/static/images/left_button.png" style="height: 200px; width: 200px" alt="NONE">
@@ -93,6 +121,32 @@
         var iframe2 = $('#camframe2');
         iframe.attr('src', camip0);
         iframe2.attr('src', camip1);
+        current_url = camip0;
+
+
+        function restart_iframe()  {
+            console.log('restrt1');
+            current_ip = iframe.src;
+            if (current_ip == ""){
+                   iframe.attr('src', current_ip);
+                }
+            console.log('restrt1');
+
+        }
+
+        function restart_iframe2()  {
+            current_ip  = iframe2.src;
+            console.log('restrt2');
+            iframe2.attr('src', current_ip);
+        }
+
+
+        function set_onunload() {
+            iframe.onload = restart_iframe
+            iframe2.onload = restart_iframe2
+            console.log('set_onunload');
+
+        }
 
 
         function prevcam() {
@@ -134,6 +188,7 @@
                 iframe.attr('src', camip0);
                 currentcam = 0;
             }
+            {# set_onunload(); #}
 
         }
 
@@ -156,6 +211,7 @@
                 iframe2.attr('src', camip2);
                 currentcam = 2;
             }
+            {# set_onunload(); #}
 
         }
 
@@ -177,6 +233,7 @@
                 iframe2.attr('src', camip0);
                 currentcam = 0;
             }
+            {# set_onunload(); #}
 
         }
 
@@ -302,6 +359,9 @@
                   }
             });
         }
+
+       {# set_onunload(); #}
+       set_onunload();
 
 </script>
 
