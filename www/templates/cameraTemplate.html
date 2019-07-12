@@ -11,27 +11,13 @@
     <script type="text/javascript">
         var current_url = "";
 
-        function refresh() {
-            console.log('refresh');
+        function check_iframe() {
+            console.log('check_iframe');
         };
-        function refresh1() {
-            console.log('refresh1');
+        function check_iframe2() {
+            console.log('check_iframe2');
         };
-        function refresh2() {
-            console.log('refresh2');
-        };
-        function refresh3() {
-            console.log('refresh3');
-            if (current_url != ''){
-                   iframe.attr('src', current_ip);
-                   var cur_frame = $('#camframe');
-                   cur_frame.attr('src', current_url);
-                   console.log('refresh3_run');
-             }
-        };
-         function refresh4() {
-            console.log('refresh4');
-        };
+
 
     </script>
 
@@ -52,7 +38,7 @@
         <div id="main_loader" >
             <div id="buttonHolder" style="text-align: left;">
                 <div scrolling="no" id="camholder" style="width:68%;">
-                        <iframe  id="camframe" style="float: left; display: block;" onerror="refresh();" onautocompleteerror="refresh1();" oninvalid="refresh2();" onload="refresh3();" onstalled="refresh4();"></iframe>
+                        <iframe  id="camframe" style="float: left; display: block;" onload="check_iframe();"></iframe>
 
                             <button class="button2" onclick="prevcam()" style="float: left; display: inline-block;">
                                <img src="/static/images/left_button.png" style="height: 200px; width: 200px" alt="NONE">
@@ -65,7 +51,7 @@
                 </div>
 
                 <div scrolling="no" id="camholder2" style="display: none; width: 68%" scrolling="no" >
-                        <iframe id="camframe2" style="float: left; display: block;"></iframe>
+                        <iframe id="camframe2" style="float: left; display: block;" onload="check_iframe2();"></iframe>
                         <div>
                             <button class="button2" onclick="prevcam2()" style="float: left; display: inline-block">
                                 <img src="/static/images/left_button.png" style="height: 200px; width: 200px" alt="NONE">
@@ -94,7 +80,7 @@
 
     </div>
 
-<script>
+<script type="text/javascript">
         $(document).ready(function(){
             $(window).on('touchmove',function(e){e.preventDefault();});
         });
@@ -122,32 +108,6 @@
         iframe.attr('src', camip0);
         iframe2.attr('src', camip1);
         current_url = camip0;
-
-
-        function restart_iframe()  {
-            console.log('restrt1');
-            current_ip = iframe.src;
-            if (current_ip == ""){
-                   iframe.attr('src', current_ip);
-                }
-            console.log('restrt1');
-
-        }
-
-        function restart_iframe2()  {
-            current_ip  = iframe2.src;
-            console.log('restrt2');
-            iframe2.attr('src', current_ip);
-        }
-
-
-        function set_onunload() {
-            iframe.onload = restart_iframe
-            iframe2.onload = restart_iframe2
-            console.log('set_onunload');
-
-        }
-
 
         function prevcam() {
 
@@ -360,8 +320,89 @@
             });
         }
 
-       {# set_onunload(); #}
-       set_onunload();
+       function restart_iframe()  {
+            console.log('restrt1');
+            var current_ip = iframe.src;
+            if (current_ip == ""){
+                   iframe.attr('src', current_ip);
+                }
+            console.log('restrt1');
+
+        }
+
+        function restart_iframe2()  {
+            var current_ip  = iframe2.src;
+            console.log('restrt2');
+            iframe2.attr('src', current_ip);
+        }
+
+
+        function set_onunload() {
+            {# if (iframe.attachEvent) {
+                iframe.attachEvent('onload', restart_iframe);
+            }
+            else {
+                iframe.addEventListener('load', restart_iframe, false)
+            }
+            if (iframe2.attachEvent) {
+                iframe2.attachEvent('onload', restart_iframe2);
+            }
+            else {
+                iframe2.addEventListener('load', restart_iframe2, false)
+            }#}
+            iframe.onload = function() {
+                    return restart_iframe;
+            }();
+            {# iframe.onload = restart_iframe;
+            iframe2.onload = restart_iframe2; #}
+            console.log('set_onload');
+
+            refresh = function() {
+                console.log('refresh_re');
+            };
+
+
+
+        }
+
+        function check_error_iframe(cur_frame) {
+
+            var error_item = cur_frame
+
+            var x = $('#camframe');
+            console.log(x.hasOwnProperty('contentWindow'));
+            console.log(x.hasOwnProperty('contentDocument'));
+            var iframeDocument = x.contentDocument || x.contentWindow.document;
+            var y = (x.contentWindow || x.contentDocument);
+
+            if (!iframeDocument) {
+                    console.log('NouDoc');;
+            }
+
+            var content = y.document.body.innerHTML;
+            alert("Content: \n" + content);
+
+            if ( y.document.innerHTML) {
+                var ifTitle = y.document.title;
+                console.log(ifTitle);
+                if ( ifTitle.indexOf("404")>=0 ) {
+            // we have a winner! probably a 404 page!
+            }
+    }
+        };
+
+        check_iframe = function() {
+            console.log('check_error_iframe1');
+            var res_check = check_error_iframe(iframe);
+        };
+
+        check_iframe2 = function() {
+            console.log('check_error_iframe2');
+            var res_check = check_error_iframe(iframe2);
+        };
+
+
+       {# set_onunload() sub-frame-error#}
 
 </script>
 

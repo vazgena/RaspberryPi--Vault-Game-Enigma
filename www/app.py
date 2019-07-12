@@ -10,7 +10,7 @@ import time
 from datetime import datetime, timedelta
 from flask import Flask, render_template, redirect, url_for, request, send_from_directory
 from pymysql import InternalError, connect
-from random import choice
+from random import choice, sample
 
 
 # Variables
@@ -350,9 +350,16 @@ def audio_station(app_id):
         for i in get_time_location_list:
             time_deployed = i[3]
             time_now = datetime.now()
-            elapsed_time = time_now - time_deployed
-            if 30 > int(elapsed_time.total_seconds()) > 10:
-                elapsed_time_reverse = (int(elapsed_time.total_seconds()) - 30) * (-1)
+
+            # Check
+            # elapsed_time = time_now - time_deployed
+            # if 30 > abs(int(elapsed_time.total_seconds())) > 10:
+            #     elapsed_time_reverse = (int(elapsed_time.total_seconds()) - 30) * (-1)
+            #     message_bomb_20_sec = "BLAST INCOMING IN {0} SECONDS.".format(str(elapsed_time_reverse))
+            # Check
+            elapsed_time = time_deployed - time_now
+            if 21 > int(elapsed_time.total_seconds()) > -1:
+                elapsed_time_reverse = int(elapsed_time.total_seconds())
                 message_bomb_20_sec = "BLAST INCOMING IN {0} SECONDS.".format(str(elapsed_time_reverse))
 
     time_doubler = time_doubler_check(station)
@@ -1238,7 +1245,6 @@ def market(app_id):
                 c.execute(update_currency_sql, (str(hacks_added), room))
 
             elif str(request.form['itemID']) == "13":
-                # TODO: modify
                 station_remove = "DELETE FROM ignoreList WHERE room = %s LIMIT 1"
                 c.execute(station_remove, atkroom)
                 ten_sec = "INSERT INTO `10secdrop` (room) VALUES (%s);"
@@ -1285,7 +1291,7 @@ def market(app_id):
                 room_list = list(c.fetchall())
                 for w in room_list:
                     station_names.append(w[1])
-                bomb_check = "SELECT * FROM bombsDeployed WHERE room = %s"
+                bomb_check = "SELECT * FROM bombsDeploy WHERE room = %s"
                 c.execute(bomb_check, atkroom)
                 bomb_list = list(c.fetchall())
                 for g in bomb_list:
@@ -1303,6 +1309,51 @@ def market(app_id):
                     current_ttd_mod = str(int(x[2]) - 10)
                     current_ttd_update = "UPDATE bombdettimer SET time = %s WHERE room = %s"
                     c.execute(current_ttd_update, (current_ttd_mod, atkroom))
+
+            elif str(request.form['itemID']) == "29":
+                if str(room) == "1":
+                    atkroom = "2"
+                if str(room) == "2":
+                    atkroom = "1"
+                sql_query = "INSERT INTO bombsDeployed (room, fake_bomb, stationName, timeDeployed) VALUES (%s,TRUE, %s);"
+                c.execute(sql_query, (atkroom, '', datetime.now() + timedelta(seconds=31)))
+
+            elif str(request.form['itemID']) == "30":
+                # Random hacking 3 stations
+                if str(room) == "1":
+                    atkroom = "2"
+                if str(room) == "2":
+                    atkroom = "1"
+
+                room_list_sql = "SELECT stationList.* FROM stationList LEFT JOIN  hackCheck ON stationList.name=hackCheck.roomstation " \
+                                "WHERE stationList.room = %s AND (hackCheck.status NOT LIKE 'hacked' OR hackCheck.status IS NULL);"
+                c.execute(room_list_sql, atkroom)
+                room_list = list(c.fetchall())
+
+                hack_count_check = 'SELECT * FROM hacks WHERE team = %s'
+                c.execute(hack_count_check, str(room))
+                hack_count_sql = list(c.fetchall())
+                how_many_hacks = 0
+                how_much_time = 60
+
+                for i in hack_count_sql:
+                    how_many_hacks = i[2]
+
+                if len(room_list) < 4:
+                    # Select All
+                    stations_hack = room_list
+                else:
+                    stations_hack = sample(room_list, 3)
+                for station in stations_hack:
+                    station_name = station[1]
+                    hack_stations = 'INSERT INTO hackCheck (roomstation, status, timeRemaining) VALUES (%s, %s, %s)'
+                    c.execute(hack_stations, (station_name, "hacked", how_much_time))
+                    funding1 = "INSERT INTO hacks (team, howMany) VALUES (%s, %s) ON DUPLICATE KEY UPDATE team = %s, howMany = %s;"
+                    c.execute(funding1, (room, int(how_many_hacks) - 1, room, int(how_many_hacks) - 1))
+                    how_many_hacks -= 1
+
+
+
 
     # Close database connection.
     connection.close()

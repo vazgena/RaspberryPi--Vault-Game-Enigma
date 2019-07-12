@@ -80,6 +80,21 @@ def update_09_07_2019():
     connection.close()
 
 
+def update_12_07_2019():
+    connection = data_connect()
+    con = connection.cursor()
+    # insertes =[(table, fields, values)]
+    insertes = [
+        ('market', ['text', 'cost', 'multipleAllowed', 'selectable'],
+         ["Launch a Fake Blast. It won\\'t hurt them, but it will scare them!", 1, "2", 'yes']),
+        ('market', ['text', 'cost', 'multipleAllowed', 'selectable'],
+         ['3 Stations get hacked at random.', 4, "1", 'no'])
+    ]
+    insert_rows(con, insertes)
+
+    connection.close()
+
+
 
 def check_market_table():
     command = "SELECT * from market;"
@@ -111,8 +126,20 @@ def add_color_market():
     connection.close()
 
 
+def add_fake_bomb():
+    connection = data_connect()
+    con = connection.cursor()
+    query = "ALTER TABLE bombsDeployed ADD fake_bomb BOOLEAN NOT NULL DEFAULT FALSE"
+    con.execute(query)
+    connection.close()
+
+
+
+
 if __name__ == "__main__":
 
-    update_09_07_2019()
+    # update_09_07_2019()
     # check_market_table()
-    add_color_market()
+    # add_color_market()
+    update_12_07_2019()
+    add_fake_bomb()

@@ -42,6 +42,7 @@ def check_det():
 				do_not_check.append(m[1])
 
 		for i in get_time_location:
+			fake_bomb = i[4]
 			station_name = i[2]
 			timer_sql = "SELECT * FROM bombdettimer WHERE room = %s"
 			c.execute(timer_sql, room)
@@ -55,18 +56,19 @@ def check_det():
 				ttd = str(10)
 				tensec_remove = "DELETE FROM `10secdrop` WHERE room = %s"
 				c.execute(tensec_remove, room)
-			if station_name in do_not_check:
+			if station_name in do_not_check and not fake_bomb:
 				pass
 			else:
-				do_not_check.append(station_name)
-				ignore_add_sql = "INSERT INTO ignoreList (station, room) VALUES (%s, %s);"
-				c.execute(ignore_add_sql, (station_name, room))
-				countdown(ttd)
+				if not fake_bomb:
+					do_not_check.append(station_name)
+					ignore_add_sql = "INSERT INTO ignoreList (station, room) VALUES (%s, %s);"
+					c.execute(ignore_add_sql, (station_name, room))
+				countdown(ttd, fake_bomb, i)
 	do_not_check.clear()
 	connection.close()
 
 
-def countdown(ttd):
+def countdown(ttd, fake=False, bomb=None):
 	bmb_del = []
 	player_locations = []
 	connection = dataconnect()
@@ -75,7 +77,11 @@ def countdown(ttd):
 	while time > -1:
 
 		if time == 0:
-
+				if fake:
+					# TODO, remove current bomb
+					remove_sql = "DELETE FROM bombsDeployed WHERE id=%s;"
+					c.execute(remove_sql, bomb[0])
+					return
 				bmb_det_sql = "SELECT * FROM bombDetect"
 				c.execute(bmb_det_sql)
 				bmb_det_list = list(c.fetchall())

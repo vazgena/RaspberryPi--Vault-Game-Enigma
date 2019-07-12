@@ -89,6 +89,7 @@ def gameStart():
     while running == True:
         connection = dataconnect()
         c = connection.cursor()
+        # sleep_timer = 10
         sleep_timer = randint(30, 50)
         while timer_count <= sleep_timer:
             sleep(1)
