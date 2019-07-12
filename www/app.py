@@ -1315,7 +1315,7 @@ def market(app_id):
                     atkroom = "2"
                 if str(room) == "2":
                     atkroom = "1"
-                sql_query = "INSERT INTO bombsDeployed (room, fake_bomb, stationName, timeDeployed) VALUES (%s,TRUE, %s);"
+                sql_query = "INSERT INTO bombsDeployed (room, fake_bomb, stationName, timeDeployed) VALUES (%s,TRUE, %s, %s);"
                 c.execute(sql_query, (atkroom, '', datetime.now() + timedelta(seconds=31)))
 
             elif str(request.form['itemID']) == "30":
