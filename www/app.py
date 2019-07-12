@@ -1291,7 +1291,7 @@ def market(app_id):
                 room_list = list(c.fetchall())
                 for w in room_list:
                     station_names.append(w[1])
-                bomb_check = "SELECT * FROM bombsDeploy WHERE room = %s"
+                bomb_check = "SELECT * FROM bombsDeployed WHERE room = %s"
                 c.execute(bomb_check, atkroom)
                 bomb_list = list(c.fetchall())
                 for g in bomb_list:
