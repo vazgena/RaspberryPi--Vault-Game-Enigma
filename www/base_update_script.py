@@ -87,7 +87,7 @@ def update_12_07_2019():
     # insertes =[(table, fields, values)]
     insertes = [
         ('market', ['text', 'cost', 'multipleAllowed', 'selectable'],
-         ["Launch a Fake Blast. It won\\'t hurt them, but it will scare them!", 1, "2", 'yes']),
+         ["Launch a Fake Blast. It won\\'t hurt them, but it will scare them!", 1, "2", 'no']),
         ('market', ['text', 'cost', 'multipleAllowed', 'selectable'],
          ['3 Stations get hacked at random.', 4, "1", 'no'])
     ]
@@ -135,6 +135,19 @@ def add_fake_bomb():
     connection.close()
 
 
+def update_15_07_2019():
+    connection = data_connect()
+    con = connection.cursor()
+
+    # fixed =[(table, id, fields, values)]
+    fixes = [
+        ('market', 29, ('selectable',), ('no',)),
+    ]
+
+    update_rows(con, fixes)
+    connection.close()
+
+
 
 
 if __name__ == "__main__":
@@ -144,5 +157,6 @@ if __name__ == "__main__":
     # add_color_market()
     # update_12_07_2019()
     # add_fake_bomb()
+    update_15_07_2019()
     pass
 

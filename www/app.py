@@ -826,7 +826,7 @@ def camera_station(app_id, room):
         time_bloks = max([row[7] for row in rows_bloks])
         time_now = datetime.now()
         time_left_sec = 300 - int((time_now - time_bloks).total_seconds())
-        timer_message = "YOUR CAMERAS HAVE BEEN SHUT DOWN. {0}:{1} UNTIL THEY ARE BACK ONLINE."\
+        timer_message = "YOUR CAMERAS HAVE BEEN SHUT DOWN. {0}:{1:02d} UNTIL THEY ARE BACK ONLINE."\
             .format(time_left_sec//60, time_left_sec%60)
     # Close database connection.
     connection.close()
