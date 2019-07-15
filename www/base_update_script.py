@@ -20,7 +20,8 @@ def update_rows(conn, fixes):
     # fixed =[(table, id, fields, values)]
     update_request_template = "UPDATE {0} SET {1} WHERE id={2};"
     for fixe in fixes:
-        set_str = ', '.join(['{0}={1}'.format(field, value) for field, value in zip(fixe[2], fixe[3])])
+        set_str = ', '.join(['{0}={1}'.format(field, value if not isinstance(value, str) else "'{}'".format(value))
+                             for field, value in zip(fixe[2], fixe[3])])
         command_str = update_request_template.format(fixe[0], set_str, fixe[1])
         conn.execute(command_str)
 
@@ -141,5 +142,7 @@ if __name__ == "__main__":
     # update_09_07_2019()
     # check_market_table()
     # add_color_market()
-    update_12_07_2019()
-    add_fake_bomb()
+    # update_12_07_2019()
+    # add_fake_bomb()
+    pass
+
