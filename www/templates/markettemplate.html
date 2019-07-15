@@ -342,7 +342,7 @@
                 }
                 stationlock = "ON";
                 document.getElementById("not_enough_message").style.display = "none";
-                itemTextPurchased = itemTextPurchased2;
+                itemTextPurchased = itemTextPurchased2.replace("\'", "'");
                 var redirect = '/marketstation/{{room}}';
                 $.ajax({
                     type: 'POST',

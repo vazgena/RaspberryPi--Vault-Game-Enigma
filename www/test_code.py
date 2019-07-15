@@ -1,10 +1,13 @@
 import os
 import time
+import re
 from random import sample
 from datetime import datetime, timedelta
 from flask import Flask, render_template, redirect, url_for, request, send_from_directory
 from pymysql import InternalError, connect
 from random import choice
+
+from base_update_script import update_rows
 
 
 # Variables
@@ -85,5 +88,31 @@ def test_fake_bomb():
     connection.close()
 
 
+def test_hach_market():
+    connection = data_connect()
+    c = connection.cursor()
+
+    getTableListSQL = 'SELECT * FROM market WHERE id=29;'
+    c.execute(getTableListSQL)
+    marketAvailableList = list(c.fetchall())
+    i = marketAvailableList[0]
+    marketText = re.sub(r"(?<!\\)'", "\\'", i[1])
+    marketCost = i[2]
+    marketMultiple = i[3]
+    marketID = i[0]
+
+    getTableListSQL = 'SELECT * FROM marketCurrent ORDER BY RAND() LIMIT 1;'
+    c.execute(getTableListSQL)
+    marketCur = list(c.fetchall())
+
+    fixes = [
+        ('marketCurrent', marketCur[0][0], ('text', 'cost', 'itemID', 'multipleAllowed'), (marketText, marketCost, marketID, marketMultiple)),
+        ]
+    update_rows(c, fixes)
+
+    connection.close()
+
+
+
 if __name__ == "__main__":
-    test_fake_bomb()
+    test_hach_market()

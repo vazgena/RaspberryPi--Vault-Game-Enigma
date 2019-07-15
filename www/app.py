@@ -6,6 +6,7 @@
 
 # imports
 import os
+import re
 import time
 from datetime import datetime, timedelta
 from flask import Flask, render_template, redirect, url_for, request, send_from_directory
@@ -1357,6 +1358,9 @@ def market(app_id):
 
     # Close database connection.
     connection.close()
+    # TODO: update marketapplett
+    for row in marketapplett:
+        row.append(re.sub(r"(?<!\\)'", "\\'", row[1]))
     return render_template('marketstation.html', market_owned_listed=market_owned_listed,
                            marketApplett=marketapplett, room=room,
                            time_doubler=time_doubler, message_bomb=message_bomb,

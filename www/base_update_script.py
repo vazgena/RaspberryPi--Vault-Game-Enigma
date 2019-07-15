@@ -142,6 +142,13 @@ def update_15_07_2019():
     # fixed =[(table, id, fields, values)]
     fixes = [
         ('market', 29, ('selectable',), ('no',)),
+        ('market', 13, ('text',), ('Detonate all blasts you have previously deployed in 10 seconds.',)),
+        ('market', 15, ('cost',), (1,)),
+        ('market', 18, ('cost', 'multipleAllowed'), (1, 1)),
+        ('market', 21, ('multipleAllowed', 'cost'), ('2', 1)),
+        ('market', 22, ('multipleAllowed',), (2,)),
+        ('market', 24, ('multipleAllowed',), (1,)),
+        ('market', 25, ('multipleAllowed',), (2,)),
     ]
 
     update_rows(con, fixes)
