@@ -1200,7 +1200,7 @@ def market(app_id):
             # see the location of all bombs
             if str(request.form['itemID']) == "12":
                 bomb_location_text = "You found bombs located at "
-                get_locations_of_bombs_sql = "SELECT * FROM bombsDeployed WHERE room = %s"
+                get_locations_of_bombs_sql = "SELECT * FROM bombsDeployed WHERE room = %s AND fake_bomb=FALSE ;"
                 c.execute(get_locations_of_bombs_sql, room)
                 row_count_bombs = c.rowcount
                 if row_count_bombs != 0:
@@ -1219,7 +1219,7 @@ def market(app_id):
             # see the location of one bomb
             if str(request.form['itemID']) == "25":
                 bomb_location_text = "You found a bomb located at "
-                get_locations_of_bombs_sql = "SELECT * FROM bombsDeployed WHERE room = %s ORDER BY RAND() LIMIT 1"
+                get_locations_of_bombs_sql = "SELECT * FROM bombsDeployed WHERE room = %s AND fake_bomb=FALSE ORDER BY RAND() LIMIT 1"
                 c.execute(get_locations_of_bombs_sql, room)
                 row_count_bombs = c.rowcount
                 if row_count_bombs != 0:
@@ -1354,13 +1354,31 @@ def market(app_id):
                     how_many_hacks -= 1
 
 
+    for row in marketapplett:
+        row.append(re.sub(r"(?<!\\)'", "\\'", row[1]))
+        # unlock flag
+        row.append('true')
 
+    # Lock on current blast
+    id_markets = set([int(row[0]) for row in marketapplett])
+    set_locked_bomb = set([13, 24, 29])
+    if id_markets.intersection(set_locked_bomb):
+        if str(room) == "1":
+            atkroom = "2"
+        if str(room) == "2":
+            atkroom = "1"
+        sql_query = "SELECT bombsDeployed.* FROM bombsDeployed LEFT JOIN ignoreList ON bombsDeployed.stationName=ignoreList.station" \
+                    " WHERE bombsDeployed.room=%s AND ignoreList.room IS NULL AND bombsDeployed.fake_bomb=FALSE;"
+        c.execute(sql_query, atkroom)
+        row_count = c.rowcount
+        if row_count > 0:
+            for row in marketapplett:
+                if int(row[0]) in set_locked_bomb:
+                    # lock flag
+                    row[6] = 'false'
 
     # Close database connection.
     connection.close()
-    # TODO: update marketapplett
-    for row in marketapplett:
-        row.append(re.sub(r"(?<!\\)'", "\\'", row[1]))
     return render_template('marketstation.html', market_owned_listed=market_owned_listed,
                            marketApplett=marketapplett, room=room,
                            time_doubler=time_doubler, message_bomb=message_bomb,

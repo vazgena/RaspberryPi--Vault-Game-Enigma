@@ -3,7 +3,7 @@
     <div id="marketbuttondiv">
     {% for i in marketApplett %}
 
-        <button class="marketbutton" onclick="buyNow('{{ i[0] }}', '{{i[2]}}', '{{i[5]}}', '{{i[4]}}' )">
+        <button class="marketbutton" onclick="buyNow('{{ i[0] }}', '{{i[2]}}', '{{i[5]}}', '{{i[4]}}', {{i[6]}})">
             <p>
                 {{i[1]}} <br>
                 IS AVAILABLE FOR {{i[2]}} ENERGY.<br>

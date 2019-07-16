@@ -320,11 +320,11 @@
         var itemTextPurchased = '';
 
         //  Activate starts here
-        function buyNow(id, price, itemTextPurchased2, selectable) {
+        function buyNow(id, price, itemTextPurchased2, selectable, notLockFlag) {
             // Press Activation Buttons When They Appear
             // Upgrade Initiated
 
-            if (currency >= price) {
+            if (currency >= price && notLockFlag) {
                 var redirectaudio2 = "/audioadd/" + room + "/", up_init = "upgrade";
 
                 $.ajax({
@@ -387,8 +387,15 @@
                         clearInterval(interval);
                     }
                 }, 1000);
-            } else{
-                document.getElementById("not_enough_message").style.display = "block";
+            } else if (! notLockFlag) {
+                var not_enough_message = document.getElementById("not_enough_message");
+                not_enough_message.innerHTML = "<h1>You cannot make this purchase now.</h1>"
+                not_enough_message.style.display = "block";
+            }
+            else {
+                var not_enough_message = document.getElementById("not_enough_message");
+                not_enough_message.style.display = "block";
+                not_enough_message.innerHTML = "<h1>You do not have enough for this purchase.</h1>"
             }
         }
 
