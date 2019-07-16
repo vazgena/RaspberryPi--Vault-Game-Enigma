@@ -39,7 +39,7 @@ def test_timer():
 def test_hach3():
     connection = data_connect()
     c = connection.cursor()
-    room = '1'
+    room = '2'
 
     if str(room) == "1":
         atkroom = "2"
@@ -115,4 +115,4 @@ def test_hach_market():
 
 
 if __name__ == "__main__":
-    test_hach_market()
+    test_timer()
