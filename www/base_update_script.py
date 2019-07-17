@@ -155,6 +155,18 @@ def update_15_07_2019():
     connection.close()
 
 
+def update_17_07_2019():
+    connection = data_connect()
+    con = connection.cursor()
+
+    fixes = [
+        ('cameraLocations', 7, ('ip',), ('http://10.255.1.249:8081/',))
+    ]
+
+    update_rows(con, fixes)
+    connection.close()
+
+
 
 
 if __name__ == "__main__":
@@ -165,5 +177,6 @@ if __name__ == "__main__":
     # update_12_07_2019()
     # add_fake_bomb()
     # update_15_07_2019()
+    update_17_07_2019()
     pass
 
