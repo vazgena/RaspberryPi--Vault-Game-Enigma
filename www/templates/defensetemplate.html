@@ -1,7 +1,4 @@
 {% block body %}
-    <head>
-        <meta name="viewport" content="user-scalable=no, width=device-width" />
-    </head>
 
 
     <script src="/static/js/jquery1.8.2.min.js"></script>
@@ -14,22 +11,12 @@
     <link href="/static/css/bootstrap.min.css" rel="stylesheet">
     <link href="/static/css/inhouse.css?version=.01.5" rel="stylesheet">
 
-    <div id="background_upper2">
+    <div id="background_upper2"></div>
 
-    </div>
+    <div id="background_lower2"></div>
 
-    <div id="background_lower2">
+    <div id="hack_load"></div>
 
-    </div>
-
-
-     <div id="top_load">
-
-    </div>
-
-    <div id="hack_load">
-
-    </div>
     <div id="wrapper">
         <div id="main_loader">
             <div id="station_load">
@@ -37,20 +24,24 @@
         </div>
     </div>
 
-    <div id="currencyCheck">
+    <div id="currencyCheck"></div>
+
+    <div id="hackBackCheck"></div>
+
+    <div id="lower_left_text">
+        <p id="bmb_message">
+        </p>
+        <p id="dbl_message">
+        </p>
     </div>
 
-    <div id="hackCheck">
+    <div id="hackCheck"></div>
 
-    </div>
-
-
-    <!----
+<!----
 
     Activate starts here
 
     ------>
-
 
     <div id="activate_back"></div>
     <div id="activate">
@@ -58,27 +49,18 @@
                 <img src="/static/images/18_Enigma_S1_Button_FINAL.png" style="width: 300px; height: 300px;" alt="none">
             </div>
 
-            <iframe id="arrows0" src="/static/html/arrows.html" style="width: 650px; height: 200px; border: none; display: none; position: absolute; top: 200px; left: 540px;">
-
-            </iframe>
+            <iframe id="arrows0" src="/static/html/arrows.html" style="width: 650px; height: 200px; border: none; display: none; position: absolute; top: 200px; left: 540px;"></iframe>
 
             <div id="activationButton1" style="position: absolute; top: 150px; left: 1030px;">
-
                 <button id="activateButton1" onclick=activate1()>
-
                     <img src="/static/images/18_Enigma_S2_Button_FINAL.png" style="width: 300px; height: 300px;" alt="none">
-
                 </button>
-
             </div>
-
             <iframe id="arrows1" src="/static/html/arrows.html" style="width: 650px; height: 200px; border: none; display: none; position: absolute; top: 380px; left: 380px; transform: rotate(155deg);">
-
             </iframe>
-
     </div>
 
-        <div id="activate2_back"></div>
+    <div id="activate2_back"></div>
 
     <div id="activate2" >
             <iframe id="arrows2" src="/static/html/arrows.html" style="width: 650px; height: 200px; border: none; display: none; position: absolute; top: 570px; left: 520px; ">
@@ -91,16 +73,16 @@
             </div>
     </div>
 
-        <div id="activate3_back"></div>
+    <div id="activate3_back"></div>
 
     <div id="activate3" >
-
             <div id="activationButton3"><button id="activateButton3" style="position: absolute; top: 465px; left: 780px;" onclick=activate3() > <img src="/static/images/18_Enigma_Launch_Button_v3.png" style="width: 300px; height: 300px;" alt="none"> </button></div>
     </div>
 
     <div id="activate4">
         <h1>Successfully Activated.</h1>
     </div>
+
     <!----
 
     Activate ends here
@@ -108,41 +90,58 @@
     ------>
 
 
-
-
+    <div id="audioplay">
+    <audio id='assist' src="/static/audio/assist.wav" type="audio/wav" preload="auto"  ></audio>
+    <audio id='blastlaunch' src="/static/audio/blastlaunch.wav" type="audio/wav" preload="auto"  ></audio>
+    <audio id='bombdroppingnew' src="/static/audio/bombdroppingnew.wav" type="audio/wav" preload="auto"  ></audio>
+    <audio id='charge' src="/static/audio/charge.wav" type="audio/wav" preload="auto"  ></audio>
+    <audio id='steal' src="/static/audio/steal.wav" type="audio/wav" preload="auto"  ></audio>
+    <audio id='gameover' src="/static/audio/gameover.wav" type="audio/wav" preload="auto"  ></audio>
+    <audio id='gamewon' src="/static/audio/gamewon.wav" type="audio/wav" preload="auto"  ></audio>
+    <audio id='hackinitiated' src="/static/audio/hackinitiated.wav" type="audio/wav" preload="auto"  ></audio>
+    <audio id='unhack' src="/static/audio/unhack.wav" type="audio/wav" preload="auto"  ></audio>
+    <audio id='upgrade' src="/static/audio/upgrade.wav" type="audio/wav" preload="auto"  ></audio>
+    <audio id='youwerehacked' src="/static/audio/youwerehacked.wav" type="audio/wav" preload="auto"  ></audio>
+    <audio id='allclearstub' src="/static/audio/allclearstub.wav" type="audio/wav" preload="auto"  ></audio>
+    </div>
+    <div id="audio_check">
+    </div>
 
     <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
     <script>
 
         var socket = io();
 
-        var station = "DEF" + room;
-        var url = "/hackCheck/DEF" + room;
-        var stationNameTemp = "";
-        var selectable_current = "no";
-        var stationlock = "OFF";
-        var sationselect = "OFF";
-        var hackcheck = "OFF";
-        var sationnotext = "OFF"
-        var min = 6;
-        var max = 12;
-        textset1 = "NO";
-        textset2 = "NO";
-
-
-
-        var texttoset = "CHOOSE WHICH STATION HAS FASTER ACTIVATIONS.";
-        text_set(texttoset, "background_upper2");
-
-        var texttoset2 = "";
-        text_set(texttoset2, "background_lower2");
-
+        $(document).ready(function(){
+            $(window).on('touchmove',function(e){e.preventDefault();});
+        });
         if ( self !== top ) {
             document.body.style.backgroundImage = "none";
             document.body.style.background = "none transparent";
         }
 
-<!-- TODO: refactor       -->
+        $(document).ready( function() {
+            $("#hack_load").load("/hack_load/");
+        });
+        var room = "{{ room }}";
+        var station = "DEF{{room}}";
+        var deactivate_dblr;
+        var hackcheck = "OFF";
+        textset1 = "NO";
+        textset2 = "NO";
+        var stationNameTemp = "";
+        var check_sec = "yes"
+
+<!--TODO: refactor-->
+
+        var texttoset = "SELECT WHICH STATION TO CHECK BLAST.";
+        text_set(texttoset, "background_upper2");
+
+        var texttoset2 = "";
+        text_set(texttoset2, "background_lower2");
+
+        setInterval(auto_load,250);
+
 
         var old_check = "";
 
@@ -151,62 +150,47 @@
             $("#hackCheck").html(data);
         }
 
-        function success_defense_station(data) {
+        function success_audiocheck(data) {
+            $("#audio_check").html(data);
+        }
+
+        function success_defensestation(data) {
             old_check = data;
             $("#station_load").html(data);
         }
 
-
-
-        setInterval(auto_load,500);
-        setInterval(currency_load,1000);
+        socket.on('hackCheck', success_check_hack);
+        socket.on('audiocheck', success_audiocheck);
+        socket.on('defenseStation', success_defensestation);
 
         function auto_load(){
-            $.ajax({
-              url: url,
-              success: function(data){
-                 $("#station_load").html(data);
-              }
-            });
-
-            if ( self === top ) {
-                $.ajax({
-                    url: "/hackCheck/" + station,
-                    success: function (data) {
-                        $("#hackCheck").html(data);
-                    }
-                });
+            socket.emit('defenseStation', {'station': station, 'room': room, 'old_value': old_check});
+            socket.emit('audiocheck', {'room': room});
+            if ( self == top ) {
+                socket.emit('hackCheck', {'station': station, 'status': hackcheck});
             }
         }
 
-        function auto_load2(){
+        var old_currency = "";
 
+        function success_currency(data) {
+            old_currency = data;
+            $("#currencyCheck").html(data);
         }
+
+        socket.on('currency', success_currency);
+
+
+        setInterval(currency_load,1000);
 
         function currency_load(){
-            $.ajax({
-              url: "/currency/" + room,
-              success: function(data){
-                 $("#currencyCheck").html(data);
-              }
-            });
+            socket.emit('currency', {'room': room, 'old_value': old_currency});
         }
 
-        $(document).ready( function() {
-            $("#hack_load").load("/hack_load/");
-        });
 
-        $.ajax({
-            url: "/static/html/top.html",
-            success: function(data){
-                $("#top_load").html(data);
-            }
-        });
-
-<!-- TODO: refactor       -->
         function hackOn() {
             if ( self === top ) {
-                  hackcheck = "ON";
+                hackcheck = "ON";
                 document.getElementById("main_loader").style.display = "none";
                 document.getElementById("hack").style.display = "block";
 
@@ -220,10 +204,10 @@
 
                 var texttoset_hack2 = "YOU’VE BEEN HACKED!";
                 text_set(texttoset_hack2, "background_lower2");
+
             }
         }
 
-<!-- TODO: refactor       -->
         function hackOff() {
             if ( self === top ) {
                 hackcheck = "OFF";
@@ -243,38 +227,53 @@
             }
         }
 
+        function auto_load2() {
 
+        }
 
-<!--        TODO: refactor-->
-        function selectedStation(station_selected) {
-            var redirect2 = '/defensetemplate/{{room}}';
-            var redirect = '/defensestation/{{room}}';
+        {#
+        function activateDoubler(station) {
+            var redirectaudio2 = "/audioadd/" + room + "/", up_init = "assist";
+
             $.ajax({
-                    type: 'POST',
-                    url: redirect,
-                    data: {
-                        itemID: idTemp,
-                        station: station_selected,
-                    }
-                });
-            if ( self !== top ) {
-                    parent.document.getElementById("hider_div").style.display = "block";
-            }
-            document.getElementById("itemtext").innerHTML = itemTextPurchased;
-            window.setTimeout(function () {
-                        $(location).attr('href', redirect2)
-                    }, 5000);
-            document.getElementById("marketloadselector").style.display = "none";
+                type: 'POST',
+                url: redirectaudio2,
+                data: {
+                    toplay: up_init
+                }
+            });
+
+            var redirect = '/masterStation/{{room}}';
+            $.ajax({
+                type: 'POST',
+                url: redirect,
+                data: {
+                    station: station
+                }
+            });
+            clearInterval(deactivate_dblr);
+            deactivate_dblr = setInterval(deactivate_doubler,30000);
+        }
+
+        function deactivate_doubler() {
+            clearInterval(deactivate_dblr);
+            var redirect = '/masterStation/{{room}}';
+            $.ajax({
+                type: 'POST',
+                url: redirect,
+                data: {
+                    station: 'none'
+                }
+            });
+        }
+        #}
+
+        function ttd(time_to_detonate){
 
         }
 
 
-        function ttd(data){
-
-        }
-
-<!--  TODO: refactor      -->
-        function defenseThis(stationName) {
+        function defendThis(stationName) {
             if (hacksAvailable >= 1) {
                 stationlock = "ON";
 
@@ -321,6 +320,59 @@
             }
         }
 
+        var whattoplay = "";
+
+        function playAudio(whattoplay){
+            var assist = document.getElementById('assist');
+            var blastlaunch = document.getElementById('blastlaunch');
+            var bombdroppingnew = document.getElementById('bombdroppingnew');
+            var charge = document.getElementById('charge');
+            var steal = document.getElementById('steal');
+            var gameover = document.getElementById('gameover');
+            var gamewon = document.getElementById('gamewon');
+            var hackinitiated = document.getElementById('hackinitiated');
+            var unhack = document.getElementById('unhack');
+            var upgrade = document.getElementById('upgrade');
+            var youwerehacked = document.getElementById('youwerehacked');
+            var allclearstub = document.getElementById('allclearstub');
+
+            if (whattoplay === "assist"){
+                assist.play();
+            }
+            else if (whattoplay === "blastlaunch"){
+                blastlaunch.play();
+            }
+            else if (whattoplay === "bombdroppingnew"){
+                bombdroppingnew.play();
+            }
+            else if (whattoplay === "charge"){
+                charge.play();
+            }
+            else if (whattoplay === "steal"){
+                steal.play();
+            }
+            else if (whattoplay === "gameover"){
+                gameover.play();
+            }
+            else if (whattoplay === "gamewon"){
+                gamewon.play();
+            }
+            else if (whattoplay === "hackinitiated"){
+                hackinitiated.play();
+            }
+            else if (whattoplay === "unhack"){
+                unhack.play();
+            }
+            else if (whattoplay === "upgrade"){
+                upgrade.play();
+            }
+            else if (whattoplay === "youwerehacked"){
+                youwerehacked.play();
+            }
+            else if (whattoplay === "allclearstub"){
+                allclearstub.play();
+            }
+        }
 
 
         function activate1() {
@@ -343,8 +395,6 @@
 
         }
 
-
-
         function activate2() {
             document.getElementById("arrows2").style.display = "block";
             document.getElementById("activate3").style.display = "block";
@@ -364,17 +414,17 @@
             }, 1000);
         }
 
+<!--TODO: refactor-->
         function activate3() {
             if ( self !== top ) {
                         parent.document.getElementById("hider_div").style.display = "block";
             }
             document.getElementById("activate_back").style.display = "none";
+            document.getElementById("main_loader").style.display = "none";
             stationlock = "OFF";
+            var redirect = "/defenseStation/{{room}}";
+            var redirect2 = '/defensetemplate/{{room}}';
 
-<!--  TODO: refactor          -->
-            var redirect = "/hackStation/{{room}}";
-            var redirect2 = '/hacktemplate/{{room}}';
-            var redirectaudio = "/audioadd/" + attackroom + "/", hack_init = "youwerehacked";
             {
                 $.ajax({
                     type: 'POST',
@@ -383,22 +433,15 @@
                         station: stationNameTemp
                     }
                 });
-                $.ajax({
-                    type: 'POST',
-                    url: redirectaudio,
-                    data: {
-                        toplay: hack_init
-                    }
-                });
+
 
                 window.setTimeout(function () {
                     $(location).attr('href', redirect2)
-                }, 500);
+                }, 100);
             }
         }
 
     </script>
-
 
 
 {% endblock %}

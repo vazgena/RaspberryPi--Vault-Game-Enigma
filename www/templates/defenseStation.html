@@ -1,0 +1,88 @@
+{% block body %}
+
+    {% if is_available == "No" %}
+        <div id="buttonHolderInner" style="display: inline-block;">
+            {% for i in stationListed %}
+                <button class="button" onclick="defendThis('{{i}}');" style="background-color:{{color_list[loop.index0]}}; position: absolute; top: {{x_list[loop.index0]}}px; left: {{y_list[loop.index0]}}px; width: {{bh_list[loop.index0]}}px; height: {{bw_list[loop.index0]}}px; border-radius: {{br_list[loop.index0]}}px;">
+                      <p>
+                            <img src="/static/images/{{image_list[loop.index0]}}" style="width:{{width_list[loop.index0]}}px;height:{{height_list[loop.index0]}}px; ">
+                      </p>
+                      <p>
+
+                      </p>
+                </button>
+
+            {% endfor %}
+        </div>
+    {% else %}
+
+
+            {% if collected_mine == "yes" %}
+                <div style="position: absolute; top: 400px; right: 0; width:100%; text-align: center "><h1>
+                {# TODO: add good text #}
+                </h1></div>
+            {% else %}
+
+                <div style="position: absolute; top: 400px; right: 0; width:100%; text-align: center "><h1>
+                {# TODO: add bad text #}
+                </h1></div>
+
+                <script>
+
+                    if (hackcheck === "OFF"){
+                        var texttoset = "";
+                        text_set(texttoset, "background_upper2");
+                    }
+
+                </script>
+
+            {% endif %}
+
+    {% endif %}
+
+    <script>
+
+        var check_sec = "{{ check_sec }}"
+
+        if ( self === top ) {
+            if (hackcheck === "OFF"){
+                var textset1 = "NO";
+                var textset2 = "NO";
+                {% if is_available == "No" %}
+                    {# TODO:  background_upper2 message#}
+                {% else %}
+                   var texttoset = "";
+                   text_set(texttoset, "background_upper2");
+
+                {% endif %}
+            }
+
+            {% if time_doubler == "yes" %}
+                var timeDoubler = "yes";
+            {% else %}
+                var timeDoubler = "no";
+            {% endif %}
+            var bomb_message = "{{ message_bomb }}";
+
+            if (bomb_message === "exit") {
+                redirect_url ="http://10.255.1.254:8080/nogametemplate/{{ station }}"
+                $(location).attr('href', redirect_url)
+            }
+        }
+
+        if (self !== top){
+            var textset1 = "NO";
+            var textset2 = "NO";
+            {% if is_available == "No" %}
+               {# TODO:  background_upper2 message#}
+            {% else %}
+                   var texttoset = "";
+                   text_set(texttoset, "background_upper2");
+            {% endif %}
+
+            var timeDoubler = parent.timeDoubler;
+        }
+
+    </script>
+
+{% endblock %}
