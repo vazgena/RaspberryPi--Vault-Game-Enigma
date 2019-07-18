@@ -19,12 +19,12 @@
 
             {% if collected_mine == "yes" %}
                 <div style="position: absolute; top: 400px; right: 0; width:100%; text-align: center "><h1>
-                {# TODO: add good text #}
+                    THE BLAST IS DETECTED ON {{station_name}} STATION
                 </h1></div>
             {% else %}
 
                 <div style="position: absolute; top: 400px; right: 0; width:100%; text-align: center "><h1>
-                {# TODO: add bad text #}
+                    THERE IS NO BLAST ON {{station_name}} STATION.
                 </h1></div>
 
                 <script>
@@ -41,20 +41,20 @@
     {% endif %}
 
     <script>
+        {% if is_available == "Yes" %}
+            {% if init_station_name == "Yes" %}
+                localStorage["stationCheck"] = "{{station_name}}";
+            {% endif %}
 
-        var check_sec = "{{ check_sec }}"
+        {% endif %}
 
         if ( self === top ) {
             if (hackcheck === "OFF"){
                 var textset1 = "NO";
                 var textset2 = "NO";
-                {% if is_available == "No" %}
-                    {# TODO:  background_upper2 message#}
-                {% else %}
-                   var texttoset = "";
-                   text_set(texttoset, "background_upper2");
 
-                {% endif %}
+                var texttoset = "SELECT THE STATION TO CHECK THE BLAST.";
+                text_set(texttoset, "background_upper2");
             }
 
             {% if time_doubler == "yes" %}
@@ -73,13 +73,8 @@
         if (self !== top){
             var textset1 = "NO";
             var textset2 = "NO";
-            {% if is_available == "No" %}
-               {# TODO:  background_upper2 message#}
-            {% else %}
-                   var texttoset = "";
-                   text_set(texttoset, "background_upper2");
-            {% endif %}
-
+            var texttoset = "SELECT THE STATION TO CHECK THE BLAST.";
+            text_set(texttoset, "background_upper2");
             var timeDoubler = parent.timeDoubler;
         }
 

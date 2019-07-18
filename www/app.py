@@ -352,9 +352,10 @@ def audio_station(app_id):
     if row_count != 0:
         get_time_location_list = list(c.fetchall())
         for i in get_time_location_list:
-            time_deployed = i[3]
+            time_deployed = i[5]
+            if time_deployed is None:
+                continue
             time_now = datetime.now()
-
             # Check
             # elapsed_time = time_now - time_deployed
             # if 30 > abs(int(elapsed_time.total_seconds())) > 10:
@@ -1320,7 +1321,7 @@ def market(app_id):
                 if str(room) == "2":
                     atkroom = "1"
                 sql_query = "INSERT INTO bombsDeployed (room, fake_bomb, stationName, timeDeployed) VALUES (%s,TRUE, %s, %s);"
-                c.execute(sql_query, (atkroom, '', datetime.now() + timedelta(seconds=31)))
+                c.execute(sql_query, (atkroom, '', datetime.now()))
 
             elif str(request.form['itemID']) == "30":
                 # Random hacking 3 stations
@@ -2490,82 +2491,45 @@ def defenses_station(app_id):
     bh_list = []
     bw_list = []
     br_list = []
-    color_selected_list = []
     color_list = []
-    this_room_collected = "no"
     collected_mine = "no"
-    color = "none"
-    station = ""
-    currency = 0
-    is_available = "Yes"
-    if room == "1":
-        station = "MTR1"
-    if room == "2":
-        station = "MTR2"
+    is_available = "No"
+    station_name = ""
+    station_check = ""
+    station = "DEF{}".format(room)
     time_doubler = time_doubler_check(station)
     message_bomb = looser_check()
     if request.method == 'POST':
+        is_available = "Yes"
         station_check = request.form['station']
-        check_station_sql = "SELECT * FROM currentColor WHERE station = %s"
-        c.execute(check_station_sql, station_check)
+        sql_query = "SELECT * FROM bombsDeployed WHERE stationName = %s AND timeIncoming < NOW();"
+        c.execute(sql_query, station_check)
         row_count = c.rowcount
         if row_count != 0:
-            update_mine_sql = "UPDATE currentColor SET roomCollected = %s, collected = %s WHERE station = %s"
-            c.execute(update_mine_sql, (room, "Yes", station_check))
-            get_cur_to_add_sql = "SELECT * FROM currency WHERE room = %s"
-            c.execute(get_cur_to_add_sql, room)
-            get_cur_to_add = list(c.fetchall())
-            for i in get_cur_to_add:
-                check_dual_sql = "SELECT * FROM marketOwned WHERE team = %s AND itemID = %s"
-                c.execute(check_dual_sql, (room, "1"))
-                row_count = c.rowcount
-                if row_count != 0:
-                    currency = int(i[1]) + 2
-                else:
-                    currency = int(i[1]) + 1
-                if color == "green":
-                    check_dual_sql = "SELECT * FROM marketOwned WHERE team = %s AND itemID = %s"
-                    c.execute(check_dual_sql, (room, "3"))
-                    row_count = c.rowcount
-                    if row_count != 0:
-                        currency = currency + 2
-                if color == "red":
-                    check_dual_sql = "SELECT * FROM marketOwned WHERE team = %s AND itemID = %s"
-                    c.execute(check_dual_sql, (room, "4"))
-                    row_count = c.rowcount
-                    if row_count != 0:
-                        currency = currency + 2
-                if color == "yellow":
-                    check_dual_sql = "SELECT * FROM marketOwned WHERE team = %s AND itemID = %s"
-                    c.execute(check_dual_sql, (room, "5"))
-                    row_count = c.rowcount
-                    if row_count != 0:
-                        currency = currency + 2
-            add_cur_sql = "UPDATE currency SET amount = %s WHERE room = %s;"
-            c.execute(add_cur_sql, (currency, room))
-
-            play_add_sql = "INSERT INTO audiomanager (whattoplay, room) VALUES (%s, %s)"
-            c.execute(play_add_sql, ("charge", room))
+            collected_mine = "yes"
         else:
-            insert_lock = "INSERT INTO mineLockOut (station) VALUES (%s);"
-            c.execute(insert_lock, station)
+            collected_mine = "no"
+        insert_lock = "INSERT INTO mineLockOut (station) VALUES (%s);"
+        c.execute(insert_lock, station)
 
-    mine_collected_sql = "SELECT * FROM currentColor WHERE room = %s AND collected = %s"
-    c.execute(mine_collected_sql, (room, "Yes"))
-    row_count_mined = c.rowcount
-    if row_count_mined != 0:
-        collected_mine = "yes"
-        mine_collected_room_sql = "SELECT * FROM currentColor WHERE roomCollected = %s AND room = %s"
-        c.execute(mine_collected_room_sql, (room, room))
-        row_count_mined_room = c.rowcount
-        if row_count_mined_room != 0:
-            this_room_collected = "yes"
-        else:
-            this_room_collected = "no"
+        station_sql = 'SELECT * FROM stationList WHERE name = %s;'
+        c.execute(station_sql, station_check)
+        station_list = list(c.fetchall())[0]
+        connection.close()
+        station_name = station_list[5]
+
+        response = render_template('defenseStation.html', time_doubler=time_doubler,
+                               collected_mine=collected_mine, is_available=is_available,
+                               stationListed=names, station=station,
+                               message_bomb=message_bomb, room=room,
+                               width_list=width_list, height_list=height_list, x_list=x_list,
+                               y_list=y_list, image_list=image_list, bh_list=bh_list,
+                               bw_list=bw_list, br_list=br_list, color_list=color_list,
+                               station_name=station_name, init_station_name='Yes')
+        return response
 
     check_lockout_sql = "SELECT * FROM  mineLockOut WHERE station = %s;"
     c.execute(check_lockout_sql, station)
-
     row_count = c.rowcount
     if row_count != 0:
         station_check_list = list(c.fetchall())
@@ -2579,15 +2543,14 @@ def defenses_station(app_id):
             else:
                 is_available = "Yes"
                 connection.close()
-                return render_template('defenseStation.html', time_doubler=time_doubler,
-                                       is_available=is_available, collected_mine=collected_mine,
-                                       stationListed=names, spelled=spelled, station=station,
-                                       room=room, message_bomb=message_bomb,
-                                       this_room_collected=this_room_collected,
+            response = render_template('defenseStation.html', time_doubler=time_doubler,
+                                       collected_mine=collected_mine,
+                                       stationListed=names, station=station,
+                                       message_bomb=message_bomb, room=room,
                                        width_list=width_list, height_list=height_list, x_list=x_list,
                                        y_list=y_list, image_list=image_list, bh_list=bh_list,
                                        bw_list=bw_list, br_list=br_list, color_list=color_list,
-                                       color_selected_list=color_selected_list)
+                                       station_name=station_name, is_available=is_available, init_station_name='No')
 
     station_list_sql = 'SELECT * FROM stationList WHERE room = %s;'
     c.execute(station_list_sql, room)
@@ -2606,23 +2569,19 @@ def defenses_station(app_id):
         bw_list.append(i[13])
         br_list.append(i[14])
         color_list.append(i[16])
-    get_color_data_sql = "SELECT * FROM currentColor WHERE room = %s"
-    c.execute(get_color_data_sql, room)
-    color_data_to_list = list(c.fetchall())
-    for l in color_data_to_list:
-        color = l[2]
-        is_available = l[4]
+        if name == station_check:
+            station_name = spelled_name
+
     # Close database connection.
     connection.close()
     return render_template('defenseStation.html', time_doubler=time_doubler,
-                           is_available=is_available, collected_mine=collected_mine,
-                           stationListed=names, spelled=spelled, station=station,
+                           collected_mine=collected_mine, is_available=is_available,
+                           stationListed=names, station=station,
                            message_bomb=message_bomb, room=room,
-                           this_room_collected=this_room_collected,
                            width_list=width_list, height_list=height_list, x_list=x_list,
                            y_list=y_list, image_list=image_list, bh_list=bh_list,
                            bw_list=bw_list, br_list=br_list, color_list=color_list,
-                           color_selected_list=color_selected_list)
+                           station_name=station_name, init_station_name='No')
 
 
 # Defense station template
@@ -3028,37 +2987,18 @@ def handle_defence_station(message):
     bh_list = []
     bw_list = []
     br_list = []
-    color_selected_list = []
     color_list = []
-    this_room_collected = "no"
+    station_name = message['stationCheck']
+    stationNameTemp = message['stationNameTemp']
+    station_check = ""
     collected_mine = "no"
-    color = "none"
-    station = ""
-    currency = 0
-    is_available = "Yes"
-    if room == "1":
-        station = "MTR1"
-    if room == "2":
-        station = "MTR2"
+    is_available = "No"
+    station = "DEF{}".format(room)
     time_doubler = time_doubler_check(station)
     message_bomb = looser_check()
 
-    mine_collected_sql = "SELECT * FROM currentColor WHERE room = %s AND collected = %s"
-    c.execute(mine_collected_sql, (room, "Yes"))
-    row_count_mined = c.rowcount
-    if row_count_mined != 0:
-        collected_mine = "yes"
-        mine_collected_room_sql = "SELECT * FROM currentColor WHERE roomCollected = %s AND room = %s"
-        c.execute(mine_collected_room_sql, (room, room))
-        row_count_mined_room = c.rowcount
-        if row_count_mined_room != 0:
-            this_room_collected = "yes"
-        else:
-            this_room_collected = "no"
-
     check_lockout_sql = "SELECT * FROM  mineLockOut WHERE station = %s;"
     c.execute(check_lockout_sql, station)
-
     row_count = c.rowcount
     if row_count != 0:
         station_check_list = list(c.fetchall())
@@ -3066,21 +3006,33 @@ def handle_defence_station(message):
             time_to_unlock = j[2]
             time_now = datetime.now()
             elapsed_time = time_now - time_to_unlock
+
+            sql_query = 'SELECT * FROM stationList WHERE name = %s;'
+            c.execute(sql_query, stationNameTemp)
+            station_list = list(c.fetchall())
+            if station_list:
+                station_name = station_list[0][5]
+
             if elapsed_time.total_seconds() > 30:
                 remove_lockout = "DELETE FROM mineLockOut WHERE station = %s"
                 c.execute(remove_lockout, station)
+                continue
             else:
                 is_available = "Yes"
                 connection.close()
-                return render_template('defenseStation.html', time_doubler=time_doubler,
-                                       is_available=is_available, collected_mine=collected_mine,
-                                       stationListed=names, spelled=spelled, station=station,
-                                       room=room, message_bomb=message_bomb,
-                                       this_room_collected=this_room_collected,
+            response = render_template('defenseStation.html', time_doubler=time_doubler,
+                                       collected_mine=collected_mine,
+                                       stationListed=names, station=station,
+                                       message_bomb=message_bomb, room=room,
                                        width_list=width_list, height_list=height_list, x_list=x_list,
                                        y_list=y_list, image_list=image_list, bh_list=bh_list,
                                        bw_list=bw_list, br_list=br_list, color_list=color_list,
-                                       color_selected_list=color_selected_list)
+                                       station_name=station_name, is_available=is_available, init_station_name='No')
+
+            if 'old_value' in message:
+                if message['old_value'] == response:
+                    return
+            emit('defenseStation', response)
 
     station_list_sql = 'SELECT * FROM stationList WHERE room = %s;'
     c.execute(station_list_sql, room)
@@ -3099,23 +3051,19 @@ def handle_defence_station(message):
         bw_list.append(i[13])
         br_list.append(i[14])
         color_list.append(i[16])
-    get_color_data_sql = "SELECT * FROM currentColor WHERE room = %s"
-    c.execute(get_color_data_sql, room)
-    color_data_to_list = list(c.fetchall())
-    for l in color_data_to_list:
-        color = l[2]
-        is_available = l[4]
+        if name == station_check:
+            station_name = spelled_name
+
     # Close database connection.
     connection.close()
     response = render_template('defenseStation.html', time_doubler=time_doubler,
-                           is_available=is_available, collected_mine=collected_mine,
-                           stationListed=names, spelled=spelled, station=station,
+                           collected_mine=collected_mine,
+                           stationListed=names, station=station,
                            message_bomb=message_bomb, room=room,
-                           this_room_collected=this_room_collected,
                            width_list=width_list, height_list=height_list, x_list=x_list,
                            y_list=y_list, image_list=image_list, bh_list=bh_list,
                            bw_list=bw_list, br_list=br_list, color_list=color_list,
-                           color_selected_list=color_selected_list)
+                           station_name=station_name, is_available=is_available, init_station_name='No')
     if 'old_value' in message:
         if message['old_value'] == response:
             return

@@ -1,6 +1,7 @@
 # imports
 from pymysql import connect
 from time import sleep
+from datetime import datetime, timedelta
 
 
 # variables
@@ -63,6 +64,8 @@ def check_det():
 					do_not_check.append(station_name)
 					ignore_add_sql = "INSERT INTO ignoreList (station, room) VALUES (%s, %s);"
 					c.execute(ignore_add_sql, (station_name, room))
+				query_update = "UPDATE bombsDeployed SET timeIncoming = %s WHERE id = %s ;"
+				c.execute(query_update, (datetime.now() + timedelta(seconds=ttd), i[0]))
 				countdown(ttd, fake_bomb, i)
 	do_not_check.clear()
 	connection.close()

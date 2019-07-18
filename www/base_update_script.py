@@ -167,6 +167,12 @@ def update_17_07_2019():
     connection.close()
 
 
+def add_incoming_bomb():
+    connection = data_connect()
+    con = connection.cursor()
+    query = "ALTER TABLE bombsDeployed ADD timeIncoming datetime DEFAULT NULL"
+    con.execute(query)
+    connection.close()
 
 
 if __name__ == "__main__":
@@ -177,6 +183,7 @@ if __name__ == "__main__":
     # update_12_07_2019()
     # add_fake_bomb()
     # update_15_07_2019()
-    update_17_07_2019()
+    # update_17_07_2019()
+    add_incoming_bomb()
     pass
 

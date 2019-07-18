@@ -130,11 +130,16 @@
         textset1 = "NO";
         textset2 = "NO";
         var stationNameTemp = "";
-        var check_sec = "yes"
+        var stationCheck = "";
 
-<!--TODO: refactor-->
+        if (localStorage["stationCheck"]){
+            stationCheck = localStorage["stationCheck"];
+        }
+        if (localStorage["stationNameTemp"]){
+            stationNameTemp = localStorage["stationNameTemp"];
+        }
 
-        var texttoset = "SELECT WHICH STATION TO CHECK BLAST.";
+        var texttoset = "SELECT THE STATION TO CHECK THE BLAST.";
         text_set(texttoset, "background_upper2");
 
         var texttoset2 = "";
@@ -164,7 +169,7 @@
         socket.on('defenseStation', success_defensestation);
 
         function auto_load(){
-            socket.emit('defenseStation', {'station': station, 'room': room, 'old_value': old_check});
+            socket.emit('defenseStation', {'station': station, 'room': room, 'old_value': old_check, 'stationCheck': stationCheck, 'stationNameTemp':stationNameTemp});
             socket.emit('audiocheck', {'room': room});
             if ( self == top ) {
                 socket.emit('hackCheck', {'station': station, 'status': hackcheck});
@@ -304,9 +309,6 @@
                 }
 
                 var seconds_left = Math.floor(Math.random() * (max - min) + min);
-                if (check_sec === "yes") {
-                    seconds_left = seconds_left - 2
-                }
                 var interval = setInterval(function () {
                     --seconds_left;
                     if (timeDoubler === "yes") {
@@ -379,9 +381,6 @@
             document.getElementById("arrows1").style.display = "block";
             document.getElementById("activate2").style.display = "block";
             var seconds_left = Math.floor(Math.random() * (max - min) + min);
-            if (check_sec === "yes") {
-                    seconds_left = seconds_left - 2
-                }
             var interval = setInterval(function () {
                 --seconds_left;
                 if (timeDoubler === "yes") {
@@ -399,9 +398,6 @@
             document.getElementById("arrows2").style.display = "block";
             document.getElementById("activate3").style.display = "block";
             var seconds_left = Math.floor(Math.random() * (max - min) + min);
-            if (check_sec === "yes") {
-                    seconds_left = seconds_left - 2
-                }
             var interval = setInterval(function () {
                 --seconds_left;
                 if (timeDoubler === "yes") {
@@ -414,7 +410,6 @@
             }, 1000);
         }
 
-<!--TODO: refactor-->
         function activate3() {
             if ( self !== top ) {
                         parent.document.getElementById("hider_div").style.display = "block";
@@ -426,6 +421,8 @@
             var redirect2 = '/defensetemplate/{{room}}';
 
             {
+                localStorage["stationNameTemp"] = stationNameTemp;
+
                 $.ajax({
                     type: 'POST',
                     url: redirect,
@@ -435,9 +432,11 @@
                 });
 
 
+
                 window.setTimeout(function () {
                     $(location).attr('href', redirect2)
                 }, 100);
+
             }
         }
 
