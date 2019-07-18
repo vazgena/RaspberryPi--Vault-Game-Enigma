@@ -13,9 +13,12 @@ from flask import Flask, render_template, redirect, url_for, request, send_from_
 from pymysql import InternalError, connect
 from random import choice, sample
 
+from flask_socketio import SocketIO, Namespace, emit
+
 
 # Variables
 app = Flask(__name__)
+socketio = SocketIO(app)
 dbuser = 'game'
 dbpass = 'h95d3T7SXFta'
 
@@ -2470,6 +2473,386 @@ def reset_server():
     return "not rebooted"
 
 
+@socketio.on('hackCheck')
+def handle_hack(message):
+    app_id = message['station']
+    hack_check = "clean"
+    connection = data_connect()
+    c = connection.cursor()
+    station_room = app_id
+    block_hack = "14"
+    get_quantity_available = "SELECT * FROM marketOwned WHERE itemID = %s AND station=%s"
+    c.execute(get_quantity_available, (block_hack, station_room))
+    row_count = c.rowcount
+    if row_count != 0:
+        hack_check = "clean"
+    else:
+        try:
+            hack_check_sql = "SELECT * FROM  hackCheck WHERE roomstation = %s"
+            c.execute(hack_check_sql, station_room)
+            hack_check_fetch = list(c.fetchall())
+            for i in hack_check_fetch:
+                hack_check = i[2]
+        except InternalError:
+            hack_check = "clean"
+
+    # Close database connection.
+    connection.close()
+
+    if 'status' in message:
+        status = "clean"
+        if message['status'] == "ON":
+            status = "hacked"
+        if status == hack_check:
+            return
+    response = render_template('hackCheck.html', hackCheck=hack_check)
+    if 'old_value' in message:
+        if message['old_value'] == response:
+            return
+
+    emit('hackCheck', response)
+
+
+@socketio.on('currency')
+def handle_hack(message):
+    room = message['room']
+    connection = data_connect()
+    c = connection.cursor()
+    hacks_available = 0
+    bombs = 0
+    opcurrency = 0
+    currencies = 0
+    timetodetonate = "-1"
+    # Room data
+    attack_room = ""
+    if room == "1":
+        attack_room = "2"
+    if room == "2":
+        attack_room = "1"
+
+    # Current rooms currency
+    currencysql = 'SELECT * FROM currency WHERE room=%s'
+    c.execute(currencysql, room)
+    currencyget = list(c.fetchall())
+    for i in currencyget:
+        currencies = i[1]
+
+    # Current rooms currency
+    getopcurrencysql = "SELECT * FROM currency WHERE room = %s"
+    c.execute(getopcurrencysql, attack_room)
+    getcurrencylist = list(c.fetchall())
+    for i in getcurrencylist:
+        opcurrency = i[1]
+
+    # How many bombs can be deployed that have been bought from the AH
+    numberofbombssql = 'SELECT * FROM numberOfBombs WHERE room = %s'
+    c.execute(numberofbombssql, room)
+    numberofbombs = list(c.fetchall())
+    for i in numberofbombs:
+        bombs = i[2]
+
+    stationlistsql = 'SELECT * FROM stationList WHERE room = %s'
+    c.execute(stationlistsql, room)
+    stationlist2 = list(c.fetchall())
+
+    # list off all stations
+    stationlistsql = 'SELECT * FROM stationList WHERE room = %s'
+    c.execute(stationlistsql, attack_room)
+    stationlist = list(c.fetchall())
+
+    # timer for bombs deployed
+    for i in stationlist:
+        name = i[1]
+        stationsbombedsql = 'SELECT * FROM bombsDeployed WHERE stationName = %s'
+        c.execute(stationsbombedsql, name)
+        stationsbombed = list(c.fetchall())
+        for j in stationsbombed:
+            a = j[3]
+            b = datetime.now()
+            timediff = (b - a).seconds
+            # print("timeDiff = " + str(timeDiff))
+
+            if 0 <= timediff <= 30:
+                timetodetonate = str(30 - timediff)
+            # print(str(timeDiff))
+            else:
+                pass
+    hacklistsql = "SELECT * FROM hacks WHERE team = %s"
+    c.execute(hacklistsql, room)
+    hack_list = list(c.fetchall())
+    for i in hack_list:
+        hacks_available = i[2]
+
+    # close database and render the page
+    connection.close()
+    response = render_template('currency.html', hacksAvailable=hacks_available,
+                           opCurrency=opcurrency, currencys=currencies,
+                           bombs=bombs, timeToDetonate=timetodetonate, stationlist2=stationlist2)
+    if 'old_value' in message:
+        if message['old_value'] == response:
+            return
+    emit('currency', response)
+
+
+@socketio.on('cameraStation')
+def handle_camearstation(message):
+    station = message['station']
+    room = message['room']
+    connection = data_connect()
+    c = connection.cursor()
+    atkroom = "0"
+    timer_message = ""
+
+    if room == "1":
+        atkroom = "2"
+    if room == "2":
+        atkroom = "1"
+
+    time_doubler = time_doubler_check(station)
+    message_bomb = looser_check()
+    check_dual_sql = "SELECT * FROM marketOwned WHERE team = %s AND itemID = %s;"
+    c.execute(check_dual_sql, (room, "6"))
+    row_count = c.rowcount
+
+    if row_count != 0:
+        cams_available = "2"
+    else:
+        cams_available = "1"
+
+    get_quantity_available = "SELECT * FROM marketOwned WHERE itemID = %s AND " \
+                             "team=%s AND time_bought BETWEEN NOW() -" \
+                             "INTERVAL 5 MINUTE AND NOW()"
+    c.execute(get_quantity_available, ("8", atkroom))
+    counted_market = c.rowcount
+    if counted_market != 0:
+        cams_available = "0"
+        rows_bloks = list(c.fetchall())
+        time_bloks = max([row[7] for row in rows_bloks])
+        time_now = datetime.now()
+        time_left_sec = 300 - int((time_now - time_bloks).total_seconds())
+        timer_message = "YOUR CAMERAS HAVE BEEN SHUT DOWN. {0}:{1:02d} UNTIL THEY ARE BACK ONLINE." \
+            .format(time_left_sec // 60, time_left_sec % 60)
+    # Close database connection.
+    connection.close()
+    # TODO: added timer check and add value for render_template, timer from counted_market
+    response = render_template('cameraStation.html', cams_available=cams_available,
+                           time_doubler=time_doubler, message_bomb=message_bomb, station=station,
+                           timer_message=timer_message)
+    if 'old_value' in message:
+        if message['old_value'] == response:
+            return
+    emit('cameraStation', response)
+
+
+@socketio.on('masterStation')
+def handle_masterstation(message):
+    connection = data_connect()
+    c = connection.cursor()
+    room = message['room']
+    station = ""
+    if room == "1":
+        station = "MAS1"
+    elif room == "2":
+        station = "MAS2"
+    time_doubler = time_doubler_check(station)
+    message_bomb = looser_check()
+    station_listed = []
+    doubler_station = []
+    spelled = []
+    height_list = []
+    width_list = []
+    x_list = []
+    y_list = []
+    image_list = []
+    bh_list = []
+    bw_list = []
+    br_list = []
+    color_selected_list = []
+    color_list = []
+
+    doubler_station_active = ""
+    check_doubler_sql = "SELECT * FROM timeDoubler WHERE room = %s"
+    c.execute(check_doubler_sql, room)
+    check_doubler_list_sql = list(c.fetchall())
+    for j in check_doubler_list_sql:
+        doubler_station.append(j[1])
+    station_list = 'SELECT * FROM stationList WHERE room = %s'
+    c.execute(station_list, room)
+    station_list_sql = list(c.fetchall())
+    for i in station_list_sql:
+        spelled.append(i[5])
+        height_list.append(i[7])
+        width_list.append(i[8])
+        x_list.append(i[17])
+        y_list.append(i[18])
+        image_list.append(i[11])
+        bh_list.append(i[12])
+        bw_list.append(i[13])
+        br_list.append(i[14])
+        if len(i) < 24:
+            # hot fix, can be deleted after making changes to the database
+            color_selected_list.append('#880000; border-style: none; background: transparent !important; border:0 '
+                                       '!important; filter: brightness(.50) hue-rotate(150deg)  saturate(5) !important;')
+        else:
+            color_selected_list.append(i[23])
+        color_list.append(i[16])
+        if i[1] in doubler_station:
+            doubler_station_active = i[1]
+            station_listed.append(i[1])
+        else:
+            station_listed.append(i[1])
+
+    if request.method == 'POST':
+        is_time_double_active_sql = "SELECT * FROM timeDoubler WHERE room = %s"
+        c.execute(is_time_double_active_sql, room)
+        row_count = c.rowcount
+        if row_count != 0:
+            station_remove = "DELETE FROM timeDoubler WHERE room = %s"
+            c.execute(station_remove, room)
+        station_insert_sql = "INSERT INTO timeDoubler (station, doubler, room) VALUES (%s, %s, %s)"
+        c.execute(station_insert_sql, (request.form['station'], "double", room))
+
+    # Close database connection.
+    connection.close()
+    response = render_template('masterStation.html', room=room, spelled=spelled,
+                           stationListed=station_listed, time_doubler=time_doubler,
+                           doublerStationActive=doubler_station_active,
+                           message_bomb=message_bomb,
+                           width_list=width_list, height_list=height_list, x_list=x_list,
+                           y_list=y_list, image_list=image_list, bh_list=bh_list,
+                           bw_list=bw_list, br_list=br_list, color_list=color_list,
+                           color_selected_list=color_selected_list, station=station)
+    if 'old_value' in message:
+        if message['old_value'] == response:
+            return
+    emit('masterStation', response)
+
+@socketio.on('mainstation')
+def handle_mainstation(message):
+    connection = data_connect()
+    c = connection.cursor()
+    room = message['room']
+    station_listed = []
+    spelled = []
+    height_list = []
+    width_list = []
+    x_list = []
+    y_list = []
+    image_list = []
+    bh_list = []
+    bw_list = []
+    br_list = []
+    color_selected_list = []
+    color_list = []
+    station = ""
+    if room == "1":
+        station = "MAN1"
+    elif room == "2":
+        station = "MAN2"
+    time_doubler = time_doubler_check(station)
+    message_bomb = looser_check()
+    station_list = "SELECT * FROM stationList WHERE room = %s"
+    c.execute(station_list, room)
+    station_list_sql = list(c.fetchall())
+    for i in station_list_sql:
+        if i[1] != "MAN1" and i[1] != "AUD1" and i[1] != "MAN2" and i[1] != "AUD2" \
+                and i[1] != "CS21" and i[1] != "CS22":
+            station_listed.append(i[1])
+            spelled.append(i[5])
+            height_list.append(i[7])
+            width_list.append(i[8])
+            x_list.append(i[17])
+            y_list.append(i[18])
+            image_list.append(i[11])
+            bh_list.append(i[12])
+            bw_list.append(i[13])
+            br_list.append(i[14])
+            color_selected_list.append(i[15])
+            color_list.append(i[16])
+    connection.close()
+    response = render_template('mainstation.html', room=room, spelled=spelled,
+                           message_bomb=message_bomb, stationListed=station_listed,
+                           time_doubler=time_doubler, width_list=width_list,
+                           height_list=height_list, x_list=x_list,
+                           y_list=y_list, image_list=image_list, bh_list=bh_list,
+                           bw_list=bw_list, br_list=br_list, color_list=color_list,
+                           color_selected_list=color_selected_list, station=station)
+    if 'old_value' in message:
+        if message['old_value'] == response:
+            return
+    emit('mainstation', response)
+
+
+@socketio.on('audiocheck')
+def handle_audio_check(message):
+    tracks = []
+    room = message['room']
+    connection = data_connect()
+    c = connection.cursor()
+    get_audio_sql = "SELECT * FROM audiomanager WHERE room = %s"
+    c.execute(get_audio_sql, room)
+    audio_list = list(c.fetchall())
+    if not audio_list:
+        return
+    for i in audio_list:
+        tracks.append(i[1])
+    remove_audio_que = "DELETE FROM audiomanager WHERE room = %s"
+    c.execute(remove_audio_que, room)
+
+    connection.close()
+    response = render_template('audiocheck.html', tracks=tracks)
+    emit('audiocheck', response)
+
+
+@socketio.on('audioStation')
+def handle_audio_station(message):
+    connection = data_connect()
+    c = connection.cursor()
+    room = message['room']
+    if room == '1':
+        station = "AUD1"
+    elif room == '2':
+        station = "AUD2"
+    else:
+        station = "error"
+    message_bomb_20_sec = ""
+    message_out = ""
+    # Create list of bombs attacking this room if in the air show.
+    bmb_check = "SELECT * FROM bombsDeployed WHERE room=%s"
+    c.execute(bmb_check, room)
+    row_count = c.rowcount
+    if row_count != 0:
+        get_time_location_list = list(c.fetchall())
+        for i in get_time_location_list:
+            time_deployed = i[3]
+            time_now = datetime.now()
+
+            # Check
+            # elapsed_time = time_now - time_deployed
+            # if 30 > abs(int(elapsed_time.total_seconds())) > 10:
+            #     elapsed_time_reverse = (int(elapsed_time.total_seconds()) - 30) * (-1)
+            #     message_bomb_20_sec = "BLAST INCOMING IN {0} SECONDS.".format(str(elapsed_time_reverse))
+            # Check
+            elapsed_time = time_deployed - time_now
+            if 21 > int(elapsed_time.total_seconds()) > -1:
+                elapsed_time_reverse = int(elapsed_time.total_seconds())
+                message_bomb_20_sec = "BLAST INCOMING IN {0} SECONDS.".format(str(elapsed_time_reverse))
+
+    time_doubler = time_doubler_check(station)
+    message_bomb = looser_check()
+    connection.close()
+
+    response = render_template('audiostation.html', room=room, station=station,
+                           message_bomb_20_sec=message_bomb_20_sec,
+                           time_doubler=time_doubler, message_bomb=message_bomb,
+                           message_out=message_out)
+    if 'old_value' in message:
+        if message['old_value'] == response:
+            return
+    emit('audioStation', response)
+
+
 # create an instance of the Flask
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8080, debug=True, threaded=True)
+    # app.run(host='0.0.0.0', port=8080, debug=True, threaded=True)
+    socketio.run(app, host='0.0.0.0', port=8080, debug=True)

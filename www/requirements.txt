@@ -8,3 +8,4 @@ netifaces
 beacontools
 statistics
 paho-mqtt
+flask-socketio

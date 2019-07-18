@@ -44,8 +44,11 @@
     <div id="hackCheck">
 
     </div>
-
+    <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
     <script>
+
+        var socket = io();
+
         $(document).ready(function(){
             $(window).on('touchmove',function(e){e.preventDefault();});
         });
@@ -117,23 +120,27 @@
 
         }
 
+        var old_check = "";
+
+        function success_check_hack(data) {
+            $("#hackCheck").html(data);
+        }
+
+        function success_master_station(data) {
+            old_check = data;
+            $("#station_load").html(data);
+        }
+
+        socket.on('hackCheck', success_check_hack);
+        socket.on('masterStation', success_master_station);
+
          //Needed in all end
         function auto_load(){
 
-            $.ajax({
-              url: "/masterStation/{{room}}",
-              success: function(data){
-                 $("#station_load").html(data);
-              }
-            });
+            socket.emit('masterStation', {'station': station, 'room': room, 'old_value': old_check});
 
             if ( self == top ) {
-                $.ajax({
-                    url: "/hackCheck/MAS{{room}}",
-                    success: function (data) {
-                        $("#hackCheck").html(data);
-                    }
-                });
+                socket.emit('hackCheck', {'station': station, 'status': hackcheck});
             }
          }
 
@@ -176,22 +183,30 @@
 
         }
 
+        var old_currency = "";
+
+        function success_currency(data) {
+            old_currency = data;
+            $("#currencyCheck").html(data);
+        }
+
+        socket.on('currency', success_currency);
+
+
         setInterval(currency_load,1000);
 
         function currency_load(){
-            $.ajax({
+            {# $.ajax({
               url: "/currency/{{room}}",
               success: function(data){
                  $("#currencyCheck").html(data);
 
               }
-        });}
+            });#}
+            socket.emit('currency', {'room': room, 'old_value': old_currency});
+        }
 
     </script>
-
-    <div id="currencyCheck">
-
-    </div>
 
 
 {% endblock %}

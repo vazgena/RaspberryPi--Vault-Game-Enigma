@@ -67,7 +67,11 @@
 
     </div>
 
+<script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
 <script type="text/javascript">
+
+        var socket = io();
+
         $(document).ready(function(){
             $(window).on('touchmove',function(e){e.preventDefault();});
         });
@@ -232,23 +236,26 @@
         setInterval(auto_load,250);
         var hackcheck = "OFF";
         var shutdown = "OFF"
-        
+
+        var old_check = "";
+
+        function success_check_hack(data) {
+            $("#hackCheck").html(data);
+        }
+
+        function success_station_load(data) {
+            old_check = data;
+            $("#station_load").html(data);
+        }
+
+        socket.on('hackCheck', success_check_hack);
+        socket.on('cameraStation', success_station_load);
 
         function auto_load(){
-            $.ajax({
-              url: url,
-              success: function(data){
-                 $("#station_load").html(data);
-              }
-            });
+            socket.emit('cameraStation', {'station': station, 'room': room, 'old_value': old_check});
 
             if ( self === top ) {
-                $.ajax({
-                    url: "/hackCheck/" + station,
-                    success: function (data) {
-                        $("#hackCheck").html(data);
-                    }
-                });
+                socket.emit('hackCheck', {'station': station, 'status': hackcheck});
             }
         }
 
@@ -357,16 +364,28 @@
 
         }
 
+        function success_currency(data) {
+            $("#currencyCheck").html(data);
+        }
+
+        socket.on('currency', success_currency);
+
+        {# not used
         setInterval(currency_load,1000);
+        #}
 
         function currency_load(){
-            $.ajax({
+           {#
+           transferred to websocket
+           $.ajax({
                   url: "/currency/{{room}}",
                   success: function(data){
                      $("#currencyCheck").html(data);
                   }
-            });
+            });#}
+            socket.emit('currency', {'room': room});
         }
+
 
        function restart_iframe()  {
             console.log('restrt1');
