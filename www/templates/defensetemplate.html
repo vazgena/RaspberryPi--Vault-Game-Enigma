@@ -1,0 +1,404 @@
+{% block body %}
+    <head>
+        <meta name="viewport" content="user-scalable=no, width=device-width" />
+    </head>
+
+
+    <script src="/static/js/jquery1.8.2.min.js"></script>
+    <script src="/static/js/in_house.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/hack.js"></script>
+    <script src="/static/js/curved_text.js"></script>
+    <link rel='stylesheet prefetch' href='/static/css/roboto.css'>
+    <link rel='stylesheet prefetch' href='/static/css/font-awesome.min.css'>
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/inhouse.css?version=.01.5" rel="stylesheet">
+
+    <div id="background_upper2">
+
+    </div>
+
+    <div id="background_lower2">
+
+    </div>
+
+
+     <div id="top_load">
+
+    </div>
+
+    <div id="hack_load">
+
+    </div>
+    <div id="wrapper">
+        <div id="main_loader">
+            <div id="station_load">
+            </div>
+        </div>
+    </div>
+
+    <div id="currencyCheck">
+    </div>
+
+    <div id="hackCheck">
+
+    </div>
+
+
+    <!----
+
+    Activate starts here
+
+    ------>
+
+
+    <div id="activate_back"></div>
+    <div id="activate">
+            <div style="position: absolute; top: 150px; left: 245px">
+                <img src="/static/images/18_Enigma_S1_Button_FINAL.png" style="width: 300px; height: 300px;" alt="none">
+            </div>
+
+            <iframe id="arrows0" src="/static/html/arrows.html" style="width: 650px; height: 200px; border: none; display: none; position: absolute; top: 200px; left: 540px;">
+
+            </iframe>
+
+            <div id="activationButton1" style="position: absolute; top: 150px; left: 1030px;">
+
+                <button id="activateButton1" onclick=activate1()>
+
+                    <img src="/static/images/18_Enigma_S2_Button_FINAL.png" style="width: 300px; height: 300px;" alt="none">
+
+                </button>
+
+            </div>
+
+            <iframe id="arrows1" src="/static/html/arrows.html" style="width: 650px; height: 200px; border: none; display: none; position: absolute; top: 380px; left: 380px; transform: rotate(155deg);">
+
+            </iframe>
+
+    </div>
+
+        <div id="activate2_back"></div>
+
+    <div id="activate2" >
+            <iframe id="arrows2" src="/static/html/arrows.html" style="width: 650px; height: 200px; border: none; display: none; position: absolute; top: 570px; left: 520px; ">
+
+            </iframe>
+            <div id="activationButton2">
+                <button id="activateButton2" style="position: absolute; top: 460px; left:5px;" onclick=activate2()>
+                    <img src="/static/images/18_Enigma_S3_Button_FINAL.png" style="width: 300px; height: 300px;" alt="none">
+                </button>
+            </div>
+    </div>
+
+        <div id="activate3_back"></div>
+
+    <div id="activate3" >
+
+            <div id="activationButton3"><button id="activateButton3" style="position: absolute; top: 465px; left: 780px;" onclick=activate3() > <img src="/static/images/18_Enigma_Launch_Button_v3.png" style="width: 300px; height: 300px;" alt="none"> </button></div>
+    </div>
+
+    <div id="activate4">
+        <h1>Successfully Activated.</h1>
+    </div>
+    <!----
+
+    Activate ends here
+
+    ------>
+
+
+
+
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
+    <script>
+
+        var socket = io();
+
+        var station = "DEF" + room;
+        var url = "/hackCheck/DEF" + room;
+        var stationNameTemp = "";
+        var selectable_current = "no";
+        var stationlock = "OFF";
+        var sationselect = "OFF";
+        var hackcheck = "OFF";
+        var sationnotext = "OFF"
+        var min = 6;
+        var max = 12;
+        textset1 = "NO";
+        textset2 = "NO";
+
+
+
+        var texttoset = "CHOOSE WHICH STATION HAS FASTER ACTIVATIONS.";
+        text_set(texttoset, "background_upper2");
+
+        var texttoset2 = "";
+        text_set(texttoset2, "background_lower2");
+
+        if ( self !== top ) {
+            document.body.style.backgroundImage = "none";
+            document.body.style.background = "none transparent";
+        }
+
+<!-- TODO: refactor       -->
+
+        var old_check = "";
+
+        function success_check_hack(data) {
+            old_check = "";
+            $("#hackCheck").html(data);
+        }
+
+        function success_defense_station(data) {
+            old_check = data;
+            $("#station_load").html(data);
+        }
+
+
+
+        setInterval(auto_load,500);
+        setInterval(currency_load,1000);
+
+        function auto_load(){
+            $.ajax({
+              url: url,
+              success: function(data){
+                 $("#station_load").html(data);
+              }
+            });
+
+            if ( self === top ) {
+                $.ajax({
+                    url: "/hackCheck/" + station,
+                    success: function (data) {
+                        $("#hackCheck").html(data);
+                    }
+                });
+            }
+        }
+
+        function auto_load2(){
+
+        }
+
+        function currency_load(){
+            $.ajax({
+              url: "/currency/" + room,
+              success: function(data){
+                 $("#currencyCheck").html(data);
+              }
+            });
+        }
+
+        $(document).ready( function() {
+            $("#hack_load").load("/hack_load/");
+        });
+
+        $.ajax({
+            url: "/static/html/top.html",
+            success: function(data){
+                $("#top_load").html(data);
+            }
+        });
+
+<!-- TODO: refactor       -->
+        function hackOn() {
+            if ( self === top ) {
+                  hackcheck = "ON";
+                document.getElementById("main_loader").style.display = "none";
+                document.getElementById("hack").style.display = "block";
+
+                textset1 = "NO";
+                textset2 = "NO";
+
+                $('body').addClass('hack');
+
+                var texttoset_hack = "PRESS ACTIVATION BUTTONS WHEN THEY APPEAR.";
+                text_set(texttoset_hack, "background_upper2");
+
+                var texttoset_hack2 = "YOU’VE BEEN HACKED!";
+                text_set(texttoset_hack2, "background_lower2");
+            }
+        }
+
+<!-- TODO: refactor       -->
+        function hackOff() {
+            if ( self === top ) {
+                hackcheck = "OFF";
+                document.getElementById("hack").style.display = "none";
+                document.getElementById("main_loader").style.display = "block";
+
+
+                textset1 = "NO";
+                textset2 = "NO";
+
+                $('body').removeClass('hack');
+
+                text_set(texttoset, "background_upper2");
+
+                text_set(texttoset2, "background_lower2");
+
+            }
+        }
+
+
+
+<!--        TODO: refactor-->
+        function selectedStation(station_selected) {
+            var redirect2 = '/defensetemplate/{{room}}';
+            var redirect = '/defensestation/{{room}}';
+            $.ajax({
+                    type: 'POST',
+                    url: redirect,
+                    data: {
+                        itemID: idTemp,
+                        station: station_selected,
+                    }
+                });
+            if ( self !== top ) {
+                    parent.document.getElementById("hider_div").style.display = "block";
+            }
+            document.getElementById("itemtext").innerHTML = itemTextPurchased;
+            window.setTimeout(function () {
+                        $(location).attr('href', redirect2)
+                    }, 5000);
+            document.getElementById("marketloadselector").style.display = "none";
+
+        }
+
+
+        function ttd(data){
+
+        }
+
+<!--  TODO: refactor      -->
+        function defenseThis(stationName) {
+            if (hacksAvailable >= 1) {
+                stationlock = "ON";
+
+                var redirectaudio2 = "/audioadd/" + room + "/", hack_init2 = "hackinitiated";
+
+                $.ajax({
+                    type: 'POST',
+                    url: redirectaudio2,
+                    data: {
+                        toplay: hack_init2
+                    }
+                });
+
+                stationNameTemp = stationName;
+                if ( self !== top ) {
+                        parent.document.getElementById("hider_div").style.display = "none";
+                }
+                document.getElementById("arrows0").style.display = "block";
+                document.getElementById("station_load").style.display = "none";
+                document.getElementById("activationButton1").style.display = "none";
+                document.getElementById("activationButton2").style.display = "none";
+                document.getElementById("activationButton3").style.display = "none";
+                document.getElementById("activate_back").style.display = "block";
+                document.getElementById("activate").style.display = "block";
+
+                if (hackcheck === "OFF") {
+
+                }
+
+                var seconds_left = Math.floor(Math.random() * (max - min) + min);
+                if (check_sec === "yes") {
+                    seconds_left = seconds_left - 2
+                }
+                var interval = setInterval(function () {
+                    --seconds_left;
+                    if (timeDoubler === "yes") {
+                        --seconds_left
+                    }
+                    if (seconds_left <= 0) {
+                        document.getElementById("activationButton1").style.display = "block";
+                        clearInterval(interval);
+                    }
+                }, 1000);
+            }
+        }
+
+
+
+        function activate1() {
+            document.getElementById("arrows1").style.display = "block";
+            document.getElementById("activate2").style.display = "block";
+            var seconds_left = Math.floor(Math.random() * (max - min) + min);
+            if (check_sec === "yes") {
+                    seconds_left = seconds_left - 2
+                }
+            var interval = setInterval(function () {
+                --seconds_left;
+                if (timeDoubler === "yes") {
+                    --seconds_left
+                }
+                if (seconds_left <= 0) {
+                    document.getElementById("activationButton2").style.display = "block";
+                    clearInterval(interval);
+                }
+            }, 1000);
+
+        }
+
+
+
+        function activate2() {
+            document.getElementById("arrows2").style.display = "block";
+            document.getElementById("activate3").style.display = "block";
+            var seconds_left = Math.floor(Math.random() * (max - min) + min);
+            if (check_sec === "yes") {
+                    seconds_left = seconds_left - 2
+                }
+            var interval = setInterval(function () {
+                --seconds_left;
+                if (timeDoubler === "yes") {
+                    --seconds_left
+                }
+                if (seconds_left <= 0) {
+                    document.getElementById("activationButton3").style.display = "block";
+                    clearInterval(interval);
+                }
+            }, 1000);
+        }
+
+        function activate3() {
+            if ( self !== top ) {
+                        parent.document.getElementById("hider_div").style.display = "block";
+            }
+            document.getElementById("activate_back").style.display = "none";
+            stationlock = "OFF";
+
+<!--  TODO: refactor          -->
+            var redirect = "/hackStation/{{room}}";
+            var redirect2 = '/hacktemplate/{{room}}';
+            var redirectaudio = "/audioadd/" + attackroom + "/", hack_init = "youwerehacked";
+            {
+                $.ajax({
+                    type: 'POST',
+                    url: redirect,
+                    data: {
+                        station: stationNameTemp
+                    }
+                });
+                $.ajax({
+                    type: 'POST',
+                    url: redirectaudio,
+                    data: {
+                        toplay: hack_init
+                    }
+                });
+
+                window.setTimeout(function () {
+                    $(location).attr('href', redirect2)
+                }, 500);
+            }
+        }
+
+    </script>
+
+
+
+{% endblock %}

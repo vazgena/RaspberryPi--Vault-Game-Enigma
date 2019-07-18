@@ -86,11 +86,11 @@
 
                 $('body').addClass('hack');
 
-                var texttoset = "PRESS ACTIVATION BUTTONS WHEN THEY APPEAR.";
-                text_set(texttoset, "background_upper2");
+                var texttoset_hack = "PRESS ACTIVATION BUTTONS WHEN THEY APPEAR.";
+                text_set(texttoset_hack, "background_upper2");
 
-                var texttoset2 = "YOU’VE BEEN HACKED!";
-                text_set(texttoset2, "background_lower2");
+                var texttoset_hack2 = "YOU’VE BEEN HACKED!";
+                text_set(texttoset_hack2, "background_lower2");
 
             }
         }
@@ -107,10 +107,8 @@
 
                 $('body').removeClass('hack');
 
-                var texttoset = "CHOOSE WHICH STATION HAS FASTER ACTIVATIONS.";
                 text_set(texttoset, "background_upper2");
 
-                var texttoset2 = "";
                 text_set(texttoset2, "background_lower2");
 
             }
@@ -123,6 +121,7 @@
         var old_check = "";
 
         function success_check_hack(data) {
+            old_check = "";
             $("#hackCheck").html(data);
         }
 
