@@ -121,6 +121,10 @@
         });
         var attackroom = "0";
         var hacksAvailable = 0;
+        if (localStorage["hacksAvailable"]){
+            hacksAvailable = localStorage["hacksAvailable"];
+        }
+
         var room = "{{ room }}";
         if (room === "1"){
             attackroom = "2"
@@ -365,6 +369,7 @@
             var redirect2 = '/hacktemplate/{{room}}';
             var redirectaudio = "/audioadd/" + attackroom + "/", hack_init = "youwerehacked";
             {
+                localStorage["hacksAvailable"] = hacksAvailable;
                 $.ajax({
                     type: 'POST',
                     url: redirect,

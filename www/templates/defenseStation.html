@@ -48,14 +48,13 @@
 
         {% endif %}
 
-        if ( self === top ) {
-            if (hackcheck === "OFF"){
-                var textset1 = "NO";
-                var textset2 = "NO";
 
-                var texttoset = "SELECT THE STATION TO CHECK THE BLAST.";
-                text_set(texttoset, "background_upper2");
+        if ( self === top ) {
+            {% if is_available == "No" %}
+            if (hackcheck === "OFF"){
+                set_normal_string();
             }
+             {% endif %}
 
             {% if time_doubler == "yes" %}
                 var timeDoubler = "yes";

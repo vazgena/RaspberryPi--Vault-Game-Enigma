@@ -115,4 +115,4 @@ def test_hach_market():
 
 
 if __name__ == "__main__":
-    test_timer()
+    test_fake_bomb()

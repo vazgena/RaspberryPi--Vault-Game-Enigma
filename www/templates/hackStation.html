@@ -1,6 +1,7 @@
 {% block body %}
 
     <script>
+        localStorage["hacksAvailable"] = hacksAvailable;
         if (stationlock === true) {
             if (hacksAvailable === true) {
                 if (stationlock === "OFF") {

@@ -139,6 +139,10 @@
         }
     }
 
+    if (localStorage["currency"]){
+            currency = localStorage["currency"];
+    }
+
     function deployBomb(stationToDeploy) {
 
 
@@ -306,6 +310,8 @@
             if ( self !== top ) {
                     parent.document.getElementById("main_loader").style.display = "block";
             }
+
+            localStorage["currency"] = currency;
             var redirect = '/bombStation/{{room}}';
             $.ajax({
                 type: 'POST',
@@ -448,8 +454,12 @@
     auto_load();
     });
 
-
     function ttd(ttdtime) {
+
+    }
+
+    function ttd2(ttdtime) {
+
         if (ttdset === "false") {
             if (ttdtime > 0) {
                 if (hackcheck === "OFF") {

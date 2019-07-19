@@ -49,21 +49,21 @@
                 <img src="/static/images/18_Enigma_S1_Button_FINAL.png" style="width: 300px; height: 300px;" alt="none">
             </div>
 
-            <iframe id="arrows0" src="/static/html/arrows.html" style="width: 650px; height: 200px; border: none; display: none; position: absolute; top: 200px; left: 540px;"></iframe>
+            <iframe id="arrows0" src="about:blank" style="width: 650px; height: 200px; border: none; display: none; position: absolute; top: 200px; left: 540px;"></iframe>
 
             <div id="activationButton1" style="position: absolute; top: 150px; left: 1030px;">
                 <button id="activateButton1" onclick=activate1()>
                     <img src="/static/images/18_Enigma_S2_Button_FINAL.png" style="width: 300px; height: 300px;" alt="none">
                 </button>
             </div>
-            <iframe id="arrows1" src="/static/html/arrows.html" style="width: 650px; height: 200px; border: none; display: none; position: absolute; top: 380px; left: 380px; transform: rotate(155deg);">
+            <iframe id="arrows1" src="about:blank" style="width: 650px; height: 200px; border: none; display: none; position: absolute; top: 380px; left: 380px; transform: rotate(155deg);">
             </iframe>
     </div>
 
     <div id="activate2_back"></div>
 
     <div id="activate2" >
-            <iframe id="arrows2" src="/static/html/arrows.html" style="width: 650px; height: 200px; border: none; display: none; position: absolute; top: 570px; left: 520px; ">
+            <iframe id="arrows2" src="about:blank" style="width: 650px; height: 200px; border: none; display: none; position: absolute; top: 570px; left: 520px; ">
 
             </iframe>
             <div id="activationButton2">
@@ -139,11 +139,14 @@
             stationNameTemp = localStorage["stationNameTemp"];
         }
 
-        var texttoset = "SELECT THE STATION TO CHECK THE BLAST.";
-        text_set(texttoset, "background_upper2");
 
+        var texttoset = "SELECT THE STATION TO CHECK THE BLAST.";
         var texttoset2 = "";
+
+        {#
+        text_set(texttoset, "background_upper2");
         text_set(texttoset2, "background_lower2");
+        #}
 
         setInterval(auto_load,250);
 
@@ -213,6 +216,22 @@
             }
         }
 
+        function set_game_string(){
+             textset1 = "NO";
+             textset2 = "NO";
+             var texttoset_temp = "PRESS ACTIVATION BUTTONS WHEN THEY APPEAR.";
+             text_set(texttoset_temp, "background_upper2");
+              {#
+                    var texttoset_hack2 = "YOU’VE BEEN HACKED!";
+                    text_set(texttoset_hack2, "background_lower2");
+               #}
+        }
+
+        function set_normal_string(){
+            text_set(texttoset, "background_upper2");
+            text_set(texttoset2, "background_lower2");
+        }
+
         function hackOff() {
             if ( self === top ) {
                 hackcheck = "OFF";
@@ -225,9 +244,12 @@
 
                 $('body').removeClass('hack');
 
-                text_set(texttoset, "background_upper2");
-
-                text_set(texttoset2, "background_lower2");
+                if (stationlock === "ON") {
+                    set_game_string();
+                }
+                else {
+                    set_normal_string();
+                 }
 
             }
         }
@@ -236,42 +258,6 @@
 
         }
 
-        {#
-        function activateDoubler(station) {
-            var redirectaudio2 = "/audioadd/" + room + "/", up_init = "assist";
-
-            $.ajax({
-                type: 'POST',
-                url: redirectaudio2,
-                data: {
-                    toplay: up_init
-                }
-            });
-
-            var redirect = '/masterStation/{{room}}';
-            $.ajax({
-                type: 'POST',
-                url: redirect,
-                data: {
-                    station: station
-                }
-            });
-            clearInterval(deactivate_dblr);
-            deactivate_dblr = setInterval(deactivate_doubler,30000);
-        }
-
-        function deactivate_doubler() {
-            clearInterval(deactivate_dblr);
-            var redirect = '/masterStation/{{room}}';
-            $.ajax({
-                type: 'POST',
-                url: redirect,
-                data: {
-                    station: 'none'
-                }
-            });
-        }
-        #}
 
         function ttd(time_to_detonate){
 
@@ -282,20 +268,13 @@
             if (hacksAvailable >= 1) {
                 stationlock = "ON";
 
-                var redirectaudio2 = "/audioadd/" + room + "/", hack_init2 = "hackinitiated";
-
-                $.ajax({
-                    type: 'POST',
-                    url: redirectaudio2,
-                    data: {
-                        toplay: hack_init2
-                    }
-                });
+                set_game_string();
 
                 stationNameTemp = stationName;
                 if ( self !== top ) {
                         parent.document.getElementById("hider_div").style.display = "none";
                 }
+                document.getElementById("arrows0").src = "/static/html/arrows.html";
                 document.getElementById("arrows0").style.display = "block";
                 document.getElementById("station_load").style.display = "none";
                 document.getElementById("activationButton1").style.display = "none";
@@ -378,6 +357,7 @@
 
 
         function activate1() {
+            document.getElementById("arrows1").src = "/static/html/arrows.html";
             document.getElementById("arrows1").style.display = "block";
             document.getElementById("activate2").style.display = "block";
             var seconds_left = Math.floor(Math.random() * (max - min) + min);
@@ -395,6 +375,7 @@
         }
 
         function activate2() {
+            document.getElementById("arrows2").src = "/static/html/arrows.html";
             document.getElementById("arrows2").style.display = "block";
             document.getElementById("activate3").style.display = "block";
             var seconds_left = Math.floor(Math.random() * (max - min) + min);

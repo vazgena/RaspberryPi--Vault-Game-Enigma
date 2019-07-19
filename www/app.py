@@ -514,6 +514,21 @@ def bombstation(app_id):
             play_add_sql = "INSERT INTO audiomanager (whattoplay, room) VALUES (%s, %s)"
             c.execute(play_add_sql, ("blastlaunch", room))
 
+
+    timetodetonatebomb = "-1"
+    stationsbombedsql = 'SELECT * FROM bombsDeployed WHERE room = %s'
+    c.execute(stationsbombedsql, attack_room)
+    stationsbombed = list(c.fetchall())
+    for j in stationsbombed:
+        if j[5]:
+            a = j[5]
+            b = datetime.now()
+            if a > (b - timedelta(seconds=1)):
+                timetodetonatebomb = str((a - b).seconds)
+                # TODO: hotfix
+                if (a - b).seconds > 100:
+                    timetodetonatebomb = "0"
+
     # Close database connection.
     connection.close()
 
@@ -527,7 +542,7 @@ def bombstation(app_id):
                            height_list=height_list, x_list=x_list,
                            y_list=y_list, image_list=image_list, bh_list=bh_list,
                            bw_list=bw_list, br_list=br_list, color_list=color_list,
-                           color_selected_list=color_selected_list, station=station)
+                           color_selected_list=color_selected_list, station=station, timetodetonatebomb=timetodetonatebomb)
 
 
 # Blast station change locations template
@@ -1996,27 +2011,40 @@ def currency_func(app_id):
     stationlist2 = list(c.fetchall())
 
     # list off all stations
-    stationlistsql = 'SELECT * FROM stationList WHERE room = %s'
-    c.execute(stationlistsql, attack_room)
-    stationlist = list(c.fetchall())
-
-    # timer for bombs deployed
-    for i in stationlist:
-        name = i[1]
-        stationsbombedsql = 'SELECT * FROM bombsDeployed WHERE stationName = %s'
-        c.execute(stationsbombedsql, name)
-        stationsbombed = list(c.fetchall())
-        for j in stationsbombed:
-            a = j[3]
+    # stationlistsql = 'SELECT * FROM stationList WHERE room = %s'
+    # c.execute(stationlistsql, attack_room)
+    # stationlist = list(c.fetchall())
+    #
+    # # timer for bombs deployed
+    # for i in stationlist:
+    #     name = i[1]
+    #     stationsbombedsql = 'SELECT * FROM bombsDeployed WHERE stationName = %s'
+    #     c.execute(stationsbombedsql, name)
+    #     stationsbombed = list(c.fetchall())
+    #     for j in stationsbombed:
+    #         a = j[3]
+    #         b = datetime.now()
+    #         timediff = (b - a).seconds
+    #         # print("timeDiff = " + str(timeDiff))
+    #
+    #         if 0 <= timediff <= 30:
+    #             timetodetonate = str(30 - timediff)
+    #         # print(str(timeDiff))
+    #         else:
+    #             pass
+    stationsbombedsql = 'SELECT * FROM bombsDeployed WHERE room = %s'
+    c.execute(stationsbombedsql, attack_room)
+    stationsbombed = list(c.fetchall())
+    for j in stationsbombed:
+        if j[5]:
+            a = j[5]
             b = datetime.now()
-            timediff = (b - a).seconds
-            # print("timeDiff = " + str(timeDiff))
+            if a > b - timedelta(seconds=2):
+                timetodetonate = str((a - b).seconds)
+                if (a - b).seconds > 100:
+                    timetodetonate = "0"
+        # print("timeDiff = " + str(timeDiff))
 
-            if 0 <= timediff <= 30:
-                timetodetonate = str(30 - timediff)
-            # print(str(timeDiff))
-            else:
-                pass
     hacklistsql = "SELECT * FROM hacks WHERE team = %s"
     c.execute(hacklistsql, room)
     hack_list = list(c.fetchall())
@@ -3019,7 +3047,16 @@ def handle_defence_station(message):
                 continue
             else:
                 is_available = "Yes"
-                connection.close()
+
+            sql_query = "SELECT * FROM bombsDeployed WHERE stationName = %s AND timeIncoming < NOW();"
+            c.execute(sql_query, stationNameTemp)
+            row_count = c.rowcount
+            if row_count != 0:
+                collected_mine = "yes"
+            else:
+                collected_mine = "no"
+
+            connection.close()
             response = render_template('defenseStation.html', time_doubler=time_doubler,
                                        collected_mine=collected_mine,
                                        stationListed=names, station=station,

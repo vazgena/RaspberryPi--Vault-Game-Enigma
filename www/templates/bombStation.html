@@ -5,6 +5,7 @@
     }
 </style>
 <script>
+    localStorage["currency"] = currency;
     if (stationlock === "OFF") {
         if (currency >= bombCost) {
             if (hackcheck === "OFF") {
@@ -91,6 +92,8 @@
     var message_bomb_20_sec = "{{ message_bomb_20_sec }}";
 
     document.getElementById("message_bomb_20_sec_p").innerHTML = message_bomb_20_sec;
+
+    ttd2({{timetodetonatebomb}});
 
 </script>
 
