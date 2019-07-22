@@ -273,10 +273,10 @@
 
         socket.on('hackCheck', success_check_hack);
         socket.on('audiocheck', success_audiocheck);
-        socket.on('mainstation', success_mainstation);
+        socket.on('mainstation_old', success_mainstation);
 
         function auto_load(){
-            socket.emit('mainstation', {'room': room, 'old_value': old_check});
+            socket.emit('mainstation_old', {'room': room, 'old_value': old_check});
             socket.emit('audiocheck', {'room': room});
             socket.emit('hackCheck', {'station': 'MAN{{room}}', 'status': hackcheck});
         }

@@ -1007,7 +1007,7 @@ def hack_station(app_id):
 
 
 # Mirror station template
-@app.route('/maintemplate/<app_id>')
+@app.route('/maintemplate_old/<app_id>')
 def maintemplate(app_id):
     room = app_id
 
@@ -1015,7 +1015,7 @@ def maintemplate(app_id):
 
 
 # Mirror station data
-@app.route('/mainstation/<app_id>')
+@app.route('/mainstation_old/<app_id>')
 def mainstation(app_id):
     connection = data_connect()
     c = connection.cursor()
@@ -2504,7 +2504,7 @@ def reset_server():
 
 
 # Defense station data
-@app.route('/defenseStation/<app_id>', methods=['GET', 'POST'])
+@app.route('/mainstation/<app_id>', methods=['GET', 'POST'])
 def defenses_station(app_id):
     connection = data_connect()
     c = connection.cursor()
@@ -2524,7 +2524,7 @@ def defenses_station(app_id):
     is_available = "No"
     station_name = ""
     station_check = ""
-    station = "DEF{}".format(room)
+    station = "MAN{}".format(room)
     time_doubler = time_doubler_check(station)
     message_bomb = looser_check()
     if request.method == 'POST':
@@ -2571,7 +2571,7 @@ def defenses_station(app_id):
             else:
                 is_available = "Yes"
                 connection.close()
-            response = render_template('defenseStation.html', time_doubler=time_doubler,
+            return render_template('defenseStation.html', time_doubler=time_doubler,
                                        collected_mine=collected_mine,
                                        stationListed=names, station=station,
                                        message_bomb=message_bomb, room=room,
@@ -2613,7 +2613,7 @@ def defenses_station(app_id):
 
 
 # Defense station template
-@app.route('/defensetemplate/<app_id>')
+@app.route('/maintemplate/<app_id>')
 def defenses_template(app_id):
     room = app_id
     return render_template('defensetemplate.html', room=room)
@@ -2874,7 +2874,7 @@ def handle_masterstation(message):
             return
     emit('masterStation', response)
 
-@socketio.on('mainstation')
+@socketio.on('mainstation_old')
 def handle_mainstation(message):
     connection = data_connect()
     c = connection.cursor()
@@ -2927,7 +2927,7 @@ def handle_mainstation(message):
     if 'old_value' in message:
         if message['old_value'] == response:
             return
-    emit('mainstation', response)
+    emit('mainstation_old', response)
 
 
 @socketio.on('audiocheck')
@@ -3000,7 +3000,7 @@ def handle_audio_station(message):
 
 
 # Defense station data
-@socketio.on('defenseStation')
+@socketio.on('mainstation')
 def handle_defence_station(message):
     connection = data_connect()
     c = connection.cursor()
@@ -3021,7 +3021,7 @@ def handle_defence_station(message):
     station_check = ""
     collected_mine = "no"
     is_available = "No"
-    station = "DEF{}".format(room)
+    station = "MAN{}".format(room)
     time_doubler = time_doubler_check(station)
     message_bomb = looser_check()
 
@@ -3069,7 +3069,8 @@ def handle_defence_station(message):
             if 'old_value' in message:
                 if message['old_value'] == response:
                     return
-            emit('defenseStation', response)
+            emit('mainstation', response)
+            return
 
     station_list_sql = 'SELECT * FROM stationList WHERE room = %s;'
     c.execute(station_list_sql, room)
@@ -3104,7 +3105,7 @@ def handle_defence_station(message):
     if 'old_value' in message:
         if message['old_value'] == response:
             return
-    emit('defenseStation', response)
+    emit('mainstation', response)
 
 
 # create an instance of the Flask

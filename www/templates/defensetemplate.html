@@ -124,7 +124,7 @@
             $("#hack_load").load("/hack_load/");
         });
         var room = "{{ room }}";
-        var station = "DEF{{room}}";
+        var station = "MAN{{room}}";
         var deactivate_dblr;
         var hackcheck = "OFF";
         textset1 = "NO";
@@ -169,10 +169,10 @@
 
         socket.on('hackCheck', success_check_hack);
         socket.on('audiocheck', success_audiocheck);
-        socket.on('defenseStation', success_defensestation);
+        socket.on('mainstation', success_defensestation);
 
         function auto_load(){
-            socket.emit('defenseStation', {'station': station, 'room': room, 'old_value': old_check, 'stationCheck': stationCheck, 'stationNameTemp':stationNameTemp});
+            socket.emit('mainstation', {'station': station, 'room': room, 'old_value': old_check, 'stationCheck': stationCheck, 'stationNameTemp':stationNameTemp});
             socket.emit('audiocheck', {'room': room});
             if ( self == top ) {
                 socket.emit('hackCheck', {'station': station, 'status': hackcheck});
@@ -398,8 +398,8 @@
             document.getElementById("activate_back").style.display = "none";
             document.getElementById("main_loader").style.display = "none";
             stationlock = "OFF";
-            var redirect = "/defenseStation/{{room}}";
-            var redirect2 = '/defensetemplate/{{room}}';
+            var redirect = "/mainstation/{{room}}";
+            var redirect2 = '/maintemplate/{{room}}';
 
             {
                 localStorage["stationNameTemp"] = stationNameTemp;

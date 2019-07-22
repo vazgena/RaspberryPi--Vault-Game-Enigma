@@ -175,6 +175,19 @@ def add_incoming_bomb():
     connection.close()
 
 
+def update_22_07_2019():
+    connection = data_connect()
+    con = connection.cursor()
+
+    fixes = [
+        ('stationList', 7, ('nameSpelled', 'hint_text'), ('DEFENSE', "You can select a station and check if there\\'s a blast layed")),
+        ('stationList', 16, ('nameSpelled', 'hint_text'), ('DEFENSE', "You can select a station and check if there\\'s a blast layed"))
+    ]
+
+    update_rows(con, fixes)
+    connection.close()
+
+
 if __name__ == "__main__":
 
     # update_09_07_2019()
@@ -184,6 +197,7 @@ if __name__ == "__main__":
     # add_fake_bomb()
     # update_15_07_2019()
     # update_17_07_2019()
-    add_incoming_bomb()
+    # add_incoming_bomb()
+    update_22_07_2019()
     pass
 
