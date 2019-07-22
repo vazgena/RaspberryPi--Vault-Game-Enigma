@@ -2672,9 +2672,9 @@ def handle_hack(message):
     timetodetonate = "-1"
     # Room data
     attack_room = ""
-    if room == "1":
+    if str(room) == "1":
         attack_room = "2"
-    if room == "2":
+    if str(room) == "2":
         attack_room = "1"
 
     # Current rooms currency
@@ -2750,9 +2750,9 @@ def handle_camearstation(message):
     atkroom = "0"
     timer_message = ""
 
-    if room == "1":
+    if str(room) == "1":
         atkroom = "2"
-    if room == "2":
+    if str(room) == "2":
         atkroom = "1"
 
     time_doubler = time_doubler_check(station)
@@ -2797,9 +2797,9 @@ def handle_masterstation(message):
     c = connection.cursor()
     room = message['room']
     station = ""
-    if room == "1":
+    if str(room) == "1":
         station = "MAS1"
-    elif room == "2":
+    elif str(room) == "2":
         station = "MAS2"
     time_doubler = time_doubler_check(station)
     message_bomb = looser_check()
@@ -2892,9 +2892,9 @@ def handle_mainstation(message):
     color_selected_list = []
     color_list = []
     station = ""
-    if room == "1":
+    if str(room) == "1":
         station = "MAN1"
-    elif room == "2":
+    elif str(room) == "2":
         station = "MAN2"
     time_doubler = time_doubler_check(station)
     message_bomb = looser_check()
@@ -2956,9 +2956,9 @@ def handle_audio_station(message):
     connection = data_connect()
     c = connection.cursor()
     room = message['room']
-    if room == '1':
+    if str(room) == '1':
         station = "AUD1"
-    elif room == '2':
+    elif str(room) == '2':
         station = "AUD2"
     else:
         station = "error"
