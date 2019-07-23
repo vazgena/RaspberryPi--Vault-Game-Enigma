@@ -9,12 +9,17 @@ import os
 import re
 import time
 from datetime import datetime, timedelta
+import logging
+import logging.config
+import logging.handlers as handlers
 from flask import Flask, render_template, redirect, url_for, request, send_from_directory
 from pymysql import InternalError, connect
 from random import choice, sample
 
 from flask_socketio import SocketIO, Namespace, emit
 
+
+logger = logging.getLogger(__name__)
 
 # Variables
 app = Flask(__name__)
@@ -2383,12 +2388,15 @@ def bledata():
         else:
             packet_data = ""
             properties = ""
+        logger.debug(request.form)
         macstat = str(bt_addr) + "," + str(station_name)
         try:
             update_sql = "INSERT INTO trackers (macstat, mac, station, signal_avg, room, packet_data, properties) " \
                          "VALUES (%s, %s, %s, %s, %s, %s, %s) ON DUPLICATE KEY UPDATE " \
                          "macstat = %s, mac = %s, station = %s, signal_avg = %s, room = %s, timestamp = %s, packet_data = %s, properties = %s;"
             c.execute(update_sql, (macstat, bt_addr, station_name, avg, room, packet_data, properties, macstat,
+                                   bt_addr, station_name, avg, room, timestamp, packet_data, properties))
+            logger.debug(update_sql % (macstat, bt_addr, station_name, avg, room, packet_data, properties, macstat,
                                    bt_addr, station_name, avg, room, timestamp, packet_data, properties))
         except InternalError:
             pass
@@ -3108,7 +3116,24 @@ def handle_defence_station(message):
     emit('mainstation', response)
 
 
+def set_logger_file():
+    log_dir = "./log"
+    if not os.path.exists(log_dir):
+        os.mkdir(log_dir)
+
+    # logger.basicConfig(filename=file_log, filemode='a', level=getattr(logging, "DEBUG"),
+    #                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    # logging.config.fileConfig('logging.conf')
+    logger.setLevel(logging.DEBUG)
+    fil_log = os.path.join(log_dir, "track.log")
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    ch = logging.FileHandler(fil_log)
+    ch.setFormatter(formatter)
+    ch.setLevel(logging.DEBUG)
+    logger.addHandler(ch)
+
 # create an instance of the Flask
 if __name__ == '__main__':
     # app.run(host='0.0.0.0', port=8080, debug=True, threaded=True)
+    set_logger_file()
     socketio.run(app, host='0.0.0.0', port=8080, debug=True)
