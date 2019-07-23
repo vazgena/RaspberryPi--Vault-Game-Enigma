@@ -113,6 +113,17 @@ def test_hach_market():
     connection.close()
 
 
+def test_audio_volume():
+    connection = data_connect()
+    c = connection.cursor()
+    room = 1
+    play_add_sql = "INSERT INTO audiomanager (whattoplay, room) VALUES (%s, %s)"
+    c.execute(play_add_sql, ("gamewon", room))
+
+    connection.close()
+
+
 
 if __name__ == "__main__":
-    test_fake_bomb()
+    test_audio_volume()
+    # test_fake_bomb()

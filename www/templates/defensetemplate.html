@@ -9,7 +9,7 @@
     <link rel='stylesheet prefetch' href='/static/css/roboto.css'>
     <link rel='stylesheet prefetch' href='/static/css/font-awesome.min.css'>
     <link href="/static/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/static/css/inhouse.css?version=.01.5" rel="stylesheet">
+    <link href="/static/css/inhouse.css?version=.01.6" rel="stylesheet">
 
     <div id="background_upper2"></div>
 
@@ -18,7 +18,7 @@
     <div id="hack_load"></div>
 
     <div id="wrapper">
-        <div id="main_loader">
+        <div id="main_loader" style="z-index: 1;">
             <div id="station_load">
             </div>
         </div>
@@ -105,6 +105,16 @@
     <audio id='allclearstub' src="/static/audio/allclearstub.wav" type="audio/wav" preload="auto"  ></audio>
     </div>
     <div id="audio_check">
+    </div>
+
+    <script>
+        function setVolume() {
+        }
+    </script>
+
+    <div style="position: fixed; bottom: 50px; right: 100px; z-index: 2;">
+        <input type="range" id="volume" name="volume" min="0" max="100" value="100" onchange="setVolume();">
+        <label class="volume" for="volume">Volume</label>
     </div>
 
     <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
@@ -353,6 +363,37 @@
             else if (whattoplay === "allclearstub"){
                 allclearstub.play();
             }
+        }
+
+        setVolume = function(){
+            var assist = document.getElementById('assist');
+            var blastlaunch = document.getElementById('blastlaunch');
+            var bombdroppingnew = document.getElementById('bombdroppingnew');
+            var charge = document.getElementById('charge');
+            var steal = document.getElementById('steal');
+            var gameover = document.getElementById('gameover');
+            var gamewon = document.getElementById('gamewon');
+            var hackinitiated = document.getElementById('hackinitiated');
+            var unhack = document.getElementById('unhack');
+            var upgrade = document.getElementById('upgrade');
+            var youwerehacked = document.getElementById('youwerehacked');
+            var allclearstub = document.getElementById('allclearstub');
+
+            var volume_input = document.getElementById('volume');
+            var volume = (volume_input.value-volume_input.min)/(volume_input.max-volume_input.min);
+
+            assist.volume = volume;
+            blastlaunch.volume = volume;
+            bombdroppingnew.volume = volume;
+            charge.volume = volume;
+            steal.volume = volume;
+            gameover.volume = volume;
+            gamewon.volume = volume;
+            hackinitiated.volume = volume;
+            unhack.volume = volume;
+            upgrade.volume = volume;
+            youwerehacked.volume = volume;
+            allclearstub.volume = volume;
         }
 
 
