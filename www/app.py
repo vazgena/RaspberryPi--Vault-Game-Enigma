@@ -11,12 +11,11 @@ import time
 from datetime import datetime, timedelta
 import logging
 import logging.config
-import logging.handlers as handlers
 from flask import Flask, render_template, redirect, url_for, request, send_from_directory
 from pymysql import InternalError, connect
 from random import choice, sample
 
-from flask_socketio import SocketIO, Namespace, emit
+from flask_socketio import SocketIO, emit
 
 
 logger = logging.getLogger(__name__)
@@ -171,6 +170,9 @@ def admin_start_vault():
         # clear bomb location lists single bomb
         market_owned_solo_update = "TRUNCATE TABLE marketbomblocationsolo"
         c.execute(market_owned_solo_update)
+        # audiomanager truncate
+        audio_update = "TRUNCATE TABLE audiomanager"
+        c.execute(audio_update)
         # currency amount 0
         currency_update = "UPDATE currency SET amount = %s WHERE room IS NOT NULL;"
         c.execute(currency_update, "0")
