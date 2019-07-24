@@ -106,16 +106,12 @@
     </div>
     <div id="audio_check">
     </div>
-
-    <script>
-        function setVolume() {
-        }
-    </script>
-
+    {#
     <div style="position: fixed; bottom: 50px; right: 100px; z-index: 2;">
         <input type="range" id="volume" name="volume" min="0" max="100" value="100" onchange="setVolume();">
         <label class="volume" for="volume">Volume</label>
     </div>
+    #}
 
     <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
     <script>
@@ -365,23 +361,7 @@
             }
         }
 
-        setVolume = function(){
-            var assist = document.getElementById('assist');
-            var blastlaunch = document.getElementById('blastlaunch');
-            var bombdroppingnew = document.getElementById('bombdroppingnew');
-            var charge = document.getElementById('charge');
-            var steal = document.getElementById('steal');
-            var gameover = document.getElementById('gameover');
-            var gamewon = document.getElementById('gamewon');
-            var hackinitiated = document.getElementById('hackinitiated');
-            var unhack = document.getElementById('unhack');
-            var upgrade = document.getElementById('upgrade');
-            var youwerehacked = document.getElementById('youwerehacked');
-            var allclearstub = document.getElementById('allclearstub');
-
-            var volume_input = document.getElementById('volume');
-            var volume = (volume_input.value-volume_input.min)/(volume_input.max-volume_input.min);
-
+         function setVolume(volume){
             assist.volume = volume;
             blastlaunch.volume = volume;
             bombdroppingnew.volume = volume;

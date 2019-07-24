@@ -188,6 +188,39 @@ def update_22_07_2019():
     connection.close()
 
 
+def create_table_volume():
+    connection = data_connect()
+    con = connection.cursor()
+
+    sql_command = """
+CREATE TABLE `station_volume` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `station` varchar(100) NOT NULL,
+  `volume` float(53) NOT NULL,
+  `id_volume_tag` varchar(100) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `station` (`station`)
+);
+    """
+    con.execute(sql_command)
+    connection.close()
+
+
+def update_24_07_2019():
+    connection = data_connect()
+    con = connection.cursor()
+
+    insertes = [
+        ('station_volume', ['station', 'volume', 'id_volume_tag'],
+         ["MAN1", 0.7, 'volume_labyrinth']),
+        ('station_volume', ['station', 'volume', 'id_volume_tag'],
+         ["MAN2", 0.7, 'volume_enigma']),
+    ]
+    insert_rows(con, insertes)
+    connection.close()
+
+
+
 if __name__ == "__main__":
 
     # update_09_07_2019()
@@ -198,6 +231,8 @@ if __name__ == "__main__":
     # update_15_07_2019()
     # update_17_07_2019()
     # add_incoming_bomb()
-    update_22_07_2019()
+    # update_22_07_2019()
+    create_table_volume()
+    update_24_07_2019()
     pass
 

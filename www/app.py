@@ -229,7 +229,16 @@ def admin_vault():
 
 @app.route('/gameactiveVault')
 def game_active_vault():
-    return render_template('gameactiveVault.html')
+    sql_volume = "SELECT * from station_volume;"
+    connection = data_connect()
+    c = connection.cursor()
+    c.execute(sql_volume)
+    station_volumes = list(c.fetchall())
+    volume_level = []
+    for station_volume in station_volumes:
+        volume_level.append([station_volume[3], station_volume[2]])
+    connection.close()
+    return render_template('gameactiveVault.html', volume_level=volume_level)
 
 
 # Shows the trackers locations
@@ -857,7 +866,6 @@ def camera_station(app_id, room):
             .format(time_left_sec//60, time_left_sec%60)
     # Close database connection.
     connection.close()
-    # TODO: added timer check and add value for render_template, timer from counted_market
     return render_template('cameraStation.html', cams_available=cams_available,
                            time_doubler=time_doubler, message_bomb=message_bomb, station=station,
                            timer_message=timer_message)
@@ -2537,6 +2545,11 @@ def defenses_station(app_id):
     station = "MAN{}".format(room)
     time_doubler = time_doubler_check(station)
     message_bomb = looser_check()
+    sql_volume = "SELECT volume from station_volume WHERE station=%s;"
+    c.execute(sql_volume, station)
+    volume_list = list(c.fetchall())
+    volume = volume_list[0][0]
+
     if request.method == 'POST':
         is_available = "Yes"
         station_check = request.form['station']
@@ -2563,7 +2576,7 @@ def defenses_station(app_id):
                                width_list=width_list, height_list=height_list, x_list=x_list,
                                y_list=y_list, image_list=image_list, bh_list=bh_list,
                                bw_list=bw_list, br_list=br_list, color_list=color_list,
-                               station_name=station_name, init_station_name='Yes')
+                               station_name=station_name, init_station_name='Yes', volume=volume)
         return response
 
     check_lockout_sql = "SELECT * FROM  mineLockOut WHERE station = %s;"
@@ -2582,7 +2595,7 @@ def defenses_station(app_id):
                 is_available = "Yes"
                 connection.close()
             return render_template('defenseStation.html', time_doubler=time_doubler,
-                                       collected_mine=collected_mine,
+                                       collected_mine=collected_mine, volume=volume,
                                        stationListed=names, station=station,
                                        message_bomb=message_bomb, room=room,
                                        width_list=width_list, height_list=height_list, x_list=x_list,
@@ -2619,7 +2632,7 @@ def defenses_station(app_id):
                            width_list=width_list, height_list=height_list, x_list=x_list,
                            y_list=y_list, image_list=image_list, bh_list=bh_list,
                            bw_list=bw_list, br_list=br_list, color_list=color_list,
-                           station_name=station_name, init_station_name='No')
+                           station_name=station_name, init_station_name='No', volume=volume)
 
 
 # Defense station template
@@ -2628,6 +2641,17 @@ def defenses_template(app_id):
     room = app_id
     return render_template('defensetemplate.html', room=room)
 
+
+@app.route('/setvolume', methods=['GET', 'POST'])
+def save_volume():
+    if request.method == 'POST':
+        station = request.form['station']
+        volume = request.form['volume']
+        update_sql = "UPDATE station_volume SET volume = %s WHERE station = %s"
+        connection = data_connect()
+        c = connection.cursor()
+        c.execute(update_sql, (volume, station))
+    return ""
 
 
 @socketio.on('hackCheck')
@@ -2791,7 +2815,6 @@ def handle_camearstation(message):
             .format(time_left_sec // 60, time_left_sec % 60)
     # Close database connection.
     connection.close()
-    # TODO: added timer check and add value for render_template, timer from counted_market
     response = render_template('cameraStation.html', cams_available=cams_available,
                            time_doubler=time_doubler, message_bomb=message_bomb, station=station,
                            timer_message=timer_message)
@@ -3035,6 +3058,11 @@ def handle_defence_station(message):
     time_doubler = time_doubler_check(station)
     message_bomb = looser_check()
 
+    sql_volume = "SELECT volume from station_volume WHERE station=%s;"
+    c.execute(sql_volume, station)
+    volume_list = list(c.fetchall())
+    volume = volume_list[0][0]
+
     check_lockout_sql = "SELECT * FROM  mineLockOut WHERE station = %s;"
     c.execute(check_lockout_sql, station)
     row_count = c.rowcount
@@ -3073,7 +3101,7 @@ def handle_defence_station(message):
                                        message_bomb=message_bomb, room=room,
                                        width_list=width_list, height_list=height_list, x_list=x_list,
                                        y_list=y_list, image_list=image_list, bh_list=bh_list,
-                                       bw_list=bw_list, br_list=br_list, color_list=color_list,
+                                       bw_list=bw_list, br_list=br_list, color_list=color_list, volume=volume,
                                        station_name=station_name, is_available=is_available, init_station_name='No')
 
             if 'old_value' in message:
@@ -3105,7 +3133,7 @@ def handle_defence_station(message):
     # Close database connection.
     connection.close()
     response = render_template('defenseStation.html', time_doubler=time_doubler,
-                           collected_mine=collected_mine,
+                           collected_mine=collected_mine, volume=volume,
                            stationListed=names, station=station,
                            message_bomb=message_bomb, room=room,
                            width_list=width_list, height_list=height_list, x_list=x_list,

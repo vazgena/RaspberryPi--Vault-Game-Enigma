@@ -29,6 +29,17 @@
         <button onclick="reset_server()">Reset Server</button>
     </p>
 
+    <div style="position: fixed; bottom: 50px; right: 100px;">
+        <div>
+                <input type="range" id="volume_labyrinth" name="volume" min="0" max="100" value="100" onchange="chengeVolume('volume_labyrinth', 'MAN1')">
+                <label class="volume" for="volume_labyrinth">Volume labyrinth</label>
+        </div>
+        <div>
+                <input type="range" id="volume_enigma" name="volume" min="0" max="100" value="100" onchange="chengeVolume('volume_enigma', 'MAN2')">
+                <label class="volume" for="volume_enigma">Volume enigma</label>
+        </div>
+    </div>
+
     <script>
 
         function reset_stations() {
@@ -90,7 +101,35 @@
 
     setInterval(auto_load,500);
 
+    function chengeVolume(id_volume, id_station){
+        var volume_input = document.getElementById(id_volume);
+        var volume = (volume_input.value-volume_input.min)/(volume_input.max-volume_input.min);
+        var url_set_volume = '/setvolume';
+        $.ajax({
+                    type: 'POST',
+                    url: '/setvolume',
+                    data: {
+                        volume: volume,
+                        station: id_station,
+                    }
+         });
+    }
+
     </script>
+
+    <script>
+    function setVolume(id_volume, volume)
+    {
+        var volume_input = document.getElementById(id_volume);
+        var set_volume = volume * (parseInt(volume_input.max)-parseInt(volume_input.min)) + parseInt(volume_input.min);
+        volume_input.value = set_volume;
+    }
+
+    {% for i in volume_level %}
+    setVolume("{{ i[0] }}", {{ i[1] }});
+    {% endfor %}
+    </script>
+
 
 {% endblock %}
 
