@@ -219,6 +219,27 @@ def update_24_07_2019():
     insert_rows(con, insertes)
     connection.close()
 
+def add_column_station():
+    connection = data_connect()
+    con = connection.cursor()
+    query = "ALTER TABLE stationList ADD lay_bomb BOOLEAN NOT NULL DEFAULT TRUE"
+    con.execute(query)
+    connection.close()
+
+
+def update_24_07_2019_2():
+    connection = data_connect()
+    con = connection.cursor()
+
+    fixes = [
+        ('stationList', 5, ('lay_bomb',),
+         (False,)),
+        ('stationList', 14, ('lay_bomb',),
+         (False,))
+    ]
+
+    update_rows(con, fixes)
+    connection.close()
 
 
 if __name__ == "__main__":
@@ -234,5 +255,7 @@ if __name__ == "__main__":
     # update_22_07_2019()
     create_table_volume()
     update_24_07_2019()
+    add_column_station()
+    update_24_07_2019_2()
     pass
 

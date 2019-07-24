@@ -466,7 +466,7 @@ def bombstation(app_id):
         bombs = j[2]
 
     # Get list of stations deployable and deployed
-    station_list_sql = 'SELECT * FROM stationList WHERE room = %s'
+    station_list_sql = 'SELECT * FROM stationList WHERE room = %s AND lay_bomb=TRUE;'
     c.execute(station_list_sql, attack_room)
     station_list = list(c.fetchall())
     for i in station_list:
@@ -631,7 +631,7 @@ def bombstation2(app_id):
         bombs = j[2]
 
     # get list of all rooms and put them in a list
-    station_list_sql = 'SELECT * FROM stationList WHERE room = %s'
+    station_list_sql = 'SELECT * FROM stationList WHERE room = %s AND lay_bomb=TRUE;'
     c.execute(station_list_sql, attack_room)
     station_list = list(c.fetchall())
 
@@ -1321,7 +1321,7 @@ def market(app_id):
                 if str(room) == "2":
                     atkroom = "1"
                 station_names = []
-                room_list_sql = "SELECT * FROM stationList WHERE room = %s"
+                room_list_sql = "SELECT * FROM stationList WHERE room = %s AND lay_bomb=TRUE;"
                 c.execute(room_list_sql, atkroom)
                 room_list = list(c.fetchall())
                 for w in room_list:
