@@ -2406,8 +2406,8 @@ def bledata():
                          "macstat = %s, mac = %s, station = %s, signal_avg = %s, room = %s, timestamp = %s, packet_data = %s, properties = %s;"
             c.execute(update_sql, (macstat, bt_addr, station_name, avg, room, packet_data, properties, macstat,
                                    bt_addr, station_name, avg, room, timestamp, packet_data, properties))
-            logger.debug(update_sql % (macstat, bt_addr, station_name, avg, room, packet_data, properties, macstat,
-                                   bt_addr, station_name, avg, room, timestamp, packet_data, properties))
+            # logger.debug(update_sql % (macstat, bt_addr, station_name, avg, room, packet_data, properties, macstat,
+            #                        bt_addr, station_name, avg, room, timestamp, packet_data, properties))
         except InternalError:
             pass
         connection.close()

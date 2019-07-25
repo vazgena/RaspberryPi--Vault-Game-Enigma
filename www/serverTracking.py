@@ -44,7 +44,7 @@ def loop():
 	listed_unique_trackers = list(trackers_set)
 
 	for k in listed_unique_trackers:
-		player_trackers = "SELECT * FROM trackers WHERE mac = %s"
+		player_trackers = "SELECT * FROM trackers WHERE mac = %s AND station != 'BMB1' AND station != 'BMB2';"
 		c.execute(player_trackers, k)
 		compareable_list = list(c.fetchall())
 		for l in compareable_list:
