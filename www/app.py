@@ -173,6 +173,9 @@ def admin_start_vault():
         # audiomanager truncate
         audio_update = "TRUNCATE TABLE audiomanager"
         c.execute(audio_update)
+        # defence truncate
+        defence_update = "TRUNCATE TABLE station_defence"
+        c.execute(defence_update)
         # currency amount 0
         currency_update = "UPDATE currency SET amount = %s WHERE room IS NOT NULL;"
         c.execute(currency_update, "0")
@@ -2571,14 +2574,15 @@ def defenses_station(app_id):
         station_sql = 'SELECT * FROM stationList WHERE name = %s;'
         c.execute(station_sql, station_check)
         station_list = list(c.fetchall())[0]
+
+        sql_query = "INSERT INTO station_defence (station, room, status, timestamp) " \
+                         "VALUES (%s, %s, %s, %s) ON DUPLICATE KEY UPDATE " \
+                         "station = %s, room = %s, status = %s, timestamp = %s;"
+        c.execute(sql_query, (station_check, room, collected_mine, datetime.now(), station_check, room, collected_mine, datetime.now()))
+
         connection.close()
         station_name = station_list[5]
-        if row_count:
-            # list_blast.append([station_list[1], station_list[15]])
-            list_blast.append(station_list[1])
-        else:
-            # list_clear.append([station_list[1], station_list[23]])
-            list_clear.append(station_list[1])
+
 
         response = render_template('defenseStation.html', time_doubler=time_doubler,
                                collected_mine=collected_mine, is_available=is_available,
@@ -3135,6 +3139,11 @@ def handle_defence_station(message):
             emit('mainstation', response)
             return
 
+    defense_list_sql = 'SELECT * FROM station_defence WHERE room = %s;'
+    c.execute(defense_list_sql, room)
+    defese_list = list(c.fetchall())
+    defense_dict = {defence[1]: defence[3] for defence in defese_list}
+
     station_list_sql = 'SELECT * FROM stationList WHERE room = %s;'
     c.execute(station_list_sql, room)
     station_list = list(c.fetchall())
@@ -3151,10 +3160,11 @@ def handle_defence_station(message):
         bh_list.append(i[12])
         bw_list.append(i[13])
         br_list.append(i[14])
-        if name in list_blast:
-            color_list.append(i[15])
-        elif name in list_clear:
-            color_list.append(i[23])
+        if name in defense_dict:
+            if defense_dict[name] == 'yes':
+                color_list.append(i[15])
+            else:
+                color_list.append(i[23])
         else:
             color_list.append(i[16])
 

@@ -250,8 +250,9 @@ def create_table_defence():
     CREATE TABLE `station_defence` (
       `id` int(11) NOT NULL AUTO_INCREMENT,
       `station` varchar(100) NOT NULL,
+      `room` int(11) NOT NULL,
       `status` varchar(100) NOT NULL,
-      `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+      `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
       PRIMARY KEY (`id`),
       UNIQUE KEY `station` (`station`)
     );
@@ -271,9 +272,10 @@ if __name__ == "__main__":
     # update_17_07_2019()
     # add_incoming_bomb()
     # update_22_07_2019()
-    create_table_volume()
-    update_24_07_2019()
-    add_column_station()
-    update_24_07_2019_2()
+    # create_table_volume()
+    # update_24_07_2019()
+    # add_column_station()
+    # update_24_07_2019_2()
+    create_table_defence()
     pass
 
