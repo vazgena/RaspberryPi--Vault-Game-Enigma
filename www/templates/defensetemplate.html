@@ -137,6 +137,8 @@
         textset2 = "NO";
         var stationNameTemp = "";
         var stationCheck = "";
+        var blastStation = [];
+        var clearStation = [];
 
         if (localStorage["stationCheck"]){
             stationCheck = localStorage["stationCheck"];
@@ -144,9 +146,15 @@
         if (localStorage["stationNameTemp"]){
             stationNameTemp = localStorage["stationNameTemp"];
         }
+        if (localStorage["blastStation"]){
+            blastStation = JSON.parse(localStorage["blastStation"]);
+        }
+        if (localStorage["clearStation"]){
+            clearStation = JSON.parse(localStorage["clearStation"]);
+        }
 
 
-        var texttoset = "SELECT THE STATION TO CHECK THE BLAST.";
+        var texttoset = "CHOOSE WHICH STATION HAS BEEN BLASTED PREVIOUSLY.";
         var texttoset2 = "";
 
         {#
@@ -178,7 +186,8 @@
         socket.on('mainstation', success_defensestation);
 
         function auto_load(){
-            socket.emit('mainstation', {'station': station, 'room': room, 'old_value': old_check, 'stationCheck': stationCheck, 'stationNameTemp':stationNameTemp});
+            socket.emit('mainstation', {'station': station, 'room': room, 'old_value': old_check, 'stationCheck': stationCheck,
+            'stationNameTemp': stationNameTemp, 'blastStation': blastStation, 'clearStation': clearStation});
             socket.emit('audiocheck', {'room': room});
             if ( self == top ) {
                 socket.emit('hackCheck', {'station': station, 'status': hackcheck});
@@ -271,7 +280,7 @@
 
 
         function defendThis(stationName) {
-            if (hacksAvailable >= 1) {
+            {# if (hacksAvailable >= 1) { #}
                 stationlock = "ON";
 
                 set_game_string();
@@ -304,7 +313,7 @@
                         clearInterval(interval);
                     }
                 }, 1000);
-            }
+            {# } #}
         }
 
         var whattoplay = "";
@@ -429,7 +438,14 @@
                     type: 'POST',
                     url: redirect,
                     data: {
-                        station: stationNameTemp
+                        "station": stationNameTemp,
+                        "clearStation": clearStation,
+                        "blastStation": stationNameTemp,
+                        "clearStation": clearStation,
+                        "blastStation": blastStation
+                    },
+                    success: function(data){
+                        $("#station_load").html(data);
                     }
                 });
 
@@ -441,6 +457,39 @@
 
             }
         }
+
+        function setColor(station_id, background){
+            var object_set = document.getElementById(station_id);
+            if (object_set) {
+                object_set.style['background-color'] = background;
+            }
+        }
+
+        function removeColor(station_id, background){
+            document.getElementById("activate_back").style.display = "none";
+        }
+
+        function setClearStation(station_list){
+            localStorage["clearStation"] = JSON.stringify(station_list);
+            clearStation = station_list;
+        }
+
+        function setBlastStation(station_list){
+            localStorage["blastStation"] = JSON.stringify(station_list);
+            blastStation = station_list;
+        }
+
+        function updateColor(){
+            for (var color_set in clearStation){
+                setColor(clearStation[color_set][0], clearStation[color_set][1]);
+            }
+
+            for (var color_set in blastStation){
+                setColor(clearStation[color_set][0], clearStation[color_set][1]);
+            }
+        }
+
+
 
     </script>
 

@@ -2538,6 +2538,8 @@ def defenses_station(app_id):
     bw_list = []
     br_list = []
     color_list = []
+    list_blast = []
+    list_clear = []
     collected_mine = "no"
     is_available = "No"
     station_name = ""
@@ -2552,6 +2554,9 @@ def defenses_station(app_id):
 
     if request.method == 'POST':
         is_available = "Yes"
+        temp = request.form
+        list_blast = request.form.get('blastStation', [])
+        list_clear = request.form.get('clearStation', [])
         station_check = request.form['station']
         sql_query = "SELECT * FROM bombsDeployed WHERE stationName = %s AND timeIncoming < NOW();"
         c.execute(sql_query, station_check)
@@ -2568,6 +2573,12 @@ def defenses_station(app_id):
         station_list = list(c.fetchall())[0]
         connection.close()
         station_name = station_list[5]
+        if row_count:
+            # list_blast.append([station_list[1], station_list[15]])
+            list_blast.append(station_list[1])
+        else:
+            # list_clear.append([station_list[1], station_list[23]])
+            list_clear.append(station_list[1])
 
         response = render_template('defenseStation.html', time_doubler=time_doubler,
                                collected_mine=collected_mine, is_available=is_available,
@@ -2576,7 +2587,9 @@ def defenses_station(app_id):
                                width_list=width_list, height_list=height_list, x_list=x_list,
                                y_list=y_list, image_list=image_list, bh_list=bh_list,
                                bw_list=bw_list, br_list=br_list, color_list=color_list,
-                               station_name=station_name, init_station_name='Yes', volume=volume)
+                               station_name=station_name, init_station_name='Yes', volume=volume,
+                                listBlast=list_blast, listClear=list_clear
+                                   )
         return response
 
     check_lockout_sql = "SELECT * FROM  mineLockOut WHERE station = %s;"
@@ -2588,7 +2601,7 @@ def defenses_station(app_id):
             time_to_unlock = j[2]
             time_now = datetime.now()
             elapsed_time = time_now - time_to_unlock
-            if elapsed_time.total_seconds() > 30:
+            if elapsed_time.total_seconds() > 4:
                 remove_lockout = "DELETE FROM mineLockOut WHERE station = %s"
                 c.execute(remove_lockout, station)
             else:
@@ -2601,7 +2614,8 @@ def defenses_station(app_id):
                                        width_list=width_list, height_list=height_list, x_list=x_list,
                                        y_list=y_list, image_list=image_list, bh_list=bh_list,
                                        bw_list=bw_list, br_list=br_list, color_list=color_list,
-                                       station_name=station_name, is_available=is_available, init_station_name='No')
+                                       station_name=station_name, is_available=is_available, init_station_name='No',
+                                   listBlast=list_blast, listClear=list_clear)
 
     station_list_sql = 'SELECT * FROM stationList WHERE room = %s;'
     c.execute(station_list_sql, room)
@@ -2619,7 +2633,14 @@ def defenses_station(app_id):
         bh_list.append(i[12])
         bw_list.append(i[13])
         br_list.append(i[14])
-        color_list.append(i[16])
+
+        if name in list_blast:
+            color_list.append(i[15])
+        elif name in list_clear:
+            color_list.append(i[23])
+        else:
+            color_list.append(i[16])
+
         if name == station_check:
             station_name = spelled_name
 
@@ -2632,7 +2653,8 @@ def defenses_station(app_id):
                            width_list=width_list, height_list=height_list, x_list=x_list,
                            y_list=y_list, image_list=image_list, bh_list=bh_list,
                            bw_list=bw_list, br_list=br_list, color_list=color_list,
-                           station_name=station_name, init_station_name='No', volume=volume)
+                           station_name=station_name, init_station_name='No', volume=volume,
+                           listBlast=list_blast, listClear=list_clear)
 
 
 # Defense station template
@@ -3049,6 +3071,8 @@ def handle_defence_station(message):
     bw_list = []
     br_list = []
     color_list = []
+    list_blast = message.get('blastStation', [])
+    list_clear = message.get('clearStation', [])
     station_name = message['stationCheck']
     stationNameTemp = message['stationNameTemp']
     station_check = ""
@@ -3079,7 +3103,7 @@ def handle_defence_station(message):
             if station_list:
                 station_name = station_list[0][5]
 
-            if elapsed_time.total_seconds() > 30:
+            if elapsed_time.total_seconds() > 4:
                 remove_lockout = "DELETE FROM mineLockOut WHERE station = %s"
                 c.execute(remove_lockout, station)
                 continue
@@ -3102,7 +3126,8 @@ def handle_defence_station(message):
                                        width_list=width_list, height_list=height_list, x_list=x_list,
                                        y_list=y_list, image_list=image_list, bh_list=bh_list,
                                        bw_list=bw_list, br_list=br_list, color_list=color_list, volume=volume,
-                                       station_name=station_name, is_available=is_available, init_station_name='No')
+                                       station_name=station_name, is_available=is_available, init_station_name='No',
+                                       listBlast=list_blast, listClear=list_clear)
 
             if 'old_value' in message:
                 if message['old_value'] == response:
@@ -3126,7 +3151,15 @@ def handle_defence_station(message):
         bh_list.append(i[12])
         bw_list.append(i[13])
         br_list.append(i[14])
-        color_list.append(i[16])
+        if name in list_blast:
+            color_list.append(i[15])
+        elif name in list_clear:
+            color_list.append(i[23])
+        else:
+            color_list.append(i[16])
+
+        if name == station_check:
+            station_name = spelled_name
         if name == station_check:
             station_name = spelled_name
 
@@ -3139,7 +3172,8 @@ def handle_defence_station(message):
                            width_list=width_list, height_list=height_list, x_list=x_list,
                            y_list=y_list, image_list=image_list, bh_list=bh_list,
                            bw_list=bw_list, br_list=br_list, color_list=color_list,
-                           station_name=station_name, is_available=is_available, init_station_name='No')
+                           station_name=station_name, is_available=is_available, init_station_name='No',
+                               listBlast=list_blast, listClear=list_clear)
     if 'old_value' in message:
         if message['old_value'] == response:
             return

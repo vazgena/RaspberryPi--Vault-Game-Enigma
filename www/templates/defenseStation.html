@@ -3,7 +3,7 @@
     {% if is_available == "No" %}
         <div id="buttonHolderInner" style="display: inline-block;">
             {% for i in stationListed %}
-                <button class="button" onclick="defendThis('{{i}}');" style="background-color:{{color_list[loop.index0]}}; position: absolute; top: {{x_list[loop.index0]}}px; left: {{y_list[loop.index0]}}px; width: {{bh_list[loop.index0]}}px; height: {{bw_list[loop.index0]}}px; border-radius: {{br_list[loop.index0]}}px;">
+                <button class="button" id="{{i}}" onclick="defendThis('{{i}}');" style="background-color:{{color_list[loop.index0]}}; position: absolute; top: {{x_list[loop.index0]}}px; left: {{y_list[loop.index0]}}px; width: {{bh_list[loop.index0]}}px; height: {{bw_list[loop.index0]}}px; border-radius: {{br_list[loop.index0]}}px;">
                       <p>
                             <img src="/static/images/{{image_list[loop.index0]}}" style="width:{{width_list[loop.index0]}}px;height:{{height_list[loop.index0]}}px; ">
                       </p>
@@ -72,12 +72,17 @@
         if (self !== top){
             var textset1 = "NO";
             var textset2 = "NO";
-            var texttoset = "SELECT THE STATION TO CHECK THE BLAST.";
+            var texttoset = "CHOOSE WHICH STATION HAS BEEN BLASTED PREVIOUSLY.";
             text_set(texttoset, "background_upper2");
             var timeDoubler = parent.timeDoubler;
         }
 
         setVolume({{ volume }});
+
+        setBlastStation({{ listBlast | tojson}});
+        setClearStation({{ listClear | tojson}});
+
+        {# updateColor(); #}
 
     </script>
 

@@ -44,6 +44,7 @@ def loop():
 	listed_unique_trackers = list(trackers_set)
 
 	for k in listed_unique_trackers:
+		# TODO: hotfix for BMB1, BMB2
 		player_trackers = "SELECT * FROM trackers WHERE mac = %s AND station != 'BMB1' AND station != 'BMB2';"
 		c.execute(player_trackers, k)
 		compareable_list = list(c.fetchall())

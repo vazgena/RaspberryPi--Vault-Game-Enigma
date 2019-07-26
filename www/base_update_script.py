@@ -242,6 +242,24 @@ def update_24_07_2019_2():
     connection.close()
 
 
+def create_table_defence():
+    connection = data_connect()
+    con = connection.cursor()
+
+    sql_command = """
+    CREATE TABLE `station_defence` (
+      `id` int(11) NOT NULL AUTO_INCREMENT,
+      `station` varchar(100) NOT NULL,
+      `status` varchar(100) NOT NULL,
+      `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+      PRIMARY KEY (`id`),
+      UNIQUE KEY `station` (`station`)
+    );
+        """
+    con.execute(sql_command)
+    connection.close()
+
+
 if __name__ == "__main__":
 
     # update_09_07_2019()
