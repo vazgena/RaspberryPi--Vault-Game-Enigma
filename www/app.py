@@ -2541,8 +2541,6 @@ def defenses_station(app_id):
     bw_list = []
     br_list = []
     color_list = []
-    list_blast = []
-    list_clear = []
     collected_mine = "no"
     is_available = "No"
     station_name = ""
@@ -2557,9 +2555,6 @@ def defenses_station(app_id):
 
     if request.method == 'POST':
         is_available = "Yes"
-        temp = request.form
-        list_blast = request.form.get('blastStation', [])
-        list_clear = request.form.get('clearStation', [])
         station_check = request.form['station']
         sql_query = "SELECT * FROM bombsDeployed WHERE stationName = %s AND timeIncoming < NOW();"
         c.execute(sql_query, station_check)
@@ -2591,8 +2586,7 @@ def defenses_station(app_id):
                                width_list=width_list, height_list=height_list, x_list=x_list,
                                y_list=y_list, image_list=image_list, bh_list=bh_list,
                                bw_list=bw_list, br_list=br_list, color_list=color_list,
-                               station_name=station_name, init_station_name='Yes', volume=volume,
-                                listBlast=list_blast, listClear=list_clear
+                               station_name=station_name, init_station_name='Yes', volume=volume
                                    )
         return response
 
@@ -2618,8 +2612,12 @@ def defenses_station(app_id):
                                        width_list=width_list, height_list=height_list, x_list=x_list,
                                        y_list=y_list, image_list=image_list, bh_list=bh_list,
                                        bw_list=bw_list, br_list=br_list, color_list=color_list,
-                                       station_name=station_name, is_available=is_available, init_station_name='No',
-                                   listBlast=list_blast, listClear=list_clear)
+                                       station_name=station_name, is_available=is_available, init_station_name='No')
+
+    defense_list_sql = 'SELECT * FROM station_defence WHERE room = %s;'
+    c.execute(defense_list_sql, room)
+    defese_list = list(c.fetchall())
+    defense_dict = {defence[1]: defence[3] for defence in defese_list}
 
     station_list_sql = 'SELECT * FROM stationList WHERE room = %s;'
     c.execute(station_list_sql, room)
@@ -2638,10 +2636,11 @@ def defenses_station(app_id):
         bw_list.append(i[13])
         br_list.append(i[14])
 
-        if name in list_blast:
-            color_list.append(i[15])
-        elif name in list_clear:
-            color_list.append(i[23])
+        if name in defense_dict:
+            if defense_dict[name] == 'yes':
+                color_list.append(i[15])
+            else:
+                color_list.append(i[23])
         else:
             color_list.append(i[16])
 
@@ -2657,8 +2656,7 @@ def defenses_station(app_id):
                            width_list=width_list, height_list=height_list, x_list=x_list,
                            y_list=y_list, image_list=image_list, bh_list=bh_list,
                            bw_list=bw_list, br_list=br_list, color_list=color_list,
-                           station_name=station_name, init_station_name='No', volume=volume,
-                           listBlast=list_blast, listClear=list_clear)
+                           station_name=station_name, init_station_name='No', volume=volume)
 
 
 # Defense station template
@@ -3075,8 +3073,6 @@ def handle_defence_station(message):
     bw_list = []
     br_list = []
     color_list = []
-    list_blast = message.get('blastStation', [])
-    list_clear = message.get('clearStation', [])
     station_name = message['stationCheck']
     stationNameTemp = message['stationNameTemp']
     station_check = ""
@@ -3130,8 +3126,7 @@ def handle_defence_station(message):
                                        width_list=width_list, height_list=height_list, x_list=x_list,
                                        y_list=y_list, image_list=image_list, bh_list=bh_list,
                                        bw_list=bw_list, br_list=br_list, color_list=color_list, volume=volume,
-                                       station_name=station_name, is_available=is_available, init_station_name='No',
-                                       listBlast=list_blast, listClear=list_clear)
+                                       station_name=station_name, is_available=is_available, init_station_name='No')
 
             if 'old_value' in message:
                 if message['old_value'] == response:
@@ -3182,8 +3177,7 @@ def handle_defence_station(message):
                            width_list=width_list, height_list=height_list, x_list=x_list,
                            y_list=y_list, image_list=image_list, bh_list=bh_list,
                            bw_list=bw_list, br_list=br_list, color_list=color_list,
-                           station_name=station_name, is_available=is_available, init_station_name='No',
-                               listBlast=list_blast, listClear=list_clear)
+                           station_name=station_name, is_available=is_available, init_station_name='No')
     if 'old_value' in message:
         if message['old_value'] == response:
             return

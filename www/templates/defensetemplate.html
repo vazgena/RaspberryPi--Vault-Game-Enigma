@@ -137,20 +137,12 @@
         textset2 = "NO";
         var stationNameTemp = "";
         var stationCheck = "";
-        var blastStation = [];
-        var clearStation = [];
 
         if (localStorage["stationCheck"]){
             stationCheck = localStorage["stationCheck"];
         }
         if (localStorage["stationNameTemp"]){
             stationNameTemp = localStorage["stationNameTemp"];
-        }
-        if (localStorage["blastStation"]){
-            blastStation = JSON.parse(localStorage["blastStation"]);
-        }
-        if (localStorage["clearStation"]){
-            clearStation = JSON.parse(localStorage["clearStation"]);
         }
 
 
@@ -187,7 +179,7 @@
 
         function auto_load(){
             socket.emit('mainstation', {'station': station, 'room': room, 'old_value': old_check, 'stationCheck': stationCheck,
-            'stationNameTemp': stationNameTemp, 'blastStation': blastStation, 'clearStation': clearStation});
+            'stationNameTemp': stationNameTemp});
             socket.emit('audiocheck', {'room': room});
             if ( self == top ) {
                 socket.emit('hackCheck', {'station': station, 'status': hackcheck});
@@ -439,10 +431,6 @@
                     url: redirect,
                     data: {
                         "station": stationNameTemp,
-                        "clearStation": clearStation,
-                        "blastStation": stationNameTemp,
-                        "clearStation": clearStation,
-                        "blastStation": blastStation
                     },
                     success: function(data){
                         $("#station_load").html(data);
@@ -457,6 +445,8 @@
 
             }
         }
+
+        {#
 
         function setColor(station_id, background){
             var object_set = document.getElementById(station_id);
@@ -488,6 +478,7 @@
                 setColor(clearStation[color_set][0], clearStation[color_set][1]);
             }
         }
+        #}
 
 
 
