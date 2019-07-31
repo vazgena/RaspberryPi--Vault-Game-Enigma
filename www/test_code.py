@@ -4,8 +4,10 @@ import re
 from random import sample
 from datetime import datetime, timedelta
 from flask import Flask, render_template, redirect, url_for, request, send_from_directory
-from pymysql import InternalError, connect
+from pymysql import InternalError, connect, cursors
 from random import choice
+
+import requests
 
 from base_update_script import update_rows
 
@@ -123,7 +125,46 @@ def test_audio_volume():
     connection.close()
 
 
+def test_track_log():
+    connection = data_connect()
+    c = connection.cursor(cursor=cursors.SSCursor)
+    date_trash_left = datetime.strptime("2019-07-26 22:16:00,000", "%Y-%m-%d %H:%M:%S,%f")
+    date_trash_rigth = date_trash_left + timedelta(minutes=100)
+
+    sql_request = "SELECT * FROM log_tracker " \
+                  "LEFT JOIN stationList ON log_tracker.station=stationList.name " \
+                  "WHERE timestamp > %s AND timestamp < %s ORDER BY log_tracker.timestamp ASC;"
+    try:
+        c.execute(sql_request, (date_trash_left, date_trash_rigth))
+        rows = c.fetchall_unbuffered()
+        prev_time = None
+
+        for row in rows:
+            cur_time = row[5]
+            if prev_time:
+                time_delta = cur_time - prev_time
+                # time.sleep(time_delta.total_seconds()/2)
+            prev_time = cur_time
+            station = row[2]
+            bt_addr = row[1]
+            avg = str(row[4])
+            room = row[8]
+            data = {
+                'station': station,
+                'bt_addr': bt_addr,
+                'avg': avg,
+                'room': room
+            }
+            print(row[5])
+            response = requests.post("http://127.0.0.1:8080/bledata", data=data)
+            a = 1
+    except:
+        connection.close()
+
+
+
 
 if __name__ == "__main__":
-    test_audio_volume()
+    # test_audio_volume()
     # test_fake_bomb()
+    test_track_log()

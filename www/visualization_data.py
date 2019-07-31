@@ -8,6 +8,9 @@ from pymysql import InternalError, connect, cursors
 import asyncio
 import concurrent.futures
 
+import numpy as np
+import scipy.signal
+
 dbuser = 'game'
 dbpass = 'h95d3T7SXFta'
 
@@ -55,7 +58,9 @@ def get_data(track_name, room=1, show=False):
     fig, ax = plt.subplots()
 
     for key in volume_dict:
-        ax.plot(time_dict[key], volume_dict[key], label=key, marker='.')
+        x = scipy.signal.medfilt(np.array(volume_dict[key]), kernel_size=(3,))
+        y = time_dict[key][:len(x)]
+        ax.plot(y, x, label=key, marker='.')
 
     # fig.xlabel('x label')
     # fig.ylabel('y label')
@@ -69,11 +74,11 @@ def get_data(track_name, room=1, show=False):
         plt.show()
 
 if __name__ == "__main__":
-    trackers = ['A%s' % i for i in range(1, 7)] + ['B%s' % i for i in range(1, 7)] + ['Unknown']
-    for room in [1, 2]:
-        for tracker in trackers:
-            get_data(tracker, room)
-    # get_data('B2', 1, True)
+    # trackers = ['A%s' % i for i in range(1, 7)] + ['B%s' % i for i in range(1, 7)] + ['Unknown']
+    # for room in [1, 2]:
+    #     for tracker in trackers:
+    #         get_data(tracker, room)
+    get_data('B2', 1, True)
 
 
 

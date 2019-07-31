@@ -260,6 +260,23 @@ def create_table_defence():
     con.execute(sql_command)
     connection.close()
 
+def init_log_table():
+    connection = data_connect()
+    con = connection.cursor()
+
+    sql_command = """
+            CREATE TABLE `trackers_value` (
+              `id` int(11) NOT NULL AUTO_INCREMENT,
+              `mac` varchar(255) NOT NULL,
+              `station` varchar(100) NOT NULL,
+              `value` float(53) NOT NULL,
+              `timestamp` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+              PRIMARY KEY (`id`)
+            );
+                """
+    con.execute(sql_command)
+    connection.close()
+
 
 if __name__ == "__main__":
 
@@ -276,6 +293,7 @@ if __name__ == "__main__":
     # update_24_07_2019()
     # add_column_station()
     # update_24_07_2019_2()
-    create_table_defence()
+    # create_table_defence()
+    init_log_table()
     pass
 

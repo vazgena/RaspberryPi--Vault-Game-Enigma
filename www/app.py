@@ -192,6 +192,8 @@ def admin_start_vault():
         c.execute(log_check, (request.form['r2Bonus'], "2"))
         log_check = 'UPDATE currency SET amount = %s WHERE room = %s;'
         c.execute(log_check, (request.form['r1Bonus'], "1"))
+        trackers_value_update = "TRUNCATE TABLE trackers_value"
+        c.execute(trackers_value_update)
         #os.system("python3 resettrackers.py")
     # Close database connection.
     connection.close()
@@ -2133,7 +2135,6 @@ def hack_check_func(app_id):
 
 
 # count_hack = 0
-# # TODO: test check
 # # hack_check_func checks is stations are hacked it is used on all stations
 # @app.route('/hackCheck/<app_id>')
 # def hack_check_func(app_id):
@@ -2409,9 +2410,11 @@ def bledata():
                          "macstat = %s, mac = %s, station = %s, signal_avg = %s, room = %s, timestamp = %s, packet_data = %s, properties = %s;"
             c.execute(update_sql, (macstat, bt_addr, station_name, avg, room, packet_data, properties, macstat,
                                    bt_addr, station_name, avg, room, timestamp, packet_data, properties))
+            insert_sql = "INSERT INTO trackers_value (mac, station, value) VALUES (%s, %s, %s);"
+            c.execute(insert_sql, (bt_addr, station_name, float(avg)))
             # logger.debug(update_sql % (macstat, bt_addr, station_name, avg, room, packet_data, properties, macstat,
             #                        bt_addr, station_name, avg, room, timestamp, packet_data, properties))
-        except InternalError:
+        except InternalError as e:
             pass
         connection.close()
         return "mac accepted"
