@@ -525,6 +525,28 @@ body {
 
 }
 
+body.enigma {
+    background-image: url("/static/images/18_Enigma_Vault_Bkgd_Screen_1_FINAL.jpg");
+    background-size: 100% 100%;
+    color:black;
+    padding: 0;
+    margin: 0;
+    font-size: 24px;
+
+}
+
+
+body.labyrinth {
+    background-image: url("/static/images/18_Labyrinth_Vault_Bkgd_Screen.v2.2.png");
+    background-size: 100% 100%;
+    color:black;
+    padding: 0;
+    margin: 0;
+    font-size: 24px;
+
+}
+
+
 body.hack{
     background-image: url("/static/images/18_Enigma_Vault_Bkgd_Screen_4_FINAL.jpg");
    background-size: 100% 100%;

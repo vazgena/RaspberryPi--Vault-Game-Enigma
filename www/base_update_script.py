@@ -277,6 +277,21 @@ def init_log_table():
     con.execute(sql_command)
     connection.close()
 
+def update_icon_defense():
+    connection = data_connect()
+    con = connection.cursor()
+
+    fixes = [
+        ('stationList', 7, ('image',),
+         ("18_EV_Detect_Button_FINAL.png",)),
+        ('stationList', 16, ('image',),
+         ("18_EV_Detect_Button_FINAL.png",))
+    ]
+
+    update_rows(con, fixes)
+    connection.close()
+
+
 
 if __name__ == "__main__":
 
@@ -294,6 +309,7 @@ if __name__ == "__main__":
     # add_column_station()
     # update_24_07_2019_2()
     # create_table_defence()
-    init_log_table()
+    # init_log_table()
+    update_icon_defense()
     pass
 
