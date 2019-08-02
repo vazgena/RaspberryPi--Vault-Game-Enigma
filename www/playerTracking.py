@@ -7,14 +7,27 @@
 from beacontools import BeaconScanner
 import requests
 import re
+import sys
+import asyncio
 from statistics import median_high, mode
 
 bleData = {}
 howManyIterations = 1
 station = "MKP1"
 room = "1"
+loop = None
 
 address = "http://10.255.1.254:8080/bledata"
+
+
+async def run_execute(function, *args, **kwargs):
+    loop = asyncio.get_event_loop()
+    result = await loop.run_in_executor(None, lambda pars, kwpars: function(*pars, **kwpars), args, kwargs)
+    return result
+
+
+def computeDistance(txPower, rssi):
+    pass
 
 
 def callback(bt_addr, rssi, packet, properties):
@@ -26,6 +39,9 @@ def callback(bt_addr, rssi, packet, properties):
         flipped_evaluated_rssi = 100 - evaluated_rssi
         bleData.setdefault(bt_addr, []).append(flipped_evaluated_rssi)
         packet_expanded = str(packet)
+
+        distance = computeDistance(float(power_val)*(-1), float(rssi))
+
         if "gamine" in packet_expanded:
             try:
                 if len(bleData[bt_addr]) >= howManyIterations:
@@ -47,11 +63,7 @@ def callback(bt_addr, rssi, packet, properties):
                             'properties': str(properties)
                             }
 
-                    r = requests.post(url=address, data=data)
-                    if r.text == "":
-                        pass
-                    else:
-                        pass
+                    asyncio.run_coroutine_threadsafe(run_execute(requests.post, url=address, data=data), loop)
 
                     bleData.pop(bt_addr, None)
             except:
@@ -62,11 +74,20 @@ def callback(bt_addr, rssi, packet, properties):
         pass
 
 
-scanner = BeaconScanner(callback)
+if __name__ == "__main__":
 
-scanner.start()
+    scanner = BeaconScanner(callback)
+    scanner.start()
 
-while True:
-    pass
+    if sys.platform == 'win32':
+        loop = asyncio.ProactorEventLoop()
+        asyncio.set_event_loop(loop)
+    else:
+        loop = asyncio.get_event_loop()
 
-scanner.stop()
+    try:
+        loop.run_forever()
+    except KeyboardInterrupt:
+        pass
+
+    scanner.stop()
