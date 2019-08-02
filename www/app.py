@@ -3198,7 +3198,7 @@ def set_logger_file():
     logger.setLevel(logging.DEBUG)
     fil_log = os.path.join(log_dir, "track.log")
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    ch = logging.FileHandler(fil_log)
+    ch = logging.FileHandler(fil_log, mode='w')
     ch.setFormatter(formatter)
     ch.setLevel(logging.DEBUG)
     logger.addHandler(ch)

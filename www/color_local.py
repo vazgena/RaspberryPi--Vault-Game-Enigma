@@ -10,8 +10,8 @@ from random import randrange
 ser = serial.Serial('/dev/ttyUSB0', 9600)
 
 
-room = "2"
-station = "MTR2"
+room = "1"
+station = "MKP1"
 site = "http://10.255.1.254:8080/setBackground/"+station+"/"+room
 
 sleep(30)

@@ -11,7 +11,7 @@ from statistics import median_high, mode
 
 bleData = {}
 howManyIterations = 1
-station = "MTR1"
+station = "MKP1"
 room = "1"
 
 address = "http://10.255.1.254:8080/bledata"
