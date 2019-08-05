@@ -123,7 +123,8 @@ def new_loop():
 		# mean_values_old = np.mean(value_array, axis=1)
 		# j_old = np.argmax(mean_values_old)
 		mean_values = scipy.signal.medfilt(value_array, kernel_size=(1, n))
-		j = np.argmax(mean_values[:, n_2])
+		# j = np.argmax(mean_values[:, n_2])
+		j = np.argmin(mean_values[:, n_2])
 
 		# mean_value = "{:.2f}".format(mean_values[j])
 		mean_value = "{:.2f}".format(mean_values[j, n_2])

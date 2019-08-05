@@ -283,9 +283,21 @@ def update_icon_defense():
 
     fixes = [
         ('stationList', 7, ('image',),
-         ("18_EV_Detect_Button_FINAL.png",)),
+         ("18_EV_Detect_Button_FINAL_v2.png",)),
         ('stationList', 16, ('image',),
-         ("18_EV_Detect_Button_FINAL.png",))
+         ("18_EV_Detect_Button_FINAL_v2.png",))
+    ]
+
+    update_rows(con, fixes)
+    connection.close()
+
+
+def update_5_09_2019():
+    connection = data_connect()
+    con = connection.cursor()
+
+    fixes = [
+        ('market', 24, ('text',), ('All of your blasts change position to a random location.',)),
     ]
 
     update_rows(con, fixes)

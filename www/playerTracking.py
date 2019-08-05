@@ -9,6 +9,7 @@ import requests
 import re
 import sys
 import asyncio
+import math
 from statistics import median_high, mode
 
 bleData = {}
@@ -27,39 +28,49 @@ async def run_execute(function, *args, **kwargs):
 
 
 def computeDistance(txPower, rssi):
-    pass
+    if rssi == 0:
+        return -1  # if we cannot determine accuracy, return -1.
+
+    ratio = rssi / txPower
+
+    if ratio <= 1.0:
+        return math.pow(ratio, 10)
+    else:
+        # return math.pow(ratio, 10)
+        return 0.89976 * math.pow(ratio, 7.7095) + 0.111
 
 
 def callback(bt_addr, rssi, packet, properties):
     try:
         power_val = ''.join([i for i in str(packet) if i.isdigit()])
-        upper_number = (int(power_val) / (-1)) - int(rssi)
-        lower_number = (10 * 4)
-        evaluated_rssi = 10 * (upper_number / lower_number)
-        flipped_evaluated_rssi = 100 - evaluated_rssi
-        bleData.setdefault(bt_addr, []).append(flipped_evaluated_rssi)
+        # upper_number = (int(power_val) / (-1)) - int(rssi)
+        # lower_number = (10 * 4)
+        # evaluated_rssi = 10 * (upper_number / lower_number)
+        # flipped_evaluated_rssi = 100 - evaluated_rssi
+        # bleData.setdefault(bt_addr, []).append(flipped_evaluated_rssi)
         packet_expanded = str(packet)
 
         distance = computeDistance(float(power_val)*(-1), float(rssi))
+        bleData.setdefault(bt_addr, []).append(distance)
 
         if "gamine" in packet_expanded:
             try:
                 if len(bleData[bt_addr]) >= howManyIterations:
                     # send Data to server
-                    avg = 0
+                    # avg = 0
                     #for j in bleData[bt_addr]:
                     #    if int(j) > int(avg):
                     #       avg = int(j)
-                    try:
-                        avg = mode(bleData[bt_addr])
-                    except:
-                        avg = median_high(bleData[bt_addr])
-                    tx_amount = re.findall(r'\d+', packet_expanded)
+                    # try:
+                    #     avg = mode(bleData[bt_addr])
+                    # except:
+                    #     avg = median_high(bleData[bt_addr])
+                    # tx_amount = re.findall(r'\d+', packet_expanded)
                     data = {'station': station,
-                           'bt_addr': bt_addr,
-                           'avg': str(avg),
-                           'room': room,
-                            'packet_data': str(tx_amount[0]),
+                            'bt_addr': bt_addr,
+                            'avg': str(distance),
+                            'room': room,
+                            'packet_data': str(packet),
                             'properties': str(properties)
                             }
 
@@ -68,6 +79,7 @@ def callback(bt_addr, rssi, packet, properties):
                     bleData.pop(bt_addr, None)
             except:
                 bleData.pop(bt_addr, None)
+                pass
         else:
             pass
     except:

@@ -1321,6 +1321,7 @@ def market(app_id):
                 c.execute(update_currency_sql, (str(coin_added), room))
 
             elif str(request.form['itemID']) == "24":
+                # TODO: modify
                 if str(room) == "1":
                     atkroom = "2"
                 if str(room) == "2":
@@ -1334,12 +1335,22 @@ def market(app_id):
                 bomb_check = "SELECT * FROM bombsDeployed WHERE room = %s"
                 c.execute(bomb_check, atkroom)
                 bomb_list = list(c.fetchall())
+                existing_bombs = [b[2] for b in bomb_list]
+                new_bombs = []
+
                 for g in bomb_list:
                     station_name = choice(station_names)
                     station_names.remove(station_name)
                     bomb_id = g[0]
-                    bomb_update = "UPDATE bombsDeployed SET stationName = %s WHERE id = %s"
+                    bomb_update = "UPDATE bombsDeployed SET stationName = %s WHERE id = %s;"
                     c.execute(bomb_update, (station_name, bomb_id))
+                    ignoreList_update = "UPDATE ignoreList SET station = %s WHERE station = %s;"
+                    c.execute(ignoreList_update, (station_name, g[2]))
+                    new_bombs.append(station_name)
+
+                # for station in set(new_bombs).difference(set(existing_bombs)):
+                #     bomb_ignore_remove = "DELETE FROM ignoreList WHERE station=%s;"
+                #     c.execute(bomb_ignore_remove, station)
 
             elif str(request.form['itemID']) == "21":
                 current_ttd_sql = "SELECT * FROM bombdettimer WHERE room = %s"
