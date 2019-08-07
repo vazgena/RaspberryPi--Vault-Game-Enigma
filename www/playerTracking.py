@@ -7,15 +7,21 @@
 from beacontools import BeaconScanner
 import requests
 import re
+import os
 import sys
 import asyncio
 import math
 from statistics import median_high, mode
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+if BASE_DIR not in sys.path:
+    sys.path.append(BASE_DIR)
+
+from config_station import station, room
+
 bleData = {}
 howManyIterations = 1
-station = "MKP1"
-room = "1"
 loop = None
 
 address = "http://10.255.1.254:8080/bledata"
@@ -42,30 +48,24 @@ def computeDistance(txPower, rssi):
 
 def callback(bt_addr, rssi, packet, properties):
     try:
-        power_val = ''.join([i for i in str(packet) if i.isdigit()])
-        # upper_number = (int(power_val) / (-1)) - int(rssi)
-        # lower_number = (10 * 4)
-        # evaluated_rssi = 10 * (upper_number / lower_number)
-        # flipped_evaluated_rssi = 100 - evaluated_rssi
-        # bleData.setdefault(bt_addr, []).append(flipped_evaluated_rssi)
         packet_expanded = str(packet)
+        power_match = re.search('(?<=tx_power: )-?\d+', packet_expanded)
+        if power_match is None:
+            return
+        power_str = power_match.group(0)
+        power_val = float(power_str)
+        rssi_val = float(rssi)
 
-        distance = computeDistance(float(power_val)*(-1), float(rssi))
+        # TODO: hotfix
+        power_val = min(power_val, -power_val, -1)
+        rssi_val = min(rssi_val, -rssi_val,  -.5)
+
+        distance = computeDistance(power_val, rssi_val)
         bleData.setdefault(bt_addr, []).append(distance)
 
         if "gamine" in packet_expanded:
             try:
                 if len(bleData[bt_addr]) >= howManyIterations:
-                    # send Data to server
-                    # avg = 0
-                    #for j in bleData[bt_addr]:
-                    #    if int(j) > int(avg):
-                    #       avg = int(j)
-                    # try:
-                    #     avg = mode(bleData[bt_addr])
-                    # except:
-                    #     avg = median_high(bleData[bt_addr])
-                    # tx_amount = re.findall(r'\d+', packet_expanded)
                     data = {'station': station,
                             'bt_addr': bt_addr,
                             'avg': str(distance),

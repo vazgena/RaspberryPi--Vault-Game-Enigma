@@ -292,15 +292,68 @@ def update_icon_defense():
     connection.close()
 
 
-def update_5_09_2019():
+def init_table_position():
     connection = data_connect()
     con = connection.cursor()
 
-    fixes = [
-        ('market', 24, ('text',), ('All of your blasts change position to a random location.',)),
-    ]
+    sql_command = """
+            CREATE TABLE `station_position` (
+              `id` int(11) NOT NULL AUTO_INCREMENT,
+              `room` int(11) NOT NULL,
+              `station` varchar(100) NOT NULL,
+              `x` float(53) NOT NULL,
+              `y` float(53) NOT NULL,
+              PRIMARY KEY (`id`)
+            );
+                """
+    con.execute(sql_command)
+    connection.close()
 
-    update_rows(con, fixes)
+
+def add_position():
+    connection = data_connect()
+    con = connection.cursor()
+    # insertes =[(table, fields, values)]
+    insertes = [
+        ('station_position', ['room', 'station', 'x', 'y'],
+         [1, 'MKP1', 0, 8]),
+        ('station_position', ['room', 'station', 'x', 'y'],
+         [1, 'MOR1', 7, 15.3]),
+        ('station_position', ['room', 'station', 'x', 'y'],
+         [1, 'MTR1', 13, 15.3]),
+        ('station_position', ['room', 'station', 'x', 'y'],
+         [1, 'CS11', 19, 15.3]),
+        ('station_position', ['room', 'station', 'x', 'y'],
+         [1, 'MAN1', 6.4, 0]),
+        ('station_position', ['room', 'station', 'x', 'y'],
+         [1, 'MAS1', 13, 0]),
+        ('station_position', ['room', 'station', 'x', 'y'],
+         [1, 'AUD1', 19, 0]),
+        ('station_position', ['room', 'station', 'x', 'y'],
+         [1, 'HAC1', 25, 7.2]),
+    ]
+    insert_rows(con, insertes)
+
+    insertes = [
+        ('station_position', ['room', 'station', 'x', 'y'],
+         [2, 'MKP2', 0, 7]),
+        ('station_position', ['room', 'station', 'x', 'y'],
+         [2, 'MOR2', 6.6, 13]),
+        ('station_position', ['room', 'station', 'x', 'y'],
+         [2, 'MTR2', 13.2, 13]),
+        ('station_position', ['room', 'station', 'x', 'y'],
+         [2, 'CS12', 20.2, 13]),
+        ('station_position', ['room', 'station', 'x', 'y'],
+         [2, 'MAN2', 7, 0]),
+        ('station_position', ['room', 'station', 'x', 'y'],
+         [2, 'MAS2', 14.3, 0]),
+        ('station_position', ['room', 'station', 'x', 'y'],
+         [2, 'AUD2', 21.3, 0]),
+        ('station_position', ['room', 'station', 'x', 'y'],
+         [2, 'HAC2', 25.8, 6.2]),
+    ]
+    insert_rows(con, insertes)
+
     connection.close()
 
 
@@ -322,6 +375,8 @@ if __name__ == "__main__":
     # update_24_07_2019_2()
     # create_table_defence()
     # init_log_table()
-    update_icon_defense()
+    # update_icon_defense()
+    init_table_position()
+    add_position()
     pass
 

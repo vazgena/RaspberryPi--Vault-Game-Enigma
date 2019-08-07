@@ -6,6 +6,8 @@ from datetime import datetime, timedelta
 from flask import Flask, render_template, redirect, url_for, request, send_from_directory
 from pymysql import InternalError, connect, cursors
 from random import choice
+import numpy as np
+from scipy.spatial.distance import cdist
 
 import requests
 
@@ -163,8 +165,61 @@ def test_track_log():
 
 
 
+locations_room = {}
+
+def init_locations():
+    connection = data_connect()
+    c = connection.cursor()
+    for room in [1, 2]:
+        select_locations_sql = "SELECT * FROM station_position WHERE room=%s;"
+        c.execute(select_locations_sql, room)
+        list_locations = list(c.fetchall())
+        list_stations = []
+        locations = np.zeros((len(list_locations), 2))
+        for i, location in enumerate(list_locations):
+            list_stations.append(location[2])
+            locations[i, :] = [location[3], location[4]]
+        locations_room[room] = {
+            "locations": locations,
+            "stations": list_stations
+        }
+    connection.close()
+
+
+def test_trilateration():
+    init_locations()
+    n_step = 60
+    k = 1.1
+    while True:
+        room = choice((1, 2))
+        time_start = time.time()
+        locations = locations_room[room]['locations']
+        x = np.random.random() * locations.max(axis=0)[0]
+        y = np.random.random() * locations.max(axis=0)[1]
+        point = np.array([[x, y]])
+        print(x, y)
+        dists = cdist(point, locations)[0, :]
+        min_dist_i = np.argmin(dists)
+        print(locations_room[room]['stations'][min_dist_i], dists[min_dist_i])
+        while time_start + n_step > time.time():
+            for i, dist in enumerate(dists):
+                try:
+                    station = locations_room[room]['stations'][i]
+                    data = {'station': station,
+                            'bt_addr': "asd3234f-{}".format(room),
+                            'avg': str(dist*k),
+                            'room': room,
+                            }
+                    address = "http://127.0.0.1:8080/bledata"
+                    response = requests.post(url=address, data=data)
+                except:
+                    pass
+
+
+
 
 if __name__ == "__main__":
     # test_audio_volume()
     # test_fake_bomb()
-    test_track_log()
+    # test_track_log()
+    test_trilateration()

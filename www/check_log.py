@@ -159,7 +159,26 @@ async def read_log(file_name, n_task=100):
     connection.close()
 
 
+def read_log_tracker(file_name, n_task=100):
+    # loop = asyncio.get_event_loop()
+    # tasks = []
+
+    for line in reverse_readline(file_name):
+        # data_dict = parse_log(line)
+        tx = re.search('(?<=tx_power: )-?\d+', line)
+        if tx:
+            print(tx.group(0))
+            if int(tx.group(0)) > -1:
+                b = 2
+            pass
+        else:
+            a = 1
+
+
 if __name__ == "__main__":
     # init_log_table()
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(read_log("track.log"))
+
+    # loop = asyncio.get_event_loop()
+    # loop.run_until_complete(read_log("track.log"))
+
+    read_log_tracker('../log/track.log')
