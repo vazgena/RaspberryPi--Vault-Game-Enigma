@@ -1,6 +1,8 @@
 from time import sleep
 import numpy as np
 import scipy.signal
+from scipy.spatial.distance import cdist
+from scipy.optimize import minimize
 from pymysql import InternalError, connect
 from datetime import datetime
 
@@ -145,6 +147,30 @@ def new_loop():
 	sql_request_remove = "DELETE FROM trackers_value WHERE timestamp < DATE_SUB(NOW(), INTERVAL 1 MINUTE);"
 	c.execute(sql_request_remove)
 	connection.close()
+
+
+def mse(x, distances, locations):
+	c_dist = cdist(x.reshape((1, 2)), locations)
+	error_dist = distances - c_dist
+	error_dist *= distances
+	error_dist[error_dist > 0] = error_dist[error_dist > 0]/2
+	mse = np.square(error_dist).mean()
+	return mse
+
+
+def optimization(initial_location, locations, distances):
+	result = minimize(
+		mse,  # The error function
+		initial_location,  # The initial guess
+		args=(locations, distances),  # Additional parameters for mse
+		method='L-BFGS-B',  # The optimisation algorithm
+		options={
+			'ftol': 1e-5,  # Tolerance
+			'maxiter': 1e+7  # Maximum iterations
+		})
+	location = result.x
+	return location
+
 
 
 while True:

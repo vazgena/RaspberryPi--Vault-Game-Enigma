@@ -2413,7 +2413,8 @@ def bledata():
         else:
             packet_data = ""
             properties = ""
-        logger.debug(request.form)
+        if 'packet' in request.form:
+            logger.debug(request.form['packet'])
         macstat = str(bt_addr) + "," + str(station_name)
         try:
             update_sql = "INSERT INTO trackers (macstat, mac, station, signal_avg, room, packet_data, properties) " \
@@ -3209,7 +3210,7 @@ def set_logger_file():
     logger.setLevel(logging.DEBUG)
     fil_log = os.path.join(log_dir, "track.log")
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    ch = logging.FileHandler(fil_log, mode='w')
+    ch = logging.FileHandler(fil_log, mode='a')
     ch.setFormatter(formatter)
     ch.setLevel(logging.DEBUG)
     logger.addHandler(ch)
