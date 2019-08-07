@@ -60,6 +60,8 @@ def callback(bt_addr, rssi, packet, properties):
         power_val = min(power_val, -power_val, -1)
         rssi_val = min(rssi_val, -rssi_val,  -.5)
 
+        power_val = -60
+
         distance = computeDistance(power_val, rssi_val)
         bleData.setdefault(bt_addr, []).append(distance)
 
@@ -71,7 +73,8 @@ def callback(bt_addr, rssi, packet, properties):
                             'avg': str(distance),
                             'room': room,
                             'packet_data': str(packet),
-                            'properties': str(properties)
+                            'properties': str(properties),
+                            'rssi': float(rssi)
                             }
 
                     asyncio.run_coroutine_threadsafe(run_execute(requests.post, url=address, data=data), loop)
