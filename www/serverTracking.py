@@ -53,7 +53,7 @@ def init_locations():
 		for i, location in enumerate(list_locations):
 			list_stations.append(location[2])
 			locations[i, :] = [location[3], location[4]]
-		locations_room[room] = {
+		locations_room[str(room)] = {
 			"locations": locations,
 			"stations": list_stations,
 		}
@@ -125,6 +125,8 @@ def new_loop():
 		station = k[1]
 		if mac not in mac_map:
 			mac_map[mac] = []
+		if station in ['BMB1', 'BMB2']:
+			continue
 		mac_map[mac].append(station)
 
 	sql_query = "SELECT value FROM trackers_value WHERE mac=%s AND station=%s ORDER BY timestamp DESC LIMIT %s;"
@@ -144,37 +146,39 @@ def new_loop():
 
 			mean_values = scipy.signal.medfilt(value_array, kernel_size=(1, n))
 			j = np.argmin(mean_values[:, n_2])
-
+			mean_value = mean_values[j, n_2]
 			location = mac_map[mac][j]
 
-			if location in locations_room[1]['stations']:
-				room = 1
-			else:
-				room = 2
 
-			locs = locations_room[room]['locations']
-			stat = locations_room[room]['stations']
-			indexs_dist = []
-			indexs_locs = []
-			for i, loc in enumerate(stat):
-				try:
-					index_dist = mac_map[mac].index(loc)
-					indexs_locs.append(i)
-					indexs_dist.append(index_dist)
-				except:
-					pass
+			# if location in locations_room["1"]['stations']:
+			# 	room = "1"
+			# else:
+			# 	room = "2"
+			#
+			# locs = locations_room[room]['locations']
+			# stat = locations_room[room]['stations']
+			# indexs_dist = []
+			# indexs_locs = []
+			# for i, loc in enumerate(stat):
+			# 	try:
+			# 		index_dist = mac_map[mac].index(loc)
+			# 		indexs_locs.append(i)
+			# 		indexs_dist.append(index_dist)
+			# 	except:
+			# 		pass
+			#
+			# dist_select = mean_values[indexs_dist, n_2]
+			# locs_select = locs[indexs_locs]
+			# # Trilateration
+			# initial_location = locs_select.mean(axis=0)
+			# x = optimization(initial_location, locs_select, dist_select)
+			#
+			# new_dist = cdist(x.reshape((1, 2)), locs)[0, :]
+			#
+			# j = np.argmin(new_dist)
+			# location = stat[j]
+			# mean_value = new_dist[j]
 
-			dist_select = mean_values[indexs_dist, n_2]
-			locs_select = locs[indexs_locs]
-			# Trilateration
-			initial_location = locs_select.mean(axis=0)
-			x = optimization(initial_location, locs_select, dist_select)
-
-			new_dist = cdist(x.reshape((1, 2)), locs)[0, :]
-
-			j = np.argmin(new_dist)
-			location = stat[j]
-			mean_value = new_dist[j]
 			mean_value_str = "{:.2f}".format(mean_value)
 
 			# print(x)
