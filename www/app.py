@@ -2635,7 +2635,7 @@ def defenses_station(app_id):
     defese_list = list(c.fetchall())
     defense_dict = {defence[1]: defence[3] for defence in defese_list}
 
-    station_list_sql = 'SELECT * FROM stationList WHERE room = %s;'
+    station_list_sql = 'SELECT * FROM stationList WHERE room = %s AND lay_bomb=TRUE;'
     c.execute(station_list_sql, room)
     station_list = list(c.fetchall())
     for i in station_list:
@@ -3155,7 +3155,7 @@ def handle_defence_station(message):
     defese_list = list(c.fetchall())
     defense_dict = {defence[1]: defence[3] for defence in defese_list}
 
-    station_list_sql = 'SELECT * FROM stationList WHERE room = %s;'
+    station_list_sql = 'SELECT * FROM stationList WHERE room = %s AND lay_bomb=TRUE;'
     c.execute(station_list_sql, room)
     station_list = list(c.fetchall())
     for i in station_list:

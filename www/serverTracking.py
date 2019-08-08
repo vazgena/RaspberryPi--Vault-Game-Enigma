@@ -11,9 +11,9 @@ dbuser = 'game'
 dbpass = 'h95d3T7SXFta'
 
 # smoothing window size
-n = 3
+n = 7
 # target value, counting from the end. affects lag, -2 recommended
-n_2 = -2  # int(np.floor(n/2)) #
+n_2 = -4  # int(np.floor(n/2)) #
 
 locations_room = {}
 
@@ -141,6 +141,7 @@ def new_loop():
 				listed_value = list(c.fetchall())
 				values = [value[0] for value in listed_value]
 				if len(values) < n:
+					value_array[i, :] = 100
 					continue
 				value_array[i, :] = values
 
@@ -148,41 +149,47 @@ def new_loop():
 			j = np.argmin(mean_values[:, n_2])
 			mean_value = mean_values[j, n_2]
 			location = mac_map[mac][j]
+			location_first = location
+			mean_value_first = mean_value
 
+			if location in locations_room["1"]['stations']:
+				room = "1"
+			else:
+				room = "2"
 
-			# if location in locations_room["1"]['stations']:
-			# 	room = "1"
-			# else:
-			# 	room = "2"
-			#
-			# locs = locations_room[room]['locations']
-			# stat = locations_room[room]['stations']
-			# indexs_dist = []
-			# indexs_locs = []
-			# for i, loc in enumerate(stat):
-			# 	try:
-			# 		index_dist = mac_map[mac].index(loc)
-			# 		indexs_locs.append(i)
-			# 		indexs_dist.append(index_dist)
-			# 	except:
-			# 		pass
-			#
-			# dist_select = mean_values[indexs_dist, n_2]
-			# locs_select = locs[indexs_locs]
-			# # Trilateration
+			locs = locations_room[room]['locations']
+			stat = locations_room[room]['stations']
+			indexs_dist = []
+			indexs_locs = []
+			for i, loc in enumerate(stat):
+				try:
+					index_dist = mac_map[mac].index(loc)
+					indexs_locs.append(i)
+					indexs_dist.append(index_dist)
+				except:
+					pass
+
+			dist_select = mean_values[indexs_dist, n_2]
+			locs_select = locs[indexs_locs]
+			# Trilateration
 			# initial_location = locs_select.mean(axis=0)
-			# x = optimization(initial_location, locs_select, dist_select)
-			#
-			# new_dist = cdist(x.reshape((1, 2)), locs)[0, :]
-			#
-			# j = np.argmin(new_dist)
-			# location = stat[j]
-			# mean_value = new_dist[j]
+			initial_location = locs[stat.index(location)]
+			x = optimization(initial_location, locs_select, dist_select)
 
+			new_dist = cdist(x.reshape((1, 2)), locs)[0, :]
+
+			j = np.argmin(new_dist)
+			location = stat[j]
+			mean_value = new_dist[j]
 			mean_value_str = "{:.2f}".format(mean_value)
 
 			# print(x)
 			# print(location, mean_value)
+			# print(location_first, location, mean_value-mean_value_first)
+			# if location_first != location:
+			# 	a = 1
+			# if location_first == "MTR1":
+			# 	a = 1
 
 			bmb_check = "SELECT * FROM ignorePlayerList WHERE mac = %s;"
 			# TODO: check location/mac
@@ -206,7 +213,7 @@ def new_loop():
 def mse(x, locations, distances):
 	c_dist = cdist(x.reshape((1, 2)), locations)
 	error_dist = distances - c_dist
-	error_dist /= distances
+	error_dist /= distances**3
 	error_dist[error_dist > 0] = error_dist[error_dist > 0]/2
 	mse = np.square(error_dist).mean()
 	return mse
