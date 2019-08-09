@@ -69,13 +69,13 @@
             }
         }
 
-        if (self !== top){
+        {% if is_available == "No" %}
             var textset1 = "NO";
             var textset2 = "NO";
             var texttoset = "CHOOSE WHICH STATION HAS BEEN BLASTED PREVIOUSLY.";
             text_set(texttoset, "background_upper2");
             var timeDoubler = parent.timeDoubler;
-        }
+        {% endif %}
 
         setVolume({{ volume }});
 

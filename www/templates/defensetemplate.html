@@ -290,6 +290,10 @@
                 }
                 document.getElementById("arrows0").src = "/static/html/arrows.html";
                 document.getElementById("arrows0").style.display = "block";
+                document.getElementById("arrows1").src = "/static/html/arrows.html";
+                document.getElementById("arrows1").style.display = "none"
+                document.getElementById("arrows2").src = "/static/html/arrows.html";
+                document.getElementById("arrows2").style.display = "none"
                 document.getElementById("station_load").style.display = "none";
                 document.getElementById("activationButton1").style.display = "none";
                 document.getElementById("activationButton2").style.display = "none";
@@ -386,7 +390,6 @@
 
 
         function activate1() {
-            document.getElementById("arrows1").src = "/static/html/arrows.html";
             document.getElementById("arrows1").style.display = "block";
             document.getElementById("activate2").style.display = "block";
             var seconds_left = Math.floor(Math.random() * (max - min) + min);
@@ -404,7 +407,6 @@
         }
 
         function activate2() {
-            document.getElementById("arrows2").src = "/static/html/arrows.html";
             document.getElementById("arrows2").style.display = "block";
             document.getElementById("activate3").style.display = "block";
             var seconds_left = Math.floor(Math.random() * (max - min) + min);

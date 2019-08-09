@@ -8,6 +8,7 @@
 import os
 import re
 import time
+import math
 from datetime import datetime, timedelta
 import logging
 import logging.config
@@ -25,6 +26,9 @@ app = Flask(__name__)
 socketio = SocketIO(app)
 dbuser = 'game'
 dbpass = 'h95d3T7SXFta'
+
+
+use_rssi = False
 
 
 # Basic connection for the database
@@ -2417,6 +2421,12 @@ def bledata():
         if 'packet' in request.form:
             logger.debug(request.form['packet'])
         macstat = str(bt_addr) + "," + str(station_name)
+
+        if 'rssi' in request.form and use_rssi:
+            rssi = request.form['rssi']
+            avg2 = computeDistance(float(rssi))
+            avg = avg2
+
         try:
             update_sql = "INSERT INTO trackers (macstat, mac, station, signal_avg, room, packet_data, properties) " \
                          "VALUES (%s, %s, %s, %s, %s, %s, %s) ON DUPLICATE KEY UPDATE " \
@@ -3215,6 +3225,19 @@ def set_logger_file():
     ch.setFormatter(formatter)
     ch.setLevel(logging.DEBUG)
     logger.addHandler(ch)
+
+
+def computeDistance(rssi, txPower=-60):
+    if rssi == 0:
+        return -1  # if we cannot determine accuracy, return -1.
+
+    ratio = rssi / txPower
+
+    if ratio <= 1.0:
+        return math.pow(ratio, 10)
+    else:
+        # return math.pow(ratio, 10)
+        return 0.89976 * math.pow(ratio, 10) + 0.111
 
 
 # create an instance of the Flask
