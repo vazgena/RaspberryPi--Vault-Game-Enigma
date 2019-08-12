@@ -120,35 +120,8 @@ def callback(bt_addr, rssi, packet, properties):
 
         rssi_filter = bleFilter[bt_addr](rssi_val)
 
-        window_filter = KalmanFilter(rssi_filter)
-        for x in bleData[bt_addr]:
-            rssi_window = window_filter(x)
+        print({"mac": bt_addr, "rssi": rssi, "kalman": rssi_filter})
 
-        power_val = -60
-
-        distance = computeDistance(power_val, rssi_window)
-
-
-        if "gamine" in packet_expanded:
-            try:
-                if len(bleData[bt_addr]) >= howManyIterations:
-                    data = {'station': station,
-                            'bt_addr': bt_addr,
-                            'avg': str(distance),
-                            'room': room,
-                            'packet_data': str(packet),
-                            'properties': str(properties),
-                            'rssi': float(rssi)
-                            }
-
-                    asyncio.run_coroutine_threadsafe(run_execute(requests.post, url=address, data=data), loop)
-
-                    # bleData.pop(bt_addr, None)
-            except:
-                # bleData.pop(bt_addr, None)
-                pass
-        else:
-            pass
     except:
         pass
 
