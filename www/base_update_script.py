@@ -357,6 +357,41 @@ def add_position():
     connection.close()
 
 
+def create_calibration_table():
+    connection = data_connect()
+    con = connection.cursor()
+
+    sql_command = """
+                CREATE TABLE `tracker_calibration` (
+                  `id` int(11) NOT NULL AUTO_INCREMENT,
+                  `mac` varchar(255) NOT NULL,
+                  `station` varchar(100) NOT NULL,
+                  `tx_power` float(53) NOT NULL,
+                  PRIMARY KEY (`id`)
+                );
+                    """
+    con.execute(sql_command)
+    connection.close()
+
+
+def create_temp_calibration_table():
+    connection = data_connect()
+    con = connection.cursor()
+
+    sql_command = """
+                   CREATE TABLE `temp_calibration` (
+                     `id` int(11) NOT NULL AUTO_INCREMENT,
+                     `mac` varchar(255) NOT NULL,
+                     `station` varchar(100) NOT NULL,
+                     `tx_power` float(53) NOT NULL,
+                     `timestamp` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                     PRIMARY KEY (`id`)
+                   );
+                       """
+    con.execute(sql_command)
+    connection.close()
+
+
 
 if __name__ == "__main__":
 
@@ -376,7 +411,9 @@ if __name__ == "__main__":
     # create_table_defence()
     # init_log_table()
     # update_icon_defense()
-    init_table_position()
-    add_position()
+    # init_table_position()
+    # add_position()
+    create_calibration_table()
+    create_temp_calibration_table()
     pass
 

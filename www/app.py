@@ -16,6 +16,8 @@ from flask import Flask, render_template, redirect, url_for, request, send_from_
 from pymysql import InternalError, connect
 from random import choice, sample
 
+import numpy as np
+
 from flask_socketio import SocketIO, emit
 
 
@@ -29,6 +31,8 @@ dbpass = 'h95d3T7SXFta'
 
 
 use_rssi = False
+
+rssi_buffer = {}
 
 
 # Basic connection for the database
@@ -2327,6 +2331,26 @@ def bomb_detect(app_id):
     return render_template('bombDetect.html', room=room)
 
 
+@app.route('/calibrationTemplate', methods=['GET', 'POST'])
+def calibration_template():
+    stationListed = []
+    treckersListed = []
+    connection = data_connect()
+    c = connection.cursor()
+    sql_get_station = "SELECT * FROM stationList ORDER BY room, name;"
+    c.execute(sql_get_station)
+    station_list = list(c.fetchall())
+    sql_get_tracker = "SELECT * FROM TrackerNames ORDER BY name;"
+    c.execute(sql_get_tracker)
+    tracker_list = list(c.fetchall())
+    connection.close()
+    for tracker in tracker_list:
+        treckersListed.append([tracker[1], tracker[2]])
+    for station in station_list:
+        stationListed.append([station[1], ' '.join([str(station[5]), str(station[2])])])
+    return render_template('calibrationTemplate.html', stationListed=stationListed, treckersListed=treckersListed)
+
+
 # function to check if assist is assisting said station
 def time_doubler_check(station):
     connection = data_connect()
@@ -3210,6 +3234,13 @@ def handle_defence_station(message):
     emit('mainstation', response)
 
 
+@socketio.on('calibration')
+def handle_calibration(message):
+    # TODO: init
+    response = None
+    emit('calibration', response)
+
+
 def set_logger_file():
     log_dir = "./log"
     if not os.path.exists(log_dir):
@@ -3237,11 +3268,52 @@ def computeDistance(rssi, txPower=-60):
         return math.pow(ratio, 10)
     else:
         # return math.pow(ratio, 10)
-        return 0.89976 * math.pow(ratio, 10) + 0.111
+        return 0.89976 * math.pow(ratio, 9) + 0.111
+
+
+def init_buffer():
+    connection = data_connect()
+    c = connection.cursor()
+
+    sql_get_station = "SELECT name FROM stationList;"
+    c.execute(sql_get_station)
+    station_list = [x[0] for x in c.fetchall()]
+
+    sql_get_tracker = "SELECT mac FROM TrackerNames;"
+    c.execute(sql_get_tracker)
+    tracker_list = [x[0] for x in c.fetchall()]
+
+    map_rssi = np.zeros((len(station_list), len(tracker_list)))
+
+    sql_get_rssi = "SELECT * FROM tracker_calibration;"
+    c.execute(sql_get_rssi)
+    rssi_list = list(c.fetchall())
+    connection.close()
+    for rssi_row in rssi_list:
+        mac = rssi_row[1]
+        station = rssi_row[2]
+        tx_power = rssi_row[3]
+        i = station_list.index(station)
+        j = tracker_list.index(mac)
+        map_rssi[i, j] = tx_power
+    if np.sum(map_rssi != 0) > 0:
+        map_rssi[map_rssi == 0] = np.mean(map_rssi[map_rssi != 0])
+    else:
+        map_rssi[map_rssi == 0] = -60
+
+    for i, station in enumerate(station_list):
+        for j, mac in enumerate(tracker_list):
+            tx_power = map_rssi[i, j]
+            if station not in rssi_buffer:
+                rssi_buffer[station] = {mac: tx_power}
+            else:
+                rssi_buffer[station][mac] = tx_power
+
 
 
 # create an instance of the Flask
 if __name__ == '__main__':
     # app.run(host='0.0.0.0', port=8080, debug=True, threaded=True)
     set_logger_file()
+    init_buffer()
     socketio.run(app, host='0.0.0.0', port=8080, debug=True)

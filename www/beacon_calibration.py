@@ -27,7 +27,7 @@ n_iters = 30
 howManyIterations = 1
 loop = None
 
-address = "http://10.255.1.254:8080/bledata"
+address = "http://10.255.1.254:8080/bledataCalibrate"
 
 
 async def run_execute(function, *args, **kwargs):
@@ -52,7 +52,7 @@ def computeDistance(txPower, rssi):
 class KalmanFilter:
     Q = 1e-5  # process variance
     R = 0.1  # estimate of measurement variance, change to see effect
-    max_delta = timedelta(seconds=30)
+    max_delta = timedelta(seconds=20)
 
     def __init__(self, x=-70):
         self.x = x
