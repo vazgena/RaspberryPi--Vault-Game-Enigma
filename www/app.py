@@ -3236,8 +3236,39 @@ def handle_defence_station(message):
 
 @socketio.on('calibration')
 def handle_calibration(message):
-    # TODO: init
-    response = None
+    mac = message['tracker']
+    station = message['station']
+    # TODO: add save val
+
+
+    current_val = rssi_buffer[station][mac]
+
+    connection = data_connect()
+    c = connection.cursor()
+
+    sql_get_new_valibrate = "SELECT * FROM temp_calibration WHERE station=%s AND mac = %s ORDER BY timestamp DESC LIMIT 1;"
+    c.execute(sql_get_new_valibrate, (station, mac))
+    result = list(c.fetchall())
+
+
+    if not result:
+        new_val = None
+    else:
+        new_val = result[0][3]
+
+    if message.get('save_value', False) and new_val is not None and new_val != current_val:
+        sql_request = """
+        UPDATE tracker_calibration SET tx_power=%s WHERE mac=%s AND station=%s;
+        """
+        result = c.execute(sql_request, (new_val, mac, station))
+        if result == 0:
+            sql_request = "INSERT INTO tracker_calibration (mac, station, tx_power) VALUES (%s, %s, %s);"
+            c.execute(sql_request, (mac, station, new_val))
+        rssi_buffer[station][mac] = new_val
+        connection.close()
+        return
+    connection.close()
+    response = {"current_val": str(current_val), "new_val": str(new_val)}
     emit('calibration', response)
 
 
