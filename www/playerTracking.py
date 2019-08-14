@@ -52,7 +52,7 @@ def computeDistance(txPower, rssi):
 class KalmanFilter:
     Q = 1e-5  # process variance
     R = 0.1  # estimate of measurement variance, change to see effect
-    max_delta = timedelta(seconds=30)
+    max_delta = timedelta(seconds=10)
 
     def __init__(self, x=-70):
         self.x = x
@@ -138,7 +138,8 @@ def callback(bt_addr, rssi, packet, properties):
                             'room': room,
                             'packet_data': str(packet),
                             'properties': str(properties),
-                            'rssi': float(rssi)
+                            'rssi': float(rssi),
+                            'rssi_window': rssi_window
                             }
 
                     asyncio.run_coroutine_threadsafe(run_execute(requests.post, url=address, data=data), loop)

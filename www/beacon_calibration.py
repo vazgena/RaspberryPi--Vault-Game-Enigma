@@ -23,11 +23,12 @@ from config_station import station, room
 
 bleData = {}
 bleFilter = {}
+bleUpdate = {}
 n_iters = 30
 howManyIterations = 1
 loop = None
 
-address = "http://10.255.1.254:8080/bledataCalibrate"
+address = "http://10.255.1.254:8080/blecalibration"
 
 
 async def run_execute(function, *args, **kwargs):
@@ -52,7 +53,7 @@ def computeDistance(txPower, rssi):
 class KalmanFilter:
     Q = 1e-5  # process variance
     R = 0.1  # estimate of measurement variance, change to see effect
-    max_delta = timedelta(seconds=20)
+    max_delta = timedelta(seconds=5)
 
     def __init__(self, x=-70):
         self.x = x
@@ -94,40 +95,29 @@ class KalmanFilter:
 
 def callback(bt_addr, rssi, packet, properties):
     try:
-        packet_expanded = str(packet)
-        power_match = re.search('(?<=tx_power: )-?\d+', packet_expanded)
-        if power_match is None:
-            return
-        power_str = power_match.group(0)
-        power_val = float(power_str)
+        now = datetime.now()
         rssi_val = float(rssi)
 
         if rssi_val > -1:
             return
 
-        # TODO: hotfix
-        power_val = min(power_val, -power_val, -1)
-        rssi_val = min(rssi_val, -rssi_val,  -.5)
-
         if bt_addr not in bleFilter:
             bleFilter[bt_addr] = KalmanFilter()
-        if bt_addr not in bleData:
-            bleData[bt_addr] = []
+        if bt_addr not in bleUpdate:
+            bleUpdate[bt_addr] = now
 
-        bleData[bt_addr].append(rssi_val)
-        if len(bleData[bt_addr]) > n_iters:
-            bleData[bt_addr].pop(0)
+        if (now - bleUpdate[bt_addr]) < timedelta(seconds=1):
+            return
+
+        bleUpdate[bt_addr] = now
 
         rssi_filter = bleFilter[bt_addr](rssi_val)
 
-
-        data['station']
-        data['bt_addr']
-        data['kalman']
-
-
-        print({"mac": bt_addr, "rssi": rssi, "kalman": rssi_filter})
-
+        data = {}
+        data['station'] = station
+        data['bt_addr'] = str(bt_addr)
+        data['kalman'] = rssi_filter
+        asyncio.run_coroutine_threadsafe(run_execute(requests.post, url=address, data=data), loop)
     except:
         pass
 

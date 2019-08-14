@@ -17,9 +17,13 @@ def startprgm(i):
         print('Running: Ip lighting controller')
         time.sleep(1)
         os.system("sudo python3 /home/pi/color_local.py")
+    elif (i == 3):
+        print('Running: calibration start')
+        time.sleep(1)
+        os.system("sudo python3 /home/pi/beacon_calibration.py")
     else:
         pass
 
-for i in range(3):
+for i in range(4):
     t = Thread(target=startprgm, args=(i,))
     t.start()
