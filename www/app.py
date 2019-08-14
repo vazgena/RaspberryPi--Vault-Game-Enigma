@@ -202,6 +202,8 @@ def admin_start_vault():
         c.execute(log_check, (request.form['r1Bonus'], "1"))
         trackers_value_update = "TRUNCATE TABLE trackers_value"
         c.execute(trackers_value_update)
+        trackers_temp = "TRUNCATE TABLE temp_calibration"
+        c.execute(trackers_temp)
         #os.system("python3 resettrackers.py")
     # Close database connection.
     connection.close()
@@ -2448,7 +2450,7 @@ def bledata():
 
         if 'rssi' in request.form and use_rssi:
             rssi = request.form['rssi']
-            avg2 = computeDistance(float(rssi))
+            avg2 = computeDistance(float(rssi), rssi_buffer[station_name][bt_addr])
             avg = avg2
 
         try:
@@ -2725,7 +2727,23 @@ def save_volume():
         connection = data_connect()
         c = connection.cursor()
         c.execute(update_sql, (volume, station))
+        connection.close()
     return ""
+
+
+@app.route('/blecalibration', methods=['GET', 'POST'])
+def ble_calibration():
+    if request.method == 'POST':
+        ts = time.time()
+        timestamp = datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
+        station_name = request.form['station']
+        bt_addr = request.form['bt_addr']
+        avg = request.form['kalman']
+        connection = data_connect()
+        c = connection.cursor()
+        sql_request = "INSERT INTO temp_calibration (mac, station, tx_power, timestamp) VALUES (%s, %s, %s, %s);"
+        c.execute(sql_request, (bt_addr, station_name, avg, timestamp))
+        connection.close()
 
 
 @socketio.on('hackCheck')

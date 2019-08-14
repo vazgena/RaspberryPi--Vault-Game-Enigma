@@ -120,6 +120,12 @@ def callback(bt_addr, rssi, packet, properties):
 
         rssi_filter = bleFilter[bt_addr](rssi_val)
 
+
+        data['station']
+        data['bt_addr']
+        data['kalman']
+
+
         print({"mac": bt_addr, "rssi": rssi, "kalman": rssi_filter})
 
     except:
