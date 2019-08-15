@@ -481,7 +481,7 @@ def bombstation(app_id):
         bombs = j[2]
 
     # Get list of stations deployable and deployed
-    station_list_sql = 'SELECT * FROM stationList WHERE room = %s AND lay_bomb=TRUE  ORDER BY name;;'
+    station_list_sql = 'SELECT * FROM stationList WHERE room = %s AND lay_bomb=TRUE;'
     c.execute(station_list_sql, attack_room)
     station_list = list(c.fetchall())
     for i in station_list:
@@ -490,10 +490,8 @@ def bombstation(app_id):
         spelled.append(i[5])
         height_list.append(i[7])
         width_list.append(i[8])
-        # x_list.append(i[9])
-        # y_list.append(i[10])
-        x_list.append(i[17])
-        y_list.append(i[18])
+        x_list.append(i[9])
+        y_list.append(i[10])
         image_list.append(i[11])
         bh_list.append(i[12])
         bw_list.append(i[13])
@@ -648,7 +646,7 @@ def bombstation2(app_id):
         bombs = j[2]
 
     # get list of all rooms and put them in a list
-    station_list_sql = 'SELECT * FROM stationList WHERE room = %s AND lay_bomb=TRUE  ORDER BY name;;'
+    station_list_sql = 'SELECT * FROM stationList WHERE room = %s AND lay_bomb=TRUE;'
     c.execute(station_list_sql, attack_room)
     station_list = list(c.fetchall())
 
@@ -659,10 +657,8 @@ def bombstation2(app_id):
         spelled.append(i[5])
         height_list.append(i[7])
         width_list.append(i[8])
-        # x_list.append(i[9])
-        # y_list.append(i[10])
-        x_list.append(i[17])
-        y_list.append(i[18])
+        x_list.append(i[9])
+        y_list.append(i[10])
         image_list.append(i[11])
         bh_list.append(i[12])
         bw_list.append(i[13])
@@ -994,7 +990,7 @@ def hack_station(app_id):
         else:
             pass
 
-    station_list = "SELECT * FROM stationList WHERE room = %s  ORDER BY name;"
+    station_list = "SELECT * FROM stationList WHERE room = %s"
     c.execute(station_list, attack_room)
     station_list_sql = list(c.fetchall())
     for i in station_list_sql:
@@ -1073,7 +1069,7 @@ def mainstation(app_id):
         station = "MAN2"
     time_doubler = time_doubler_check(station)
     message_bomb = looser_check()
-    station_list = "SELECT * FROM stationList WHERE room = %s  ORDER BY name;"
+    station_list = "SELECT * FROM stationList WHERE room = %s"
     c.execute(station_list, room)
     station_list_sql = list(c.fetchall())
     for i in station_list_sql:
@@ -1468,7 +1464,7 @@ def marketselector(app_id):
     br_list = []
     color_selected_list = []
     color_list = []
-    station_list_sql = 'SELECT * FROM stationList WHERE room = %s  ORDER BY name;;'
+    station_list_sql = 'SELECT * FROM stationList WHERE room = %s;'
     c.execute(station_list_sql, room)
     station_list = list(c.fetchall())
     for i in station_list:
@@ -1533,7 +1529,7 @@ def masterstation(app_id):
     check_doubler_list_sql = list(c.fetchall())
     for j in check_doubler_list_sql:
         doubler_station.append(j[1])
-    station_list = 'SELECT * FROM stationList WHERE room = %s ORDER BY name;'
+    station_list = 'SELECT * FROM stationList WHERE room = %s'
     c.execute(station_list, room)
     station_list_sql = list(c.fetchall())
     for i in station_list_sql:
@@ -1696,7 +1692,7 @@ def mine_this(app_id):
                                        bw_list=bw_list, br_list=br_list, color_list=color_list,
                                        color_selected_list=color_selected_list)
 
-    station_list_sql = 'SELECT * FROM stationList WHERE room = %s  ORDER BY name;;'
+    station_list_sql = 'SELECT * FROM stationList WHERE room = %s;'
     c.execute(station_list_sql, room)
     station_list = list(c.fetchall())
     for i in station_list:
@@ -1706,10 +1702,8 @@ def mine_this(app_id):
         spelled.append(spelled_name)
         height_list.append(i[7])
         width_list.append(i[8])
-        # x_list.append(i[9])
-        # y_list.append(i[10])
-        x_list.append(i[17])
-        y_list.append(i[18])
+        x_list.append(i[9])
+        y_list.append(i[10])
         image_list.append(i[11])
         bh_list.append(i[12])
         bw_list.append(i[13])
@@ -1926,7 +1920,7 @@ def mine_that(app_id):
                                        bw_list=bw_list, br_list=br_list, color_list=color_list,
                                        color_selected_list=color_selected_list)
 
-    station_list_sql = 'SELECT * FROM stationList WHERE room = %s  ORDER BY name;;'
+    station_list_sql = 'SELECT * FROM stationList WHERE room = %s;'
     c.execute(station_list_sql, atkroom)
     station_list = list(c.fetchall())
     for i in station_list:
@@ -1936,10 +1930,8 @@ def mine_that(app_id):
         spelled.append(spelled_name)
         height_list.append(i[7])
         width_list.append(i[8])
-        # x_list.append(i[9])
-        # y_list.append(i[10])
-        x_list.append(i[17])
-        y_list.append(i[18])
+        x_list.append(i[9])
+        y_list.append(i[10])
         image_list.append(i[11])
         bh_list.append(i[12])
         bw_list.append(i[13])
@@ -2055,7 +2047,7 @@ def currency_func(app_id):
     for i in numberofbombs:
         bombs = i[2]
 
-    stationlistsql = 'SELECT * FROM stationList WHERE room = %s  ORDER BY name;'
+    stationlistsql = 'SELECT * FROM stationList WHERE room = %s'
     c.execute(stationlistsql, room)
     stationlist2 = list(c.fetchall())
 
@@ -2492,7 +2484,7 @@ def nogame(station):
     message = ""
     status = ""
     blown_up = ""
-    get_room_sql = 'SELECT room FROM stationList WHERE name = %s  ORDER BY name;'
+    get_room_sql = 'SELECT room FROM stationList WHERE name = %s'
     c.execute(get_room_sql, station)
     room_list = list(c.fetchall())
     is_live_sql = "SELECT * FROM isalive WHERE is_alive = 'no'"
@@ -2679,7 +2671,7 @@ def defenses_station(app_id):
     defese_list = list(c.fetchall())
     defense_dict = {defence[1]: defence[3] for defence in defese_list}
 
-    station_list_sql = 'SELECT * FROM stationList WHERE room = %s AND lay_bomb=TRUE  ORDER BY name;;'
+    station_list_sql = 'SELECT * FROM stationList WHERE room = %s AND lay_bomb=TRUE;'
     c.execute(station_list_sql, room)
     station_list = list(c.fetchall())
     for i in station_list:
@@ -2753,6 +2745,9 @@ def ble_calibration():
         c = connection.cursor()
         sql_request = "INSERT INTO temp_calibration (mac, station, tx_power, timestamp) VALUES (%s, %s, %s, %s);"
         c.execute(sql_request, (bt_addr, station_name, avg, timestamp))
+        delta_time = datetime.now() - timedelta(minutes=1)
+        sql_request_remove = "DELETE FROM temp_calibration WHERE timestamp < %s;"
+        c.execute(sql_request_remove, delta_time)
         connection.close()
 
 
@@ -2958,7 +2953,7 @@ def handle_masterstation(message):
     check_doubler_list_sql = list(c.fetchall())
     for j in check_doubler_list_sql:
         doubler_station.append(j[1])
-    station_list = 'SELECT * FROM stationList WHERE room = %s  ORDER BY name;'
+    station_list = 'SELECT * FROM stationList WHERE room = %s'
     c.execute(station_list, room)
     station_list_sql = list(c.fetchall())
     for i in station_list_sql:
@@ -3033,7 +3028,7 @@ def handle_mainstation(message):
         station = "MAN2"
     time_doubler = time_doubler_check(station)
     message_bomb = looser_check()
-    station_list = "SELECT * FROM stationList WHERE room = %s  ORDER BY name;"
+    station_list = "SELECT * FROM stationList WHERE room = %s"
     c.execute(station_list, room)
     station_list_sql = list(c.fetchall())
     for i in station_list_sql:
@@ -3217,7 +3212,7 @@ def handle_defence_station(message):
     defese_list = list(c.fetchall())
     defense_dict = {defence[1]: defence[3] for defence in defese_list}
 
-    station_list_sql = 'SELECT * FROM stationList WHERE room = %s AND lay_bomb=TRUE  ORDER BY name;;'
+    station_list_sql = 'SELECT * FROM stationList WHERE room = %s AND lay_bomb=TRUE;'
     c.execute(station_list_sql, room)
     station_list = list(c.fetchall())
     for i in station_list:
@@ -3313,7 +3308,7 @@ def set_logger_file():
     logger.setLevel(logging.DEBUG)
     fil_log = os.path.join(log_dir, "track.log")
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    ch = logging.FileHandler(fil_log, mode='a')
+    ch = logging.FileHandler(fil_log, mode='w')
     ch.setFormatter(formatter)
     ch.setLevel(logging.DEBUG)
     logger.addHandler(ch)

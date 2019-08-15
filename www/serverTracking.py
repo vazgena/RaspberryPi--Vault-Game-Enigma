@@ -211,7 +211,7 @@ def new_loop():
 	delta_time = datetime.now() - timedelta(minutes=1)
 	if not debug:
 		sql_request_remove = "DELETE FROM trackers_value WHERE timestamp < %s;"
-	c.execute(sql_request_remove, delta_time)
+		c.execute(sql_request_remove, delta_time)
 	connection.close()
 
 
