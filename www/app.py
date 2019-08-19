@@ -2450,7 +2450,7 @@ def bledata():
 
         if 'rssi' in request.form and use_rssi:
             rssi = request.form['rssi_window']
-            avg2 = computeDistance(float(rssi), rssi_buffer[station_name][bt_addr])
+            avg2 = computeDistance(float(rssi), float(rssi_buffer[station_name][bt_addr]))
             avg = avg2
 
         try:

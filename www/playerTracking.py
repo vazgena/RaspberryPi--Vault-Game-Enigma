@@ -11,6 +11,7 @@ import os
 import sys
 import asyncio
 import math
+import numpy as np
 from datetime import datetime, timedelta
 from statistics import median_high, mode
 
@@ -43,10 +44,10 @@ def computeDistance(txPower, rssi):
     ratio = rssi / txPower
 
     if ratio <= 1.0:
-        return math.pow(ratio, 10)
+        return np.pow(ratio, 10)
     else:
         # return math.pow(ratio, 10)
-        return 0.89976 * math.pow(ratio, 9.) + 0.111
+        return 0.89976 * np.pow(ratio, 9.) + 0.111
 
 
 class KalmanFilter:
