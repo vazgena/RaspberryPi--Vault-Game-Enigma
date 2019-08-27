@@ -2736,6 +2736,7 @@ def save_volume():
 
 @app.route('/blecalibration', methods=['GET', 'POST'])
 def ble_calibration():
+    return ""
     if request.method == 'POST':
         ts = time.time()
         timestamp = datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
@@ -3375,3 +3376,6 @@ if __name__ == '__main__':
     set_logger_file()
     init_buffer()
     socketio.run(app, host='0.0.0.0', port=8080, debug=False)
+
+# vim: set expandtab:
+# vim: set softtabstop=4:
