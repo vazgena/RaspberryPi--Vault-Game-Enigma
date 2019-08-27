@@ -15,6 +15,7 @@ n = 3
 # target value, counting from the end. affects lag, -2 recommended
 n_2 = -2  # int(np.floor(n/2)) #
 #triangulate = True
+triangulate = False
 debug = False
 #debug = True
 

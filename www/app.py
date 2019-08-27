@@ -3374,4 +3374,4 @@ if __name__ == '__main__':
     # app.run(host='0.0.0.0', port=8080, debug=True, threaded=True)
     set_logger_file()
     init_buffer()
-    socketio.run(app, host='0.0.0.0', port=8080, debug=True)
+    socketio.run(app, host='0.0.0.0', port=8080, debug=False)
