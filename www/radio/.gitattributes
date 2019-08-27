@@ -1,0 +1,6 @@
+talk.mp3 filter=lfs diff=lfs merge=lfs -text
+cyrillicmorse.png filter=lfs diff=lfs merge=lfs -text
+cyrillic.png filter=lfs diff=lfs merge=lfs -text
+morse.ogg filter=lfs diff=lfs merge=lfs -text
+morse.mp3 filter=lfs diff=lfs merge=lfs -text
+static.mp3 filter=lfs diff=lfs merge=lfs -text
