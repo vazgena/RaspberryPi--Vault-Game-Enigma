@@ -1,0 +1,76 @@
+{% block body %}
+
+
+    <div id="hack" >
+        <div id="hacktext" style="position: absolute; top: 50px; left: 100px; ">You have been hacked.</div>
+You Have Been Hacked! <p><div id="pressAndHold">Remove Hack</div></p></div>
+    <div>
+        <h2>Mine self</h2>
+        <p>Mine your own room:</p>
+        <p>
+            <button class="button BlueButton" onclick="location.href='/mine/1minethis/blue';">Blue</button>
+            <button class="button RedButton" onclick="location.href='/mine/1minethis/red';">Red</button>
+        <br>
+            <button class="button YellowButton" onclick="location.href='/mine/1minethis/yellow';">Yellow</button>
+        <button class="button GreenButton" onclick="location.href='/mine/1minethis/green';">Green</button>
+        </p>
+    </div>
+    <script>
+    </script>
+    <div id="hackCheck">
+    </div>
+    <script>
+        function hackOn() {
+            document.getElementById("hack").style.display = "block";
+        }
+        function hackOff() {
+            document.getElementById("hack").style.display = "none";
+        }
+        function auto_load(){
+            $.ajax({
+              url: "/hackCheck/MTR-1",
+              success: function(data){
+                 $("#hackCheck").html(data);
+              }
+        });
+        }
+        $(document).ready(function(){
+        auto_load(); 
+        });
+        setInterval(auto_load,1000);
+        var pressAndHold = document.querySelector("#pressAndHold");
+        var pressHoldEvent = new CustomEvent("pressHold");
+        var counter = 0;
+        var pressHoldDuration = 1;
+        pressAndHold.addEventListener("mousedown", pressingDown, false);
+        pressAndHold.addEventListener("mouseup", notPressingDown, false);
+        pressAndHold.addEventListener("mouseleave", notPressingDown, false);
+        pressAndHold.addEventListener("touchstart", pressingDown, false);
+        pressAndHold.addEventListener("touchend", notPressingDown, false);
+        pressAndHold.addEventListener("pressHold", pressingDown, false);
+        function pressingDown(e) {
+          // Start the timer
+          timer();
+          e.preventDefault();
+        }
+        function notPressingDown(e) {
+              counter = 0;
+        }
+        function timer() {
+          if (counter < pressHoldDuration) {
+            counter++;
+          } else {
+            item.dispatchEvent(pressHoldEvent);
+            removeS();
+            counter = 0;
+          }
+        }
+        function removeS() {
+            $.ajax({
+              method: "POST",
+              url: "sRemove/",
+              data: { station: "MTR-1"}
+            });
+        }
+    </script>
+{% endblock %}

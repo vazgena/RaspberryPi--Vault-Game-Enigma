@@ -1,0 +1,122 @@
+<style>
+    body {
+      /* Disables pull-to-refresh but allows overscroll glow effects. */
+      overscroll-behavior-y: contain;
+    }
+</style>
+<script>
+    localStorage["currency"] = currency;
+    if (stationlock === "OFF") {
+        if (currency >= bombCost) {
+            if (hackcheck === "OFF") {
+                if (ttdset === "false") {
+                    textset1 = "NO";
+
+                    var texttoset = "SELECT A STATION TO BLAST FOR 8 ENERGY.";
+                    text_set(texttoset, "background_upper2");
+
+                    var elems = document.getElementsByClassName('button_pressable');
+                    for (var i = 0; i < elems.length; i += 1) {
+                        elems[i].style.display = 'block';
+                    }
+
+                    var elems2 = document.getElementsByClassName('button_unpressable');
+                    for (var i = 0; i < elems2.length; i += 1) {
+                        elems2[i].style.display = 'block';
+                    }
+                }
+            }
+        }
+
+        if (currency < bombCost) {
+            if (hackcheck === "OFF") {
+                if (ttdset === "false") {
+                    textset1 = "NO";
+
+                    var texttoset = "YOU DON’T HAVE ENOUGH ENERGY TO BLAST";
+                    text_set(texttoset, "background_upper2");
+
+                    var elems = document.getElementsByClassName('button_pressable');
+                    for (var i = 0; i < elems.length; i += 1) {
+                        elems[i].style.display = 'none';
+                    }
+                    var elems2 = document.getElementsByClassName('button_unpressable');
+                    for (var i = 0; i < elems2.length; i += 1) {
+                        elems2[i].style.display = 'block';
+                    }
+                }
+            }
+        }
+    }
+
+    if (ttdset === "true"){
+        if (hackcheck === "OFF") {
+            var elems = document.getElementsByClassName('button_pressable');
+            for (var i = 0; i < elems.length; i += 1) {
+                elems[i].style.display = 'none';
+            }
+
+            var elems2 = document.getElementsByClassName('button_unpressable');
+            for (var i = 0; i < elems2.length; i += 1) {
+                elems2[i].style.display = 'block';
+            }
+        }
+    }
+
+    {% if redirect_page_2 == "True" %}
+
+        window.location.replace("/bombtemplate2/{{room}}");
+
+    {% endif %}
+
+    var bombCost = {{ bombCost }};
+
+    if ( self === top ) {
+        {% if time_doubler == "yes" %}
+            var timeDoubler = "yes";
+        {% else %}
+            var timeDoubler = "no";
+        {% endif %}
+        var bomb_message = "{{ message_bomb }}";
+        if (bomb_message == "exit") {
+            redirect_url ="http://10.255.1.254:8080/nogametemplate/{{ station }}"
+            $(location).attr('href', redirect_url)
+        }
+        document.getElementById("bmb_message").innerHTML = bomb_message;
+    }
+
+    if (self !== top){
+        var timeDoubler = parent.timeDoubler;
+    }
+
+    var message_bomb_20_sec = "{{ message_bomb_20_sec }}";
+
+    document.getElementById("message_bomb_20_sec_p").innerHTML = message_bomb_20_sec;
+
+    ttd2({{timetodetonatebomb}});
+
+</script>
+
+<div id="buttonHolderInner" style="display: inline-block;">
+
+    {% for i in names %}
+        {% if i in stations_deployable %}
+            <div class="button_pressable" >
+                    <button class="button" onclick='deployBomb("{{i}}")' style="background-color:{{color_list[loop.index0]}}; position: absolute; top: {{x_list[loop.index0]}}px; left: {{y_list[loop.index0]}}px; width: {{bh_list[loop.index0]}}px; height: {{bw_list[loop.index0]}}px; border-radius: {{br_list[loop.index0]}}px;">
+                           <img src="/static/images/{{image_list[loop.index0]}}" style="width:{{width_list[loop.index0]}}px;height:{{height_list[loop.index0]}}px; " alt="none">
+                    </button>
+            </div>
+        {% else %}
+             <div class="button_unpressable" >
+                    <button class="button" style="background-color:{{color_selected_list[loop.index0]}}; position: absolute; top: {{x_list[loop.index0]}}px; left: {{y_list[loop.index0]}}px; width: {{bw_list[loop.index0]}}px; height: {{bh_list[loop.index0]}}px; border-radius: {{br_list[loop.index0]}}px;">
+                            <img src="/static/images/{{image_list[loop.index0]}}" style="width:{{width_list[loop.index0]}}px;height:{{height_list[loop.index0]}}px; " alt="none">
+                    </button>
+            </div>
+        {% endif%}
+    {% endfor %}
+
+</div>
+
+<p id="message_bomb_20_sec_p">
+
+</p>

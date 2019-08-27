@@ -1,0 +1,486 @@
+{% block body %}
+    <head>
+        <meta name="viewport" content="user-scalable=no, width=device-width" />
+    </head>
+    <script src="/static/js/jquery1.8.2.min.js"></script>
+    <script src="/static/js/in_house.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/hack.js"></script>
+    <script src="/static/js/curved_text.js"></script>
+
+    <link rel='stylesheet prefetch' href='/static/css/roboto.css'>
+    <link rel='stylesheet prefetch' href='/static/css/font-awesome.min.css'>
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/inhouse.css?version=.01.7" rel="stylesheet">
+
+    <div id="background_upper2">
+
+    </div>
+
+    <div id="background_lower2">
+
+    </div>
+
+    <div id="wrapper">
+        <div id="main_loader" >
+            <div id="buttonHolder" style="text-align: left;">
+                <div scrolling="no" id="camholder" style="width:68%;">
+                        <iframe  id="camframe" style="float: left; display: block;"></iframe>
+
+                            <button class="button2" onclick="prevcam()" style="float: left; display: inline-block;">
+                               <img src="/static/images/left_button.png" style="height: 200px; width: 200px" alt="NONE">
+                            </button>
+
+                            <button id="right1button" class="button3" onclick="nextcam()" style="float: right; display: inline-block">
+                                <img src="/static/images/right_button.png" style="height: 200px; width: 200px" alt="NONE">
+                            </button>
+
+                </div>
+
+                <div scrolling="no" id="camholder2" style="display: none; width: 68%" scrolling="no" >
+                        <iframe id="camframe2" style="float: left; display: block;"></iframe>
+                        <div>
+                            <button class="button2" onclick="prevcam2()" style="float: left; display: inline-block">
+                                <img src="/static/images/left_button.png" style="height: 200px; width: 200px" alt="NONE">
+                            </button>
+                            <button id="right2button" class="button3" onclick="nextcam2()" style="float: right; display: inline-block">
+                                <img src="/static/images/right_button.png" style="height: 200px; width: 200px" alt="NONE">
+                            </button>
+                        </div>
+                </div>
+            </div>
+        </div>
+        <div id="station_load">
+
+        </div>
+    </div>
+
+    <div id="currencyCheck">
+
+    </div>
+
+    <div id="hackCheck">
+
+    </div>
+
+    <div id="hack_load">
+
+    </div>
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
+<script type="text/javascript">
+
+        var socket = io();
+
+        {% if room == "1" %}
+        var class_body = "labyrinth";
+        {% else %}
+        var class_body = "enigma";
+        {% endif %}
+        document.body.className = class_body;
+
+
+        $(document).ready(function(){
+            $(window).on('touchmove',function(e){e.preventDefault();});
+        });
+
+        if (self !== top) {
+            document.body.style.backgroundImage = "none";
+            document.body.style.background = "none transparent";
+        }
+
+        $(document).ready( function() {
+            $("#hack_load").load("/hack_load/");
+        });
+
+        if ( self !== top ) {
+            document.body.style.backgroundImage = "none";
+            document.body.style.background = "none transparent";
+        }
+        {% for i in cam_list %}
+            var camip{{loop.index0}} = "{{ i }}";
+        {% endfor %}
+        var currentcam = 0;
+        var currentcam2 = 1;
+        var iframe = $('#camframe');
+        var iframe2 = $('#camframe2');
+        {#
+        iframe.attr('src', camip0);
+        iframe2.attr('src', camip1);
+        #}
+
+        iframe.attr('src', "about:blank");
+        iframe2.attr('src', "about:blank");
+
+        function prevcam() {
+
+            if (currentcam === 0){
+                iframe.attr('src', camip3);
+                currentcam = 3;
+            }
+            else if (currentcam === 1){
+                iframe.attr('src', camip0);
+                currentcam = 0;
+            }
+            else if (currentcam === 2){
+                iframe.attr('src', camip1);
+                currentcam = 1;
+            }
+            else if (currentcam === 3){
+                iframe.attr('src', camip2);
+                currentcam = 2;
+            }
+
+        }
+
+        function nextcam() {
+
+            if (currentcam === 0){
+                iframe.attr('src', camip1);
+                currentcam = 1;
+            }
+            else if (currentcam === 1){
+                iframe.attr('src', camip2);
+                currentcam = 2;
+            }
+            else if (currentcam === 2){
+                iframe.attr('src', camip3);
+                currentcam = 3;
+            }
+            else if (currentcam === 3){
+                iframe.attr('src', camip0);
+                currentcam = 0;
+            }
+            {# set_onunload(); #}
+
+        }
+
+        function prevcam2() {
+
+
+            if (currentcam2 === 0){
+                iframe2.attr('src', camip3);
+                currentcam2 = 3;
+            }
+            else if (currentcam2 === 1){
+                iframe2.attr('src', camip0);
+                currentcam2 = 0;
+            }
+            else if (currentcam2 === 2){
+                iframe2.attr('src', camip1);
+                currentcam2 = 1;
+            }
+            else if (currentcam2 === 3){
+                iframe2.attr('src', camip2);
+                currentcam2 = 2;
+            }
+
+        }
+
+        function nextcam2() {
+
+            if (currentcam2 === 0){
+                iframe2.attr('src', camip1);
+                currentcam2 = 1;
+            }
+            else if (currentcam2 === 1){
+                iframe2.attr('src', camip2);
+                currentcam2 = 2;
+            }
+            else if (currentcam2 === 2){
+                iframe2.attr('src', camip3);
+                currentcam2 = 3;
+            }
+            else if (currentcam2 === 3){
+                iframe2.attr('src', camip0);
+                currentcam2 = 0;
+            }
+
+        }
+
+        function curcam() {
+
+            if (currentcam === 1){
+                iframe.attr('src', camip1);
+            }
+            else if (currentcam === 2){
+                iframe.attr('src', camip2);
+            }
+            else if (currentcam === 3){
+                iframe.attr('src', camip3);
+            }
+            else if (currentcam === 0){
+                iframe.attr('src', camip0);
+            }
+
+        }
+
+        function curcam2() {
+
+            if (currentcam2 === 1){
+                iframe2.attr('src', camip1);
+            }
+            else if (currentcam2 === 2){
+                iframe2.attr('src', camip2);
+            }
+            else if (currentcam2 === 3){
+                iframe2.attr('src', camip3);
+            }
+            else if (currentcam2 === 0){
+                iframe2.attr('src', camip0);
+            }
+
+        }
+
+
+        var cam2style = document.getElementById("camholder2");
+        var room = "{{ room }}";
+        var station = "{{station}}";
+        var url = "/cameraStation/" + station + "/" +room;
+        
+        var min = 6;
+        var max = 12;
+        var stationNameTemp = "";
+        setInterval(auto_load,250);
+        var hackcheck = "OFF";
+        var shutdown = "OFF"
+
+        var old_check = "";
+
+        function success_check_hack(data) {
+            old_check = "";
+            $("#hackCheck").html(data);
+        }
+
+        function success_station_load(data) {
+            old_check = data;
+            $("#station_load").html(data);
+        }
+
+        socket.on('hackCheck', success_check_hack);
+        socket.on('cameraStation', success_station_load);
+
+        function auto_load(){
+            socket.emit('cameraStation', {'station': station, 'room': room, 'old_value': old_check});
+
+            if ( self === top ) {
+                socket.emit('hackCheck', {'station': station, 'status': hackcheck});
+            }
+        }
+
+        function check_cam_src(id_name, src_check){
+            var current_iframe = document.getElementById(id_name);
+            var current_src =  current_iframe.src;
+            if (current_src == src_check)
+            {
+                return true;
+            }
+            else {
+                return false;
+            }
+        };
+
+
+        function check_cam(camavailable) {
+            if (camavailable === 2) {
+                document.getElementById("camholder2").style.display = "block";
+                document.getElementById("camholder").style.display = "block";
+                document.getElementById("camholder").style.left = "-100px";
+                document.getElementById("camholder").style.transform = "scale(0.5,0.5)";
+                document.getElementById("camholder2").style.left = "700px";
+                document.getElementById("camholder2").style.top = "50px";
+                document.getElementById("camholder2").style.transform = "scale(0.5,0.5)";
+                document.getElementById("right1button").style.left = "200px";
+
+                if (check_cam_src("camframe", "about:blank")){
+                    curcam();
+                }
+                if (check_cam_src("camframe2", "about:blank")){
+                    curcam2();
+                }
+
+            }
+
+            if (camavailable === 0) {
+                document.getElementById("camholder").style.left = "15%";
+                document.getElementById("camholder2").style.display = "none";
+                document.getElementById("camholder").style.display = "none";
+                iframe.attr('src', "about:blank");
+                iframe2.attr('src', "about:blank");
+
+            }
+            if (camavailable === 1) {
+                document.getElementById("camholder").style.top = "10%";
+                document.getElementById("camholder").style.left = "17%";
+                document.getElementById("camholder2").style.display = "none";
+                iframe2.attr('src', "about:blank");
+                document.getElementById("camholder").style.display = "block";
+                document.getElementById("camholder").style.width = "1280px";
+                document.getElementById("camholder").style.transform = "scale(0.67,0.67)";
+                if (check_cam_src("camframe", "about:blank")){
+                    curcam();
+                }
+            }
+        }
+
+       function hackOn() {
+            if ( self === top ) {
+                hackcheck = "ON";
+                textset1 = "NO";
+                textset2 = "NO";
+
+                document.body.className = 'hack';
+
+                var texttoset = "PRESS ACTIVATION BUTTONS WHEN THEY APPEAR.";
+                text_set(texttoset, "background_upper2");
+
+                var texttoset2 = "YOU’VE BEEN HACKED!";
+                text_set(texttoset2, "background_lower2");
+
+                document.getElementById("wrapper").style.display = "none";
+                document.getElementById("hack").style.display = "block";
+            }
+        }
+
+        function hackOff() {
+            if ( self === top ) {
+                hackcheck = "OFF";
+                document.getElementById("wrapper").style.display = "block";
+                document.getElementById("hack").style.display = "none";
+
+                textset1 = "NO";
+                textset2 = "NO";
+
+                document.body.className = class_body;
+
+                if (shutdown == "OFF"){
+                    var texttoset = "WATCH YOUR OPPONENTS.";
+                    text_set(texttoset, "background_upper2");
+
+                    var texttoset2 = "";
+                    text_set(texttoset2, "background_lower2");
+                }
+
+            }
+        }
+
+        function auto_load2(){
+
+        }
+
+
+        function ttd(time_to_detonate){
+
+        }
+
+        function success_currency(data) {
+            $("#currencyCheck").html(data);
+        }
+
+        socket.on('currency', success_currency);
+
+        {# not used
+        setInterval(currency_load,1000);
+        #}
+
+        function currency_load(){
+           {#
+           transferred to websocket
+           $.ajax({
+                  url: "/currency/{{room}}",
+                  success: function(data){
+                     $("#currencyCheck").html(data);
+                  }
+            });#}
+            socket.emit('currency', {'room': room});
+        }
+
+
+       function restart_iframe()  {
+            console.log('restrt1');
+            var current_ip = iframe.src;
+            if (current_ip == ""){
+                   iframe.attr('src', current_ip);
+                }
+            console.log('restrt1');
+
+        }
+
+        function restart_iframe2()  {
+            var current_ip  = iframe2.src;
+            console.log('restrt2');
+            iframe2.attr('src', current_ip);
+        }
+
+
+        function set_onunload() {
+            {# if (iframe.attachEvent) {
+                iframe.attachEvent('onload', restart_iframe);
+            }
+            else {
+                iframe.addEventListener('load', restart_iframe, false)
+            }
+            if (iframe2.attachEvent) {
+                iframe2.attachEvent('onload', restart_iframe2);
+            }
+            else {
+                iframe2.addEventListener('load', restart_iframe2, false)
+            }#}
+            iframe.onload = function() {
+                    return restart_iframe;
+            }();
+            {# iframe.onload = restart_iframe;
+            iframe2.onload = restart_iframe2; #}
+            console.log('set_onload');
+
+            refresh = function() {
+                console.log('refresh_re');
+            };
+
+
+
+        }
+
+        function check_error_iframe(cur_frame) {
+
+            var error_item = cur_frame
+
+            var x = $('#camframe');
+            console.log(x.hasOwnProperty('contentWindow'));
+            console.log(x.hasOwnProperty('contentDocument'));
+            var iframeDocument = x.contentDocument || x.contentWindow.document;
+            var y = (x.contentWindow || x.contentDocument);
+
+            if (!iframeDocument) {
+                    console.log('NouDoc');;
+            }
+
+            var content = y.document.body.innerHTML;
+            alert("Content: \n" + content);
+
+            if ( y.document.innerHTML) {
+                var ifTitle = y.document.title;
+                console.log(ifTitle);
+                if ( ifTitle.indexOf("404")>=0 ) {
+            // we have a winner! probably a 404 page!
+            }
+    }
+        };
+
+        {#
+        check_iframe = function() {
+            console.log('check_error_iframe1');
+            var res_check = check_error_iframe(iframe);
+        };
+
+        check_iframe2 = function() {
+            console.log('check_error_iframe2');
+            var res_check = check_error_iframe(iframe2);
+        };#}
+
+
+       {# set_onunload() sub-frame-error#}
+
+</script>
+
+{% endblock %}

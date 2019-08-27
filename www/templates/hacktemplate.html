@@ -1,0 +1,402 @@
+{% block body %}
+<head>
+        <meta name="viewport" content="user-scalable=no, width=device-width" />
+    </head>
+
+    <script src="/static/js/jquery1.8.2.min.js"></script>
+    <script src="/static/js/in_house.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/hack.js"></script>
+    <script src="/static/js/curved_text.js"></script>
+    <link rel='stylesheet prefetch' href='/static/css/roboto.css'>
+    <link rel='stylesheet prefetch' href='/static/css/font-awesome.min.css'>
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/inhouse.css?version=.01.7" rel="stylesheet">
+
+    <div id="background_upper2">
+
+    </div>
+    <div id="background_lower2">
+
+    </div>
+
+    <div id="top_load">
+
+    </div>
+
+    <div id="hack_load">
+
+    </div>
+    <div id="wrapper">
+        <div id="main_loader">
+            <div id="station_load">
+            </div>
+        </div>
+    </div>
+
+    <div id="currencyCheck">
+    </div>
+
+    <div id="hackBackCheck">
+    </div>
+
+    <div id="lower_left_text">
+        <p id="bmb_message">
+        </p>
+        <p id="dbl_message">
+        </p>
+    </div>
+
+    <div id="hackCheck">
+
+    </div>
+
+
+
+    <!----
+
+    Activate starts here
+
+    ------>
+
+    <div id="activate_back"></div>
+    <div id="activate">
+            <div style="position: absolute; top: 150px; left: 245px">
+                <img src="/static/images/18_Enigma_S1_Button_FINAL.png" style="width: 300px; height: 300px;" alt="none">
+            </div>
+
+            <iframe id="arrows0" src="/static/html/arrows.html" style="width: 650px; height: 200px; border: none; display: none; position: absolute; top: 200px; left: 540px;">
+
+            </iframe>
+
+            <div id="activationButton1" style="position: absolute; top: 150px; left: 1030px;">
+
+                <button id="activateButton1" onclick=activate1()>
+
+                    <img src="/static/images/18_Enigma_S2_Button_FINAL.png" style="width: 300px; height: 300px;" alt="none">
+
+                </button>
+
+            </div>
+
+            <iframe id="arrows1" src="/static/html/arrows.html" style="width: 650px; height: 200px; border: none; display: none; position: absolute; top: 380px; left: 380px; transform: rotate(155deg);">
+
+            </iframe>
+
+    </div>
+
+        <div id="activate2_back"></div>
+
+    <div id="activate2" >
+            <iframe id="arrows2" src="/static/html/arrows.html" style="width: 650px; height: 200px; border: none; display: none; position: absolute; top: 570px; left: 520px; ">
+
+            </iframe>
+            <div id="activationButton2">
+                <button id="activateButton2" style="position: absolute; top: 460px; left:5px;" onclick=activate2()>
+                    <img src="/static/images/18_Enigma_S3_Button_FINAL.png" style="width: 300px; height: 300px;" alt="none">
+                </button>
+            </div>
+    </div>
+
+        <div id="activate3_back"></div>
+
+    <div id="activate3" >
+
+            <div id="activationButton3"><button id="activateButton3" style="position: absolute; top: 465px; left: 780px;" onclick=activate3() > <img src="/static/images/18_Enigma_Launch_Button_v3.png" style="width: 300px; height: 300px;" alt="none"> </button></div>
+    </div>
+
+    <div id="activate4">
+        <h1>Successfully Activated.</h1>
+    </div>
+
+    <!----
+
+    Activate ends here
+
+    ------>
+    
+    <script>
+        $(document).ready(function(){
+            $(window).on('touchmove',function(e){e.preventDefault();});
+        });
+        var attackroom = "0";
+        var hacksAvailable = 0;
+        if (localStorage["hacksAvailable"]){
+            hacksAvailable = localStorage["hacksAvailable"];
+        }
+
+        var room = "{{ room }}";
+        if (room === "1"){
+            attackroom = "2"
+        }
+        if (room === "2"){
+            attackroom = "1"
+        }
+        var hackcheck = "OFF";
+        var station = "HAC" + room;
+        var url = "/hackStation/" + room;
+        var stationNameTemp = "";
+        var stationlock = "OFF";
+        var min = 6;
+        var max = 12;
+        {% if room == "1" %}
+        var class_body = "labyrinth";
+        {% else %}
+        var class_body = "enigma";
+        {% endif %}
+        document.body.className = class_body;
+
+        if ( self !== top ) {
+            document.body.style.backgroundImage = "none";
+            document.body.style.background = "none transparent";
+        }
+
+        setInterval(auto_load,500);
+        setInterval(currency_load,1000);
+
+        function auto_load(){
+            $.ajax({
+              url: url,
+              success: function(data){
+                 $("#station_load").html(data);
+              }
+            });
+
+            if ( self === top ) {
+                $.ajax({
+                    url: "/hackCheck/" + station,
+                    success: function (data) {
+                        $("#hackCheck").html(data);
+                    }
+                });
+            }
+        }
+
+        function auto_load2(){
+
+        }
+
+        function currency_load(){
+            $.ajax({
+              url: "/currency/" + room,
+              success: function(data){
+                 $("#currencyCheck").html(data);
+              }
+            });
+        }
+
+        $(document).ready( function() {
+            $("#hack_load").load("/hack_load/");
+        });
+
+        $.ajax({
+            url: "/static/html/top.html",
+            success: function(data){
+                $("#top_load").html(data);
+            }
+        });
+
+        function hackOn() {
+            if ( self === top ) {
+                hackcheck = "ON";
+                textset1 = "NO";
+                textset2 = "NO";
+
+                document.body.className = 'hack';
+
+                var texttoset = "PRESS ACTIVATION BUTTONS WHEN THEY APPEAR.";
+                text_set(texttoset, "background_upper2");
+
+                var texttoset2 = "YOU’VE BEEN HACKED!";
+                text_set(texttoset2, "background_lower2");
+
+                document.getElementById("wrapper").style.display = "none";
+                document.getElementById("hack").style.display = "block";
+            }
+        }
+
+        function hackOff() {
+            if ( self === top ) {
+                document.getElementById("hack").style.display = "none";
+                document.getElementById("wrapper").style.display = "block";
+                hackcheck = "OFF";
+
+               document.body.className = class_body;
+
+                if (stationlock === "OFF") {
+
+                    if (hacksAvailable >= 1) {
+                        textset1 = "NO";
+                        textset2 = "NO";
+                        var texttoset = "SELECT WHICH STATION TO HACK.";
+                        text_set(texttoset, "background_upper2");
+
+                        var texttoset2 = "HACKS LEFT " + hacksAvailable;
+                        text_set(texttoset2, "background_lower2");
+                    }
+
+                    if (hacksAvailable < 1) {
+                        textset1 = "NO";
+                        textset2 = "NO";
+
+                        var texttoset = "NO HACKS AVAILABLE, CHECK BACK SOON.";
+                        text_set(texttoset, "background_upper2");
+
+                        var texttoset2 = "HACKS LEFT " + hacksAvailable;
+                        text_set(texttoset2, "background_lower2");
+                    }
+                }
+
+                if (stationlock === "ON") {
+                    textset1 = "NO";
+                    textset2 = "NO";
+                    var texttoset = "PRESS ACTIVATION BUTTONS WHEN THEY APPEAR.";
+                    text_set(texttoset, "background_upper2");
+
+                    var texttoset2 = "HACK INITIATED";
+                    text_set(texttoset2, "background_lower2");
+                }
+            }
+
+
+
+
+            if (stationlock === "ON") {
+                textset1 = "NO";
+                textset2 = "NO";
+                var texttoset = "PRESS ACTIVATION BUTTONS WHEN THEY APPEAR.";
+                text_set(texttoset, "background_upper2");
+
+                var texttoset2 = "HACK INITIATED";
+                text_set(texttoset2, "background_lower2");
+            }
+        }
+
+
+
+
+        function ttd(data){
+
+        }
+
+        function hackThis(stationName) {
+            if (hacksAvailable >= 1) {
+                stationlock = "ON";
+
+                var redirectaudio2 = "/audioadd/" + room + "/", hack_init2 = "hackinitiated";
+
+                $.ajax({
+                    type: 'POST',
+                    url: redirectaudio2,
+                    data: {
+                        toplay: hack_init2
+                    }
+                });
+
+                stationNameTemp = stationName;
+                if ( self !== top ) {
+                        parent.document.getElementById("hider_div").style.display = "none";
+                }
+                document.getElementById("arrows0").style.display = "block";
+                document.getElementById("station_load").style.display = "none";
+                document.getElementById("activationButton1").style.display = "none";
+                document.getElementById("activationButton2").style.display = "none";
+                document.getElementById("activationButton3").style.display = "none";
+                document.getElementById("activate_back").style.display = "block";
+                document.getElementById("activate").style.display = "block";
+
+                if (hackcheck === "OFF") {
+
+                }
+
+                var seconds_left = Math.floor(Math.random() * (max - min) + min);
+                if (check_sec === "yes") {
+                    seconds_left = seconds_left - 2
+                }
+                var interval = setInterval(function () {
+                    --seconds_left;
+                    if (timeDoubler === "yes") {
+                        --seconds_left
+                    }
+                    if (seconds_left <= 0) {
+                        document.getElementById("activationButton1").style.display = "block";
+                        clearInterval(interval);
+                    }
+                }, 1000);
+            }
+        }
+
+        function activate1() {
+            document.getElementById("arrows1").style.display = "block";
+            document.getElementById("activate2").style.display = "block";
+            var seconds_left = Math.floor(Math.random() * (max - min) + min);
+            if (check_sec === "yes") {
+                    seconds_left = seconds_left - 2
+                }
+            var interval = setInterval(function () {
+                --seconds_left;
+                if (timeDoubler === "yes") {
+                    --seconds_left
+                }
+                if (seconds_left <= 0) {
+                    document.getElementById("activationButton2").style.display = "block";
+                    clearInterval(interval);
+                }
+            }, 1000);
+
+        }
+
+        function activate2() {
+            document.getElementById("arrows2").style.display = "block";
+            document.getElementById("activate3").style.display = "block";
+            var seconds_left = Math.floor(Math.random() * (max - min) + min);
+            if (check_sec === "yes") {
+                    seconds_left = seconds_left - 2
+                }
+            var interval = setInterval(function () {
+                --seconds_left;
+                if (timeDoubler === "yes") {
+                    --seconds_left
+                }
+                if (seconds_left <= 0) {
+                    document.getElementById("activationButton3").style.display = "block";
+                    clearInterval(interval);
+                }
+            }, 1000);
+        }
+
+        function activate3() {
+            if ( self !== top ) {
+                        parent.document.getElementById("hider_div").style.display = "block";
+            }
+            document.getElementById("activate_back").style.display = "none";
+            stationlock = "OFF";
+            var redirect = "/hackStation/{{room}}";
+            var redirect2 = '/hacktemplate/{{room}}';
+            var redirectaudio = "/audioadd/" + attackroom + "/", hack_init = "youwerehacked";
+            {
+                localStorage["hacksAvailable"] = hacksAvailable;
+                $.ajax({
+                    type: 'POST',
+                    url: redirect,
+                    data: {
+                        station: stationNameTemp
+                    }
+                });
+                $.ajax({
+                    type: 'POST',
+                    url: redirectaudio,
+                    data: {
+                        toplay: hack_init
+                    }
+                });
+
+                window.setTimeout(function () {
+                    $(location).attr('href', redirect2)
+                }, 500);
+            }
+        }
+
+    </script>
+
+{% endblock %}

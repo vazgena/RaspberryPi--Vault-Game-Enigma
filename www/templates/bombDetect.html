@@ -1,0 +1,65 @@
+{% block body %}
+    <style>
+    html{
+        background-color: black;
+        color: white;
+        text-align: center;
+    }
+    button{
+        width: 60%;
+        height: 60%;
+        background-color: white;
+        color: black;
+
+    }
+    </style>
+
+    <link rel='stylesheet prefetch' href='/static/css/roboto.css'>
+    <link rel='stylesheet prefetch' href='/static/css/font-awesome.min.css'>
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/inhouse.css?version=.01.7" rel="stylesheet">
+<script src="/static/js/jquery1.8.2.min.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/hack.js"></script>
+    <div id="bombdetbutton"></div>
+    <div id="bombtext"></div>
+
+    <script>
+
+    var autoloadinterval;
+    autoloadinterval = setInterval(auto_load,1000);
+    function auto_load(){
+
+        $.ajax({
+          url: "/bombcheck/{{room}}",
+          success: function(data){
+             $("#bombdetbutton").html(data);
+          }
+    });
+    }
+
+    function sutohidetext(){
+
+    }
+
+    function checkbomb() {
+        clearInterval(autoloadinterval);
+            $.ajax({
+        type: "POST",
+        cache:false,
+        url: '/bombcheck/{{ room }}',
+        data: ({  somthing: "something" }),
+        dataType: "html",
+        success: function(data) {
+            $("#bombtext").html(data);
+            $("#bombdetbutton").html("");
+            autoloadinterval = setInterval(auto_load,300);
+            autohidetext = setInterval(sutohidetext, 10000);
+
+        }
+    });
+    }
+
+    </script>
+
+{% endblock %}

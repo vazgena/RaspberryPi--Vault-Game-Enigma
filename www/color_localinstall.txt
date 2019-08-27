@@ -1,0 +1,13 @@
+sudo pkill -f ipadress.py
+sudo pip3 install pyserial
+sudo apt-get update
+sudo pip3 install requests
+sudo apt-get install -y python3-lxml
+
+sudo rm startup.py
+sudo nano startup.py
+sudo nano ipadress.py
+sudo nano color_local.py
+
+crontab -e
+@reboot sudo python /home/pi/blah.py

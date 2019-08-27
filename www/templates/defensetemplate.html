@@ -1,0 +1,497 @@
+{% block body %}
+
+
+    <script src="/static/js/jquery1.8.2.min.js"></script>
+    <script src="/static/js/in_house.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/hack.js"></script>
+    <script src="/static/js/curved_text.js"></script>
+    <link rel='stylesheet prefetch' href='/static/css/roboto.css'>
+    <link rel='stylesheet prefetch' href='/static/css/font-awesome.min.css'>
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/inhouse.css?version=.01.7" rel="stylesheet">
+
+    <div id="background_upper2"></div>
+
+    <div id="background_lower2"></div>
+
+    <div id="hack_load"></div>
+
+    <div id="wrapper">
+        <div id="main_loader" style="z-index: 1;">
+            <div id="station_load">
+            </div>
+        </div>
+    </div>
+
+    <div id="currencyCheck"></div>
+
+    <div id="hackBackCheck"></div>
+
+    <div id="lower_left_text">
+        <p id="bmb_message">
+        </p>
+        <p id="dbl_message">
+        </p>
+    </div>
+
+    <div id="hackCheck"></div>
+
+<!----
+
+    Activate starts here
+
+    ------>
+
+    <div id="activate_back"></div>
+    <div id="activate">
+            <div style="position: absolute; top: 150px; left: 245px">
+                <img src="/static/images/18_Enigma_S1_Button_FINAL.png" style="width: 300px; height: 300px;" alt="none">
+            </div>
+
+            <iframe id="arrows0" src="about:blank" style="width: 650px; height: 200px; border: none; display: none; position: absolute; top: 200px; left: 540px;"></iframe>
+
+            <div id="activationButton1" style="position: absolute; top: 150px; left: 1030px;">
+                <button id="activateButton1" onclick=activate1()>
+                    <img src="/static/images/18_Enigma_S2_Button_FINAL.png" style="width: 300px; height: 300px;" alt="none">
+                </button>
+            </div>
+            <iframe id="arrows1" src="about:blank" style="width: 650px; height: 200px; border: none; display: none; position: absolute; top: 380px; left: 380px; transform: rotate(155deg);">
+            </iframe>
+    </div>
+
+    <div id="activate2_back"></div>
+
+    <div id="activate2" >
+            <iframe id="arrows2" src="about:blank" style="width: 650px; height: 200px; border: none; display: none; position: absolute; top: 570px; left: 520px; ">
+
+            </iframe>
+            <div id="activationButton2">
+                <button id="activateButton2" style="position: absolute; top: 460px; left:5px;" onclick=activate2()>
+                    <img src="/static/images/18_Enigma_S3_Button_FINAL.png" style="width: 300px; height: 300px;" alt="none">
+                </button>
+            </div>
+    </div>
+
+    <div id="activate3_back"></div>
+
+    <div id="activate3" >
+            <div id="activationButton3"><button id="activateButton3" style="position: absolute; top: 465px; left: 780px;" onclick=activate3() > <img src="/static/images/18_Enigma_Launch_Button_v3.png" style="width: 300px; height: 300px;" alt="none"> </button></div>
+    </div>
+
+    <div id="activate4">
+        <h1>Successfully Activated.</h1>
+    </div>
+
+    <!----
+
+    Activate ends here
+
+    ------>
+
+
+    <div id="audioplay">
+    <audio id='assist' src="/static/audio/assist.wav" type="audio/wav" preload="auto"  ></audio>
+    <audio id='blastlaunch' src="/static/audio/blastlaunch.wav" type="audio/wav" preload="auto"  ></audio>
+    <audio id='bombdroppingnew' src="/static/audio/bombdroppingnew.wav" type="audio/wav" preload="auto"  ></audio>
+    <audio id='charge' src="/static/audio/charge.wav" type="audio/wav" preload="auto"  ></audio>
+    <audio id='steal' src="/static/audio/steal.wav" type="audio/wav" preload="auto"  ></audio>
+    <audio id='gameover' src="/static/audio/gameover.wav" type="audio/wav" preload="auto"  ></audio>
+    <audio id='gamewon' src="/static/audio/gamewon.wav" type="audio/wav" preload="auto"  ></audio>
+    <audio id='hackinitiated' src="/static/audio/hackinitiated.wav" type="audio/wav" preload="auto"  ></audio>
+    <audio id='unhack' src="/static/audio/unhack.wav" type="audio/wav" preload="auto"  ></audio>
+    <audio id='upgrade' src="/static/audio/upgrade.wav" type="audio/wav" preload="auto"  ></audio>
+    <audio id='youwerehacked' src="/static/audio/youwerehacked.wav" type="audio/wav" preload="auto"  ></audio>
+    <audio id='allclearstub' src="/static/audio/allclearstub.wav" type="audio/wav" preload="auto"  ></audio>
+    </div>
+    <div id="audio_check">
+    </div>
+    {#
+    <div style="position: fixed; bottom: 50px; right: 100px; z-index: 2;">
+        <input type="range" id="volume" name="volume" min="0" max="100" value="100" onchange="setVolume();">
+        <label class="volume" for="volume">Volume</label>
+    </div>
+    #}
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
+    <script>
+
+        var socket = io();
+
+        $(document).ready(function(){
+            $(window).on('touchmove',function(e){e.preventDefault();});
+        });
+        if ( self !== top ) {
+            document.body.style.backgroundImage = "none";
+            document.body.style.background = "none transparent";
+        }
+
+        $(document).ready( function() {
+            $("#hack_load").load("/hack_load/");
+        });
+        var room = "{{ room }}";
+        var station = "MAN{{room}}";
+        var deactivate_dblr;
+        var hackcheck = "OFF";
+        textset1 = "NO";
+        textset2 = "NO";
+        var stationNameTemp = "";
+        var stationCheck = "";
+        {% if room == "1" %}
+        var class_body = "labyrinth";
+        {% else %}
+        var class_body = "enigma";
+        {% endif %}
+        document.body.className = class_body;
+
+
+        if (localStorage["stationCheck"]){
+            stationCheck = localStorage["stationCheck"];
+        }
+        if (localStorage["stationNameTemp"]){
+            stationNameTemp = localStorage["stationNameTemp"];
+        }
+
+
+        var texttoset = "CHOOSE WHICH STATION HAS BEEN BLASTED PREVIOUSLY.";
+        var texttoset2 = "";
+
+        {#
+        text_set(texttoset, "background_upper2");
+        text_set(texttoset2, "background_lower2");
+        #}
+
+        setInterval(auto_load,250);
+
+
+        var old_check = "";
+
+        function success_check_hack(data) {
+            old_check = "";
+            $("#hackCheck").html(data);
+        }
+
+        function success_audiocheck(data) {
+            $("#audio_check").html(data);
+        }
+
+        function success_defensestation(data) {
+            old_check = data;
+            $("#station_load").html(data);
+        }
+
+        socket.on('hackCheck', success_check_hack);
+        socket.on('audiocheck', success_audiocheck);
+        socket.on('mainstation', success_defensestation);
+
+        function auto_load(){
+            socket.emit('mainstation', {'station': station, 'room': room, 'old_value': old_check, 'stationCheck': stationCheck,
+            'stationNameTemp': stationNameTemp});
+            socket.emit('audiocheck', {'room': room});
+            if ( self == top ) {
+                socket.emit('hackCheck', {'station': station, 'status': hackcheck});
+            }
+        }
+
+        var old_currency = "";
+
+        function success_currency(data) {
+            old_currency = data;
+            $("#currencyCheck").html(data);
+        }
+
+        socket.on('currency', success_currency);
+
+
+        setInterval(currency_load,1000);
+
+        function currency_load(){
+            socket.emit('currency', {'room': room, 'old_value': old_currency});
+        }
+
+
+        function hackOn() {
+            if ( self === top ) {
+                hackcheck = "ON";
+                document.getElementById("main_loader").style.display = "none";
+                document.getElementById("hack").style.display = "block";
+
+                textset1 = "NO";
+                textset2 = "NO";
+
+                document.body.className = 'hack';
+
+                var texttoset_hack = "PRESS ACTIVATION BUTTONS WHEN THEY APPEAR.";
+                text_set(texttoset_hack, "background_upper2");
+
+                var texttoset_hack2 = "YOU’VE BEEN HACKED!";
+                text_set(texttoset_hack2, "background_lower2");
+
+            }
+        }
+
+        function set_game_string(){
+             textset1 = "NO";
+             textset2 = "NO";
+             var texttoset_temp = "PRESS ACTIVATION BUTTONS WHEN THEY APPEAR.";
+             text_set(texttoset_temp, "background_upper2");
+              {#
+                    var texttoset_hack2 = "YOU’VE BEEN HACKED!";
+                    text_set(texttoset_hack2, "background_lower2");
+               #}
+        }
+
+        function set_normal_string(){
+            text_set(texttoset, "background_upper2");
+            text_set(texttoset2, "background_lower2");
+        }
+
+        function hackOff() {
+            if ( self === top ) {
+                hackcheck = "OFF";
+                document.getElementById("hack").style.display = "none";
+                document.getElementById("main_loader").style.display = "block";
+
+
+                textset1 = "NO";
+                textset2 = "NO";
+
+                document.body.className = class_body;
+
+                if (stationlock === "ON") {
+                    set_game_string();
+                }
+                else {
+                    set_normal_string();
+                 }
+
+            }
+        }
+
+        function auto_load2() {
+
+        }
+
+
+        function ttd(time_to_detonate){
+
+        }
+
+
+        function defendThis(stationName) {
+            {# if (hacksAvailable >= 1) { #}
+                stationlock = "ON";
+
+                set_game_string();
+
+                stationNameTemp = stationName;
+                if ( self !== top ) {
+                        parent.document.getElementById("hider_div").style.display = "none";
+                }
+                document.getElementById("arrows0").src = "/static/html/arrows.html";
+                document.getElementById("arrows0").style.display = "block";
+                document.getElementById("arrows1").src = "/static/html/arrows.html";
+                document.getElementById("arrows1").style.display = "none"
+                document.getElementById("arrows2").src = "/static/html/arrows.html";
+                document.getElementById("arrows2").style.display = "none"
+                document.getElementById("station_load").style.display = "none";
+                document.getElementById("activationButton1").style.display = "none";
+                document.getElementById("activationButton2").style.display = "none";
+                document.getElementById("activationButton3").style.display = "none";
+                document.getElementById("activate_back").style.display = "block";
+                document.getElementById("activate").style.display = "block";
+
+                if (hackcheck === "OFF") {
+
+                }
+
+                var seconds_left = Math.floor(Math.random() * (max - min) + min);
+                var interval = setInterval(function () {
+                    --seconds_left;
+                    if (timeDoubler === "yes") {
+                        --seconds_left
+                    }
+                    if (seconds_left <= 0) {
+                        document.getElementById("activationButton1").style.display = "block";
+                        clearInterval(interval);
+                    }
+                }, 1000);
+            {# } #}
+        }
+
+        var whattoplay = "";
+
+        function playAudio(whattoplay){
+            var assist = document.getElementById('assist');
+            var blastlaunch = document.getElementById('blastlaunch');
+            var bombdroppingnew = document.getElementById('bombdroppingnew');
+            var charge = document.getElementById('charge');
+            var steal = document.getElementById('steal');
+            var gameover = document.getElementById('gameover');
+            var gamewon = document.getElementById('gamewon');
+            var hackinitiated = document.getElementById('hackinitiated');
+            var unhack = document.getElementById('unhack');
+            var upgrade = document.getElementById('upgrade');
+            var youwerehacked = document.getElementById('youwerehacked');
+            var allclearstub = document.getElementById('allclearstub');
+
+            if (whattoplay === "assist"){
+                assist.play();
+            }
+            else if (whattoplay === "blastlaunch"){
+                blastlaunch.play();
+            }
+            else if (whattoplay === "bombdroppingnew"){
+                bombdroppingnew.play();
+            }
+            else if (whattoplay === "charge"){
+                charge.play();
+            }
+            else if (whattoplay === "steal"){
+                steal.play();
+            }
+            else if (whattoplay === "gameover"){
+                gameover.play();
+            }
+            else if (whattoplay === "gamewon"){
+                gamewon.play();
+            }
+            else if (whattoplay === "hackinitiated"){
+                hackinitiated.play();
+            }
+            else if (whattoplay === "unhack"){
+                unhack.play();
+            }
+            else if (whattoplay === "upgrade"){
+                upgrade.play();
+            }
+            else if (whattoplay === "youwerehacked"){
+                youwerehacked.play();
+            }
+            else if (whattoplay === "allclearstub"){
+                allclearstub.play();
+            }
+        }
+
+         function setVolume(volume){
+            assist.volume = volume;
+            blastlaunch.volume = volume;
+            bombdroppingnew.volume = volume;
+            charge.volume = volume;
+            steal.volume = volume;
+            gameover.volume = volume;
+            gamewon.volume = volume;
+            hackinitiated.volume = volume;
+            unhack.volume = volume;
+            upgrade.volume = volume;
+            youwerehacked.volume = volume;
+            allclearstub.volume = volume;
+        }
+
+
+        function activate1() {
+            document.getElementById("arrows1").style.display = "block";
+            document.getElementById("activate2").style.display = "block";
+            var seconds_left = Math.floor(Math.random() * (max - min) + min);
+            var interval = setInterval(function () {
+                --seconds_left;
+                if (timeDoubler === "yes") {
+                    --seconds_left
+                }
+                if (seconds_left <= 0) {
+                    document.getElementById("activationButton2").style.display = "block";
+                    clearInterval(interval);
+                }
+            }, 1000);
+
+        }
+
+        function activate2() {
+            document.getElementById("arrows2").style.display = "block";
+            document.getElementById("activate3").style.display = "block";
+            var seconds_left = Math.floor(Math.random() * (max - min) + min);
+            var interval = setInterval(function () {
+                --seconds_left;
+                if (timeDoubler === "yes") {
+                    --seconds_left
+                }
+                if (seconds_left <= 0) {
+                    document.getElementById("activationButton3").style.display = "block";
+                    clearInterval(interval);
+                }
+            }, 1000);
+        }
+
+        function activate3() {
+            if ( self !== top ) {
+                        parent.document.getElementById("hider_div").style.display = "block";
+            }
+            document.getElementById("activate_back").style.display = "none";
+            document.getElementById("main_loader").style.display = "none";
+            stationlock = "OFF";
+            var redirect = "/mainstation/{{room}}";
+            var redirect2 = '/maintemplate/{{room}}';
+
+            {
+                localStorage["stationNameTemp"] = stationNameTemp;
+
+                $.ajax({
+                    type: 'POST',
+                    url: redirect,
+                    data: {
+                        "station": stationNameTemp,
+                    },
+                    success: function(data){
+                        $("#station_load").html(data);
+                    }
+                });
+
+
+
+                window.setTimeout(function () {
+                    $(location).attr('href', redirect2)
+                }, 100);
+
+            }
+        }
+
+        {#
+
+        function setColor(station_id, background){
+            var object_set = document.getElementById(station_id);
+            if (object_set) {
+                object_set.style['background-color'] = background;
+            }
+        }
+
+        function removeColor(station_id, background){
+            document.getElementById("activate_back").style.display = "none";
+        }
+
+        function setClearStation(station_list){
+            localStorage["clearStation"] = JSON.stringify(station_list);
+            clearStation = station_list;
+        }
+
+        function setBlastStation(station_list){
+            localStorage["blastStation"] = JSON.stringify(station_list);
+            blastStation = station_list;
+        }
+
+        function updateColor(){
+            for (var color_set in clearStation){
+                setColor(clearStation[color_set][0], clearStation[color_set][1]);
+            }
+
+            for (var color_set in blastStation){
+                setColor(clearStation[color_set][0], clearStation[color_set][1]);
+            }
+        }
+        #}
+
+
+
+    </script>
+
+
+{% endblock %}

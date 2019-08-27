@@ -1,0 +1,11 @@
+
+
+{% for i in tracker_list %}
+
+<form onsubmit="return false" action="" method="post">
+  Tracker mac: <input type="hidden" name="mac" value="{{ i[0] }}">{{ i[0] }}<br>
+  Tracker Name: <input type="text" name="name" value="{{ i[1] }}"><br>
+  <input type="submit" value="Submit" onclick="submit()">
+</form>
+
+{% endfor %}

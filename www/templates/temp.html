@@ -1,0 +1,98 @@
+{% block body %}
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+
+<div id="hack" >
+        <div id="hacktext" style="position: absolute; top: 50px; left: 100px; ">You have been hacked.</div>
+You Have Been Hacked! <p><div id="pressAndHold">Remove Hack</div></p></div>
+{% for i in roomsAvailable: %}
+    <button class="button" onclick=hackThis("{{i}}")> Station: {{i}} </button>
+{% endfor %}
+<div id="hackCheck">
+</div>
+<script>
+    var room = "hackStation"
+    function sleep_ms(millisecs) {
+    var initiation = new Date().getTime();
+    while ((new Date().getTime() - initiation) < millisecs);
+    }
+    function hackThis(stationName){
+        $.post("/hackStation/{{room}}",
+        {
+          station: stationName
+        });
+        sleep_ms(300)
+        window.location.href = "/hackStation/{{room}}";
+
+    }
+    function hackOn() {
+        document.getElementById("hack").style.display = "block";
+    }
+    function hackOff() {
+        window.location.href = "/hackStation/{{room}}";
+        document.getElementById("hack").style.display = "none";
+    }
+    function auto_load(){
+        $.ajax({
+          url: "/hackCheck/HAC-{{room}}",
+          success: function(data){
+             $("#hackCheck").html(data);
+          }
+    });
+    function auto_load2(){
+        window.location.href = "/hackStation/{{room}}";
+    }
+    }
+    $(document).ready(function(){
+    auto_load();
+    });
+    setInterval(auto_load,1000);
+    var pressAndHold = document.querySelector("#pressAndHold");
+    var pressHoldEvent = new CustomEvent("pressHold");
+    var counter = 0;
+    var pressHoldDuration = 100;
+    pressAndHold.addEventListener("mousedown", pressingDown, false);
+    pressAndHold.addEventListener("mouseup", notPressingDown, false);
+    pressAndHold.addEventListener("mouseleave", notPressingDown, false);
+    pressAndHold.addEventListener("touchstart", pressingDown, false);
+    pressAndHold.addEventListener("touchend", notPressingDown, false);
+    pressAndHold.addEventListener("pressHold", pressingDown, false);
+    interval = null;
+    var counter = 0;
+    function pressingDown(e) {
+      // Start the timer
+      var i = 0;
+
+        interval = setInterval(function () {
+        timer() // this is inside your loop
+    }, 1);
+
+    }
+
+    function notPressingDown(e) {
+         clearInterval(interval); 
+          counter = 0;
+          console.log("released")
+    }
+
+    function timer() {
+      console.log(counter)
+      if (counter < pressHoldDuration) {
+        sleep_ms(10)
+        counter++;
+
+      } else {
+
+        removeS();
+        counter = 0;
+
+      }
+    }
+    function removeS() {
+        $.ajax({
+          type: "POST",
+          url: "/sRemove/",
+          data: { station: "HAC-{{room}}"}
+        });
+    }
+</script>
+{% endblock %}

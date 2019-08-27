@@ -1,0 +1,492 @@
+{% block body %}
+    {% if station == "AUD1" %}
+    {#LISTEN 1#}
+        <script>
+            var room = "1";
+            var redirect_url = "http://10.255.1.254:8080/audiotemplate/1";
+        </script>
+        {% if status == "0" %}
+            <script>
+                status = "off";
+            </script>
+        {% elif status == "WIN" %}
+            <div id="message">{{ message }}</div>
+            <script>
+                status = "win";
+            </script>
+        {% elif status == "LOSE" %}
+            <div id="message">{{ message }}</div>
+            <script>
+                status = "lose";
+            </script>
+        {% elif status == "gameon" %}
+            <script>
+                status = "redirect";
+            </script>
+        {% else %}
+        {% endif %}
+
+    {% elif station == "AUD2" %}
+    {#LISTEN 2#}
+         <script>
+            var room = "2";
+            var redirect_url = "http://10.255.1.254:8080/audiotemplate/2";
+        </script>
+        {% if status == "0" %}
+            <script>
+                status = "off";
+            </script>
+        {% elif status == "WIN" %}
+            <div id="message">{{ message }}</div>
+            <script>
+                status = "win";
+            </script>
+        {% elif status == "LOSE" %}
+            <div id="message">{{ message }}</div>
+            <script>
+                status = "lose";
+            </script>
+        {% elif status == "gameon" %}
+            <script>
+                status = "redirect";
+            </script>
+        {% else %}
+        {% endif %}
+
+    {% elif station == "BMB1" %}
+    {#BLAST 1#}
+        <script>
+            var room = "1";
+            var redirect_url = "http://10.255.1.254:8080/bombtemplate/1";
+        </script>
+
+        {% if status == "0" %}
+            <script>
+                status = "off";
+            </script>
+        {% elif status == "WIN" %}
+            <div id="message">{{ message }}</div>
+            <script>
+                status = "win";
+            </script>
+        {% elif status == "LOSE" %}
+            <div id="message">{{ message }}</div>
+            <script>
+                status = "lose";
+            </script>
+        {% elif status == "gameon" %}
+            <script>
+                status = "redirect";
+            </script>
+        {% else %}
+        {% endif %}
+
+    {% elif station == "BMB2" %}
+    {#BLAST 2#}
+        <script>
+            var room = "2";
+            var redirect_url = "http://10.255.1.254:8080/bombtemplate/2";
+        </script>
+        {% if status == "0" %}
+            <script>
+                status = "off";
+            </script>
+        {% elif status == "WIN" %}
+            <div id="message">{{ message }}</div>
+            <script>
+                status = "win";
+            </script>
+        {% elif status == "LOSE" %}
+            <div id="message">{{ message }}</div>
+            <script>
+                status = "lose";
+            </script>
+        {% elif status == "gameon" %}
+            <script>
+                status = "redirect";
+            </script>
+        {% else %}
+        {% endif %}
+
+    {% elif station == "CS11" %}
+    {#WATCH 1#}
+        <script>
+            var room = "1";
+            var redirect_url = "http://10.255.1.254:8080/cameraTemplate/CS11/1";
+        </script>
+        {% if status == "0" %}
+            <script>
+                status = "off";
+            </script>
+        {% elif status == "WIN" %}
+            <div id="message">{{ message }}</div>
+            <script>
+                status = "win";
+            </script>
+        {% elif status == "LOSE" %}
+            <div id="message">{{ message }}</div>
+            <script>
+                status = "lose";
+            </script>
+        {% elif status == "gameon" %}
+            <script>
+                status = "redirect";
+            </script>
+        {% else %}
+        {% endif %}
+
+    {% elif station == "CS12" %}
+    {#WATCH 2#}
+        <script>
+            var room = "2";
+            var redirect_url = "http://10.255.1.254:8080/cameraTemplate/CS12/2";
+        </script>
+        {% if status == "0" %}
+            <script>
+                status = "off";
+            </script>
+        {% elif status == "WIN" %}
+            <div id="message">{{ message }}</div>
+            <script>
+                status = "win";
+            </script>
+        {% elif status == "LOSE" %}
+            <div id="message">{{ message }}</div>
+            <script>
+                status = "lose";
+            </script>
+        {% elif status == "gameon" %}
+            <script>
+                status = "redirect";
+            </script>
+        {% else %}
+        {% endif %}
+
+    {% elif station == "HAC1" %}
+    {#HACK 1#}
+        <script>
+            var room = "1";
+            var redirect_url = "http://10.255.1.254:8080/hacktemplate/1";
+        </script>
+        {% if status == "0" %}
+            <script>
+                status = "off";
+            </script>
+        {% elif status == "WIN" %}
+            <div id="message">{{ message }}</div>
+            <script>
+                status = "win";
+            </script>
+        {% elif status == "LOSE" %}
+            <div id="message">{{ message }}</div>
+            <script>
+                status = "lose";
+            </script>
+        {% elif status == "gameon" %}
+            <script>
+                status = "redirect";
+            </script>
+        {% else %}
+        {% endif %}
+
+    {% elif station == "HAC2" %}
+    {#HACK 2#}
+        <script>
+            var room = "2";
+            var redirect_url = "http://10.255.1.254:8080/hacktemplate/2";
+        </script>
+        {% if status == "0" %}
+            <script>
+                status = "off";
+            </script>
+        {% elif status == "WIN" %}
+            <div id="message">{{ message }}</div>
+            <script>
+                status = "win";
+            </script>
+        {% elif status == "LOSE" %}
+            <div id="message">{{ message }}</div>
+            <script>
+                status = "lose";
+            </script>
+        {% elif status == "gameon" %}
+            <script>
+                status = "redirect";
+            </script>
+        {% else %}
+        {% endif %}
+
+    {% elif station == "MAN1" %}
+    {#MIRROR 1#}
+        <script>
+            var station =  "MAN1";
+            var room = "1";
+            var redirect_url = "http://10.255.1.254:8080/maintemplate/1";
+        </script>
+        {% if status == "0" %}
+            <script>
+                status = "off";
+            </script>
+        {% elif status == "WIN" %}
+            <div id="message">{{ message }}</div>
+            <script>
+                status = "win";
+            </script>
+        {% elif status == "LOSE" %}
+            <div id="message">{{ message }}</div>
+            <script>
+                status = "lose";
+            </script>
+        {% elif status == "gameon" %}
+            <script>
+                status = "redirect";
+            </script>
+        {% else %}
+        {% endif %}
+
+    {% elif station == "MAN2" %}
+    {#MIRROR 2#}
+        <script>
+            var station =  "MAN2";
+            var room = "2";
+            var redirect_url = "http://10.255.1.254:8080/maintemplate/2";
+        </script>
+        {% if status == "0" %}
+            <script>
+                status = "off";
+            </script>
+        {% elif status == "WIN" %}
+            <div id="message">{{ message }}</div>
+            <script>
+                status = "win";
+            </script>
+        {% elif status == "LOSE" %}
+            <div id="message">{{ message }}</div>
+            <script>
+                status = "lose";
+            </script>
+        {% elif status == "gameon" %}
+            <script>
+                status = "redirect";
+            </script>
+        {% else %}
+        {% endif %}
+
+    {% elif station == "MAS1" %}
+    {#ASSIST 1#}
+        <script>
+            var room = "1";
+            var redirect_url = "http://10.255.1.254:8080/mastertemplate/1";
+        </script>
+        {% if status == "0" %}
+            <script>
+                status = "off";
+            </script>
+        {% elif status == "WIN" %}
+            <div id="message">{{ message }}</div>
+            <script>
+                status = "win";
+            </script>
+        {% elif status == "LOSE" %}
+            <div id="message">{{ message }}</div>
+            <script>
+                status = "lose";
+            </script>
+        {% elif status == "gameon" %}
+            <script>
+                status = "redirect";
+            </script>
+        {% else %}
+        {% endif %}
+
+    {% elif station == "MAS2" %}
+    {#ASSIST 2#}
+        <script>
+            var room = "2";
+            var redirect_url = "http://10.255.1.254:8080/mastertemplate/2";
+        </script>
+        {% if status == "0" %}
+            <script>
+                status = "off";
+            </script>
+        {% elif status == "WIN" %}
+            <div id="message">{{ message }}</div>
+            <script>
+                status = "win";
+            </script>
+        {% elif status == "LOSE" %}
+            <div id="message">{{ message }}</div>
+            <script>
+                status = "lose";
+            </script>
+        {% elif status == "gameon" %}
+            <script>
+                status = "redirect";
+            </script>
+        {% else %}
+        {% endif %}
+
+    {% elif station == "MKP1" %}
+    {#UPGRADE 1#}
+        <script>
+            var room = "1";
+            var redirect_url = "http://10.255.1.254:8080/markettemplate/1";
+        </script>
+        {% if status == "0" %}
+            <script>
+                status = "off";
+            </script>
+        {% elif status == "WIN" %}
+            <div id="message">{{ message }}</div>
+            <script>
+                status = "win";
+            </script>
+        {% elif status == "LOSE" %}
+            <div id="message">{{ message }}</div>
+            <script>
+                status = "lose";
+            </script>
+        {% elif status == "gameon" %}
+            <script>
+                status = "redirect";
+            </script>
+        {% else %}
+        {% endif %}
+
+    {% elif station == "MKP2" %}
+    {#UPGRADE 2#}
+        <script>
+            var room = "2";
+            var redirect_url = "http://10.255.1.254:8080/markettemplate/2";
+        </script>
+        {% if status == "0" %}
+            <script>
+                status = "off";
+            </script>
+        {% elif status == "WIN" %}
+            <div id="message">{{ message }}</div>
+            <script>
+                status = "win";
+            </script>
+        {% elif status == "LOSE" %}
+            <div id="message">{{ message }}</div>
+            <script>
+                status = "lose";
+            </script>
+        {% elif status == "gameon" %}
+            <script>
+                status = "redirect";
+            </script>
+        {% else %}
+        {% endif %}
+
+    {% elif station == "MOR1" %}
+    {#STEAL 1#}
+        <script>
+            var room = "1";
+            var redirect_url = "http://10.255.1.254:8080/mineothertemplate/1";
+        </script>
+        {% if status == "0" %}
+            <script>
+                status = "off";
+            </script>
+        {% elif status == "WIN" %}
+            <div id="message">{{ message }}</div>
+            <script>
+                status = "win";
+            </script>
+        {% elif status == "LOSE" %}
+            <div id="message">{{ message }}</div>
+            <script>
+                status = "lose";
+            </script>
+        {% elif status == "gameon" %}
+            <script>
+                status = "redirect";
+            </script>
+        {% else %}
+        {% endif %}
+
+    {% elif station == "MOR2" %}
+    {#STEAL 2#}
+        <script>
+            var room = "2";
+            var redirect_url = "http://10.255.1.254:8080/mineothertemplate/2";
+        </script>
+        {% if status == "0" %}
+            <script>
+                status = "off";
+            </script>
+        {% elif status == "WIN" %}
+            <div id="message">{{ message }}</div>
+            <script>
+                status = "win";
+            </script>
+        {% elif status == "LOSE" %}
+            <div id="message">{{ message }}</div>
+            <script>
+                status = "lose";
+            </script>
+        {% elif status == "gameon" %}
+            <script>
+                status = "redirect";
+            </script>
+        {% else %}
+        {% endif %}
+
+    {% elif station == "MTR1" %}
+    {#HARVEST 1#}
+        <script>
+            var room = "1";
+            var redirect_url = "http://10.255.1.254:8080/minethistemplate/1";
+        </script>
+        {% if status == "0" %}
+            <script>
+                status = "off";
+            </script>
+        {% elif status == "WIN" %}
+            <div id="message">{{ message }}</div>
+            <script>
+                status = "win";
+            </script>
+        {% elif status == "LOSE" %}
+            <div id="message">{{ message }}</div>
+            <script>
+                status = "lose";
+            </script>
+        {% elif status == "gameon" %}
+            <script>
+                status = "redirect";
+            </script>
+        {% else %}
+        {% endif %}
+
+    {% elif station == "MTR2" %}
+    {#HARVEST 2#}
+        <script>
+            var room = "2";
+            var redirect_url = "http://10.255.1.254:8080/minethistemplate/2";
+        </script>
+        {% if status == "0" %}
+            <script>
+                status = "off";
+            </script>
+        {% elif status == "WIN" %}
+            <div id="message">{{ message }}</div>
+            <script>
+                status = "win";
+            </script>
+        {% elif status == "LOSE" %}
+            <div id="message">{{ message }}</div>
+            <script>
+                status = "lose";
+            </script>
+        {% elif status == "gameon" %}
+            <script>
+                status = "redirect";
+            </script>
+        {% else %}
+        {% endif %}
+    {% endif %}
+
+{% endblock %}

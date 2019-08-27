@@ -1,0 +1,218 @@
+{% block body %}
+
+
+    <script src="/static/js/jquery1.8.2.min.js"></script>
+    <script src="/static/js/in_house.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/hack.js"></script>
+    <script src="/static/js/curved_text.js"></script>
+    <link rel='stylesheet prefetch' href='/static/css/roboto.css'>
+    <link rel='stylesheet prefetch' href='/static/css/font-awesome.min.css'>
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/inhouse.css?version=.01.7" rel="stylesheet">
+
+<div id="background_upper2">
+
+    </div>
+    <div id="background_lower2">
+
+    </div>
+
+    <div id="hack_load">
+
+    </div>
+    <div id="wrapper">
+        <div id="main_loader">
+            <div id="station_load">
+            </div>
+        </div>
+    </div>
+
+    <div id="currencyCheck">
+    </div>
+
+    <div id="hackBackCheck">
+    </div>
+
+    <div id="lower_left_text">
+        <p id="bmb_message">
+        </p>
+        <p id="dbl_message">
+        </p>
+    </div>
+
+    <div id="hackCheck">
+
+    </div>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
+    <script>
+
+        var socket = io();
+
+        $(document).ready(function(){
+            $(window).on('touchmove',function(e){e.preventDefault();});
+        });
+        if ( self !== top ) {
+            document.body.style.backgroundImage = "none";
+            document.body.style.background = "none transparent";
+        }
+
+        $(document).ready( function() {
+            $("#hack_load").load("/hack_load/");
+        });
+        var room = "{{ room }}";
+        var station = "MAS{{room}}";
+        var deactivate_dblr;
+        var hackcheck = "OFF";
+        textset1 = "NO";
+        textset2 = "NO";
+
+        {% if room == "1" %}
+        var class_body = "labyrinth";
+        {% else %}
+        var class_body = "enigma";
+        {% endif %}
+        document.body.className = class_body;
+
+        var texttoset = "CHOOSE WHICH STATION HAS FASTER ACTIVATIONS.";
+        text_set(texttoset, "background_upper2");
+
+        var texttoset2 = "";
+        text_set(texttoset2, "background_lower2");
+
+        setInterval(auto_load,250);
+
+        function hackOn() {
+            if ( self === top ) {
+                hackcheck = "ON";
+                document.getElementById("main_loader").style.display = "none";
+                document.getElementById("hack").style.display = "block";
+
+                textset1 = "NO";
+                textset2 = "NO";
+
+                document.body.className = 'hack';
+
+                var texttoset_hack = "PRESS ACTIVATION BUTTONS WHEN THEY APPEAR.";
+                text_set(texttoset_hack, "background_upper2");
+
+                var texttoset_hack2 = "YOU’VE BEEN HACKED!";
+                text_set(texttoset_hack2, "background_lower2");
+
+            }
+        }
+
+        function hackOff() {
+            if ( self === top ) {
+                hackcheck = "OFF";
+                document.getElementById("hack").style.display = "none";
+                document.getElementById("main_loader").style.display = "block";
+
+
+                textset1 = "NO";
+                textset2 = "NO";
+
+                document.body.className = class_body;
+
+                text_set(texttoset, "background_upper2");
+
+                text_set(texttoset2, "background_lower2");
+
+            }
+        }
+
+        function auto_load2() {
+
+        }
+
+        var old_check = "";
+
+        function success_check_hack(data) {
+            old_check = "";
+            $("#hackCheck").html(data);
+        }
+
+        function success_master_station(data) {
+            old_check = data;
+            $("#station_load").html(data);
+        }
+
+        socket.on('hackCheck', success_check_hack);
+        socket.on('masterStation', success_master_station);
+
+         //Needed in all end
+        function auto_load(){
+
+            socket.emit('masterStation', {'station': station, 'room': room, 'old_value': old_check});
+
+            if ( self == top ) {
+                socket.emit('hackCheck', {'station': station, 'status': hackcheck});
+            }
+         }
+
+        function activateDoubler(station) {
+            var redirectaudio2 = "/audioadd/" + room + "/", up_init = "assist";
+
+            $.ajax({
+                type: 'POST',
+                url: redirectaudio2,
+                data: {
+                    toplay: up_init
+                }
+            });
+
+            var redirect = '/masterStation/{{room}}';
+            $.ajax({
+                type: 'POST',
+                url: redirect,
+                data: {
+                    station: station
+                }
+            });
+            clearInterval(deactivate_dblr);
+            deactivate_dblr = setInterval(deactivate_doubler,30000);
+        }
+
+        function deactivate_doubler() {
+            clearInterval(deactivate_dblr);
+            var redirect = '/masterStation/{{room}}';
+            $.ajax({
+                type: 'POST',
+                url: redirect,
+                data: {
+                    station: 'none'
+                }
+            });
+        }
+
+        function ttd(time_to_detonate){
+
+        }
+
+        var old_currency = "";
+
+        function success_currency(data) {
+            old_currency = data;
+            $("#currencyCheck").html(data);
+        }
+
+        socket.on('currency', success_currency);
+
+
+        setInterval(currency_load,1000);
+
+        function currency_load(){
+            {# $.ajax({
+              url: "/currency/{{room}}",
+              success: function(data){
+                 $("#currencyCheck").html(data);
+
+              }
+            });#}
+            socket.emit('currency', {'room': room, 'old_value': old_currency});
+        }
+
+    </script>
+
+
+{% endblock %}

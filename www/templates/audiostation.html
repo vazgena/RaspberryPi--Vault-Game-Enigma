@@ -1,0 +1,37 @@
+
+<div id="message">{{ message }}</div>
+<div id="message_out"> </div>
+
+<script>
+
+    if ( self === top ) {
+        {% if time_doubler == "yes" %}
+            var timeDoubler = "yes";
+        {% else %}
+            var timeDoubler = "no";
+        {% endif %}
+        var bomb_message = "{{ message_bomb }}";
+        if (bomb_message === "exit") {
+            redirect_url ="http://10.255.1.254:8080/nogametemplate/{{ station }}"
+            $(location).attr('href', redirect_url)
+        }
+    }
+    if (self !== top){
+        var timeDoubler = parent.timeDoubler;
+    }
+    var message_bomb_20_sec = "{{ message_bomb_20_sec }}";
+    document.getElementById("message_bomb_20_sec_p").innerHTML = message_bomb_20_sec;
+    if ( self === top ) {
+        if (hackcheck === "OFF") {
+            var texttoset = "LISTEN TO YOUR OPPONENTS ON THE HEADSET.";
+            text_set(texttoset, "background_upper2");
+        }
+    }
+    if (self !== top){
+            var textset1 = "NO";
+            var textset2 = "NO";
+            var texttoset = "LISTEN TO YOUR OPPONENTS ON THE HEADSET.";
+            text_set(texttoset, "background_upper2");
+    }
+
+</script>

@@ -1,0 +1,87 @@
+{% block body %}
+
+    <link rel='stylesheet prefetch' href='https://fonts.googleapis.com/css?family=Roboto:400,100,300,500,700,900|RobotoDraft:400,100,300,500,700,900'>
+    <link rel='stylesheet prefetch' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css'>
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0-rc1/css/bootstrap.min.css" rel="stylesheet">
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0-rc1/js/bootstrap.min.js"></script>
+
+    <div id="playersLocations">
+
+    </div>
+
+    <div id="resettext"> </div>
+    <p>
+    <button onclick="reset_stations()">Reset Stations</button>
+</p>
+
+    <p>
+    <button onclick="reset_trackers()">Reset Tracking</button>
+    </p>
+    <p>
+            <button onclick="reset_server()">Reset Server</button>
+        </p>
+    <script>
+
+    function reset_stations() {
+        $('#resettext').text("Stations Resetting");
+        var reset_site = "/resetall";
+
+        {
+            $.ajax({
+                type: 'POST',
+                url: reset_site,
+                data: {
+                    endgame: "true"
+                }
+            });
+
+        }
+    }
+
+    function reset_server() {
+        $('#resettext').text("Server Resetting Please Wait");
+        var reset_site = "/resetserver";
+
+        {
+            $.ajax({
+                type: 'POST',
+                url: reset_site,
+                data: {
+                    reset: "True"
+                }
+            });
+
+        }
+    }
+
+    function reset_trackers() {
+        $('#resettext').text("trackers reset");
+        var reset_site = "/resettrack";
+
+        {
+            $.ajax({
+                type: 'POST',
+                url: reset_site,
+                data: {
+                    endgame: "true"
+                }
+            });
+
+        }
+    }
+    function auto_load(){
+        $.ajax({
+              url: "/playersLocations",
+              success: function(data){
+                 $("#playersLocations").html(data);
+              }
+        });
+    }
+
+    setInterval(auto_load,1000);
+
+    </script>
+
+{% endblock %}
+

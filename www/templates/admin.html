@@ -1,0 +1,12 @@
+{% block body %}
+
+    {% if vault_is_active == "Yes" %}
+        <button id="Vault_Button" onclick="goto_vault_active()">The Vault Admin</button>
+        Game is Active
+
+    {% else %}
+        <button id="Vault_Button" onclick="goto_vault_unactive()">The Vault Admin</button>
+        Game is Not Active
+    {% endif %}
+
+{% endblock %}

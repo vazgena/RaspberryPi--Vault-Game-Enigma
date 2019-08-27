@@ -1,0 +1,50 @@
+{% block body %}
+
+    <script>
+        {% if cams_available == "2" %}
+            check_cam(2);
+        {% elif cams_available == "0" %}
+            check_cam(0);
+        {% else %}
+            check_cam(1);
+        {% endif %}
+    </script>
+    <script>
+        if ( self === top ) {
+            {% if time_doubler == "yes" %}
+                var timeDoubler = "yes";
+            {% else %}
+                var timeDoubler = "no";
+            {% endif %}
+            var bomb_message = "{{ message_bomb }}";
+            if (bomb_message === "exit") {
+            redirect_url ="http://10.255.1.254:8080/nogametemplate/{{ station }}"
+            $(location).attr('href', redirect_url)
+        }
+        }
+        if (self !== top){
+        var timeDoubler = parent.timeDoubler;
+    }
+        if (hackcheck === "OFF") {
+
+            {% if cams_available == "0" %}
+                var textset1 = "NO";
+                var textset2 = "NO";
+                var texttoset = "{{ timer_message }}";
+                text_set(texttoset, "background_upper2");
+                var texttoset = "";
+                text_set(texttoset, "background_lower2");
+                shutdown = "ON"
+            {% else %}
+                var textset1 = "NO";
+                var textset2 = "NO";
+                var texttoset = "WATCH YOUR OPPONENTS.";
+                text_set(texttoset, "background_upper2");
+                var texttoset = "";
+                text_set(texttoset, "background_lower2");
+                shutdown = "OFF"
+            {% endif %}
+        }
+        {# TODO: added timer #}
+    </script>
+{% endblock %}

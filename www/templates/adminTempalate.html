@@ -1,0 +1,48 @@
+{% block body %}
+
+    <script src="/static/js/jquery1.8.2.min.js"></script>
+    <script src="/static/js/in_house.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/hack.js"></script>
+    <script src="/static/js/curved_text.js"></script>
+    <link rel='stylesheet prefetch' href='/static/css/roboto.css'>
+    <link rel='stylesheet prefetch' href='/static/css/font-awesome.min.css'>
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/inhouse.css?version=.01.7" rel="stylesheet">
+
+    <div id="VaultStatus">
+
+    </div>
+
+    <div id="Eop1Status">
+        The Eye of Providence room 1 Coming Soon
+    </div>
+
+    <div id="Eop2Status">
+        The Eye of Providence room 2 Coming Soon
+    </div>
+
+    <script>
+
+        function auto_load() {
+            $.ajax({
+                url: "/admin",
+                success: function (data) {
+                    $("#VaultStatus").html(data);
+                }
+            });
+        }
+
+        setInterval(auto_load,1000);
+
+        function goto_vault_active() {
+            window.location.replace("/adminVault");
+        }
+
+        function goto_vault_unactive() {
+            window.location.replace("/adminStartvault");
+        }
+
+    </script>
+
+{% endblock %}

@@ -1,0 +1,98 @@
+{% block body %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+
+
+
+<div id ="head">
+<div id="countup">
+<p>You have been playing for:</p>
+  <p id="minutes">00</p>
+  <p>:</p>
+  <p id="seconds">00</p>
+</div>
+
+<div id="scoring">
+    This should not be seen!
+</div>
+
+</div>
+<div id="dataload">
+
+
+</div>
+
+<div id="station">
+    {% if stationnumber == "1": %}
+        192.168.188.3:8081
+        <script type="text/javascript">
+            $(document).ready(function(){
+                $('#dataload').click(function () {
+                    $(this).load('/camera1room1');
+                });
+            });
+        </script>
+
+    {% elif stationnumber == "2": %}
+         <script type="text/javascript">
+            $(document).ready(function(){
+                $('#dataload').click(function () {
+                    $(this).load('/marketroom1');
+                });
+            });
+        </script>
+
+    {% elif stationnumber == "3":  %}
+        <div id="station"> Audio Station </div>
+    {% elif stationnumber == "4":  %}
+        <div id="station"> Hacking Station </div>
+    {% elif stationnumber == "5": %}
+        <div id="station"> Camera Station 2 </div>
+    {% elif stationnumber == "6": %}
+        <div id="station"> bomb launch </div>
+    {% elif stationnumber == "7":  %}
+        <div id="station"> Mine This Room </div>
+    {% elif stationnumber == "8":  %}
+        <div id="station"> Mine That Room </div>
+    {% elif stationnumber == "9":  %}
+        <div id="station"> Master Station </div>
+    {% endif %}
+</div>
+
+
+<script>
+    function auto_load(){
+    $.ajax({
+      url: "/room1score",
+      success: function(data){
+         $("#scoring").html(data);
+      }
+    });
+  }
+  $(document).ready(function(){
+    auto_load(); //Call auto_load() function when DOM is Ready
+  });
+  //Refresh auto_load() function after 10000 milliseconds
+  setInterval(auto_load,1000);
+
+window.onload=function() {
+  // Month,Day,Year,Hour,Minute,Second
+  upTime('{{timestart}}');
+}
+function upTime(countTo) {
+  now = new Date();
+  countTo = new Date(countTo);
+  difference = (now-countTo);
+
+  mins=Math.floor(((difference%(60*60*1000*24))%(60*60*1000))/(60*1000)*1);
+  secs=Math.floor((((difference%(60*60*1000*24))%(60*60*1000))%(60*1000))/1000*1);
+
+  document.getElementById('minutes').firstChild.nodeValue = mins;
+  document.getElementById('seconds').firstChild.nodeValue = secs;
+
+  clearTimeout(upTime.to);
+  upTime.to=setTimeout(function(){ upTime(countTo); },1000);
+}
+
+</script>
+
+{% endblock %}

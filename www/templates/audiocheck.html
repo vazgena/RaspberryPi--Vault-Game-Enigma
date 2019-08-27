@@ -1,0 +1,10 @@
+{% block body %}
+    <script>
+
+        {% for i in tracks %}
+            playAudio("{{ i }}");
+        {% endfor %}
+
+    </script>
+
+{% endblock %}

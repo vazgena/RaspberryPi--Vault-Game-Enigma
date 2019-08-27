@@ -1,0 +1,506 @@
+{% block body %}
+<head>
+        <meta name="viewport" content="user-scalable=no, width=device-width" />
+    </head>
+    <script src="/static/js/jquery1.8.2.min.js"></script>
+    <script src="/static/js/in_house.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/hack.js"></script>
+    <script src="/static/js/curved_text.js"></script>
+    <link rel='stylesheet prefetch' href='/static/css/roboto.css'>
+    <link rel='stylesheet prefetch' href='/static/css/font-awesome.min.css'>
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/inhouse.css?version=.01.7" rel="stylesheet">
+
+    <div id="background_upper2">
+
+    </div>
+
+    <div id="background_lower2">
+
+    </div>
+
+   <div id="not_enough_message">
+       <h1>You do not have enough for this purchase.</h1>
+   </div>
+
+    <div id="wrapper">
+        <div id="textTopMarketonly">
+            <h1 style="position: absolute; top: 10px; left: 500px;"><div style="display: inline-block">PURCHASE AN UPGRADE.</div></h1>
+        </div>
+        <div id="main_loader">
+            <div id="marketload">
+
+            </div>
+        </div>
+
+        <div id="currencyCheck">
+
+        </div>
+    </div>
+
+    <div id="activate_back">
+
+    </div>
+
+    <!----
+
+    Activate starts here
+
+    ------>
+
+    <div id="activate">
+
+            <div style="position: absolute; top: 150px; left: 245px">
+                <img src="/static/images/18_Enigma_S1_Button_FINAL.png" style="width: 300px; height: 300px;">
+            </div>
+
+            <iframe id="arrows0" src="/static/html/arrows.html" style="width: 650px; height:200px; border: none; display: none; position: absolute; top: 200px; left: 540px;">
+
+            </iframe>
+
+            <div id="activationButton1" style="position: absolute; top: 150px; left: 1025px;">
+
+                <button id="activateButton1" onclick=activate1()>
+
+                    <img src="/static/images/18_Enigma_S2_Button_FINAL.png" style="width: 300px; height: 300px;">
+
+                </button>
+
+            </div>
+
+            <iframe id="arrows1" src="/static/html/arrows.html" style="width: 650px; height:200px; border: none; display: none; position: absolute; top: 380px; left: 380px; transform: rotate(155deg);">
+
+            </iframe>
+
+    </div>
+
+        <div id="activate2_back"></div>
+
+    <div id="activate2" >
+            <iframe id="arrows2" src="/static/html/arrows.html" style="width: 700px; height:200px; border: none; display: none; position: absolute; top: 570px; left: 520px; ">
+
+            </iframe>
+            <div id="activationButton2">
+                <button id="activateButton2" style="position: absolute; top: 460px; left: 5px;" onclick=activate2()>
+                    <img src="/static/images/18_Enigma_S3_Button_FINAL.png" style="width: 300px; height: 300px;">
+                </button>
+            </div>
+    </div>
+
+        <div id="activate3_back"></div>
+
+    <div id="activate3" >
+
+            <div id="activationButton3"><button id="activateButton3" style="position: absolute; top: 465px; left: 780px;" onclick=activate3() > <img src="/static/images/18_Enigma_Launch_Button_v3.png" style="width: 300px; height: 300px;" alt="none"> </button></div>
+    </div>
+
+    <div id="activate4">
+        <h1>
+            <div id="itemtext" style="display: inline-block; position: absolute; top: 400px; right: 0; width:100%; text-align: center ">
+
+            </div>
+        </h1>
+    </div>
+
+    <!----
+
+    Activate ends here
+
+    ------>
+
+    <div id="marketloadselector">
+
+    </div>
+
+    <div id="hackCheck">
+
+    </div>
+
+    <div id="hack_load">
+
+    </div>
+
+    <script>
+
+
+        $(document).ready(function(){
+            $(window).on('touchmove',function(e){e.preventDefault();});
+        });
+
+        $(document).ready( function() {
+            $("#hack_load").load("/hack_load/");
+        });
+
+        document.getElementById("not_enough_message").style.display = "none";
+
+        if ( self !== top ) {
+            document.body.style.backgroundImage = "none";
+            document.body.style.background = "none transparent";
+        }
+
+        var min = 6;
+        var max = 12;
+        var idTemp = "";
+        var priceTemp = "";
+        var room = {{ room }};
+        var station = "MKP" + room;
+        var url = "/hackCheck/MKP" + room;
+        var stationNameTemp = "";
+        var selectable_current = "no";
+        var stationlock = "OFF";
+        var sationselect = "OFF";
+        var hackcheck = "OFF";
+        var sationnotext = "OFF"
+
+        {% if room == "1" %}
+        var class_body = "labyrinth";
+        {% else %}
+        var class_body = "enigma";
+        {% endif %}
+        document.body.className = class_body;
+
+
+        function auto_load(){
+            $.ajax({
+              url: "/marketstation/{{room}}",
+              success: function(data){
+                 $("#marketload").html(data);
+              }
+        });
+            if ( self == top ) {
+                $.ajax({
+                      url: "/hackCheck/MKP{{room}}",
+                      success: function(data){
+                         $("#hackCheck").html(data);
+                      }
+                });
+            }
+        }
+
+        function selectedStation(station_selected) {
+            var redirect2 = '/markettemplate/{{room}}';
+            var redirect = '/marketstation/{{room}}';
+            $.ajax({
+                    type: 'POST',
+                    url: redirect,
+                    data: {
+                        itemID: idTemp,
+                        station: station_selected,
+                    }
+                });
+            if ( self !== top ) {
+                    parent.document.getElementById("hider_div").style.display = "block";
+            }
+            document.getElementById("itemtext").innerHTML = itemTextPurchased;
+            window.setTimeout(function () {
+                        $(location).attr('href', redirect2)
+                    }, 5000);
+            document.getElementById("marketloadselector").style.display = "none";
+
+        }
+
+        function load_selector(){
+            $.ajax({
+              url: "/marketselector/{{room}}",
+              success: function(data){
+                 $("#marketloadselector").html(data);
+              }
+            });
+        }
+
+        load_selector();
+
+        function hackOn() {
+            if ( self === top ) {
+                hackcheck = "ON";
+                document.getElementById("textTopMarketonly").style.display = "none";
+
+                document.getElementById("wrapper").style.display = "none";
+                document.getElementById("hack").style.display = "block";
+
+                textset1 = "NO";
+                textset2 = "NO";
+
+                document.body.className = 'hack';
+
+                var texttoset = "PRESS ACTIVATION BUTTONS WHEN THEY APPEAR.";
+                text_set(texttoset, "background_upper2");
+
+                var texttoset2 = "YOU’VE BEEN HACKED!";
+                text_set(texttoset2, "background_lower2");
+
+            }
+        }
+
+        function hackOff() {
+            if (self === top) {
+                hackcheck = "OFF";
+                document.getElementById("hack").style.display = "none";
+                document.getElementById("wrapper").style.display = "block";
+
+                document.body.className = class_body;
+
+                if (stationlock === "OFF") {
+                    textset1 = "NO";
+                    textset2 = "NO";
+                    document.getElementById("textTopMarketonly").style.display = "block";
+
+                    var texttoset = "";
+                    text_set(texttoset, "background_upper2");
+
+                    var texttoset2 = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; YOUR ENERGY " + currency;
+                    text_set(texttoset2, "background_lower2");
+
+                }
+
+                if (sationselect === "OFF") {
+                    document.getElementById("textTopMarketonly").style.display = "block";
+                }
+
+                if (stationlock === "ON") {
+                    document.getElementById("textTopMarketonly").style.display = "none";
+
+                    textset1 = "NO";
+                    textset2 = "NO";
+
+                    var texttoset = "PRESS ACTIVATION BUTTONS WHEN THEY APPEAR.";
+                    text_set(texttoset, "background_upper2");
+
+                    var texttoset2 = "UPGRADE INITIATED";
+                    text_set(texttoset2, "background_lower2");
+                }
+
+                if (sationselect === "ON") {
+                    document.getElementById("textTopMarketonly").style.display = "none";
+
+                    textset1 = "NO";
+                    textset2 = "NO";
+
+                    var texttoset = "SELECT A STATION TO DEPLOY UPGRADE.";
+                    text_set(texttoset, "background_upper2");
+
+                    var texttoset2 = "";
+                    text_set(texttoset2, "background_lower2");
+                }
+                if (sationnotext === "ON") {
+                    document.getElementById("textTopMarketonly").style.display = "none";
+
+                    textset1 = "NO";
+                    textset2 = "NO";
+
+                    var texttoset = "";
+                    text_set(texttoset, "background_upper2");
+
+                    var texttoset2 = "";
+                    text_set(texttoset2, "background_lower2");
+                }
+            }
+        }
+
+        function auto_load2() {
+            nothingdata = "nothing";
+
+        }
+
+        setInterval(auto_load,1000);
+
+        auto_load();
+
+        function ttd(data){
+
+        }
+
+        function currency_load(){
+            $.ajax({
+              url: "/currency/{{room}}",
+              success: function(data){
+                 $("#currencyCheck").html(data);
+              }
+            });
+        }
+
+        setInterval(currency_load,1000);
+
+
+
+        var itemTextPurchased = '';
+
+        //  Activate starts here
+        function buyNow(id, price, itemTextPurchased2, selectable, notLockFlag) {
+            // Press Activation Buttons When They Appear
+            // Upgrade Initiated
+
+            if (currency >= price && notLockFlag) {
+                var redirectaudio2 = "/audioadd/" + room + "/", up_init = "upgrade";
+
+                $.ajax({
+                    type: 'POST',
+                    url: redirectaudio2,
+                    data: {
+                        toplay: up_init
+                    }
+                });
+                if (selectable == "yes") {
+                    selectable_current = "yes"
+                }
+                if (selectable == "no") {
+                    selectable_current = "no"
+                }
+                stationlock = "ON";
+                document.getElementById("not_enough_message").style.display = "none";
+                itemTextPurchased = itemTextPurchased2.replace("\'", "'");
+                var redirect = '/marketstation/{{room}}';
+                $.ajax({
+                    type: 'POST',
+                    url: redirect,
+                    data: {
+                        itemID: id,
+                        cost: price,
+                        activated: "no",
+                    }
+                });
+                textset1 = "NO";
+                textset2 = "NO";
+
+                document.getElementById("textTopMarketonly").style.display = "none";
+
+                var texttoset = "PRESS ACTIVATION BUTTONS WHEN THEY APPEAR.";
+                text_set(texttoset, "background_upper2");
+
+                var texttoset2 = "UPGRADE INITIATED";
+                text_set(texttoset2, "background_lower2");
+
+                document.getElementById("arrows0").style.display = "block";
+                document.getElementById("marketload").style.display = "none";
+                document.getElementById("activationButton1").style.display = "none";
+                document.getElementById("activationButton2").style.display = "none";
+                document.getElementById("activationButton3").style.display = "none";
+                document.getElementById("activate_back").style.display = "block";
+                document.getElementById("activate").style.display = "block";
+                if ( self !== top ) {
+                    parent.document.getElementById("hider_div").style.display = "none";
+                }
+                var seconds_left = Math.floor(Math.random() * (max - min) + min);
+                var interval = setInterval(function () {
+                    --seconds_left;
+                    if (timeDoubler === "yes") {
+                        --seconds_left
+                    }
+                    if (seconds_left <= 0) {
+                        idTemp = id;
+                        priceTemp = price;
+                        document.getElementById("activationButton1").style.display = "block";
+                        clearInterval(interval);
+                    }
+                }, 1000);
+            } else if (! notLockFlag) {
+                var not_enough_message = document.getElementById("not_enough_message");
+                not_enough_message.innerHTML = "<h1>You cannot make this purchase now.</h1>"
+                not_enough_message.style.display = "block";
+            }
+            else {
+                var not_enough_message = document.getElementById("not_enough_message");
+                not_enough_message.style.display = "block";
+                not_enough_message.innerHTML = "<h1>You do not have enough for this purchase.</h1>"
+            }
+        }
+
+        function activate1() {
+            document.getElementById("arrows1").style.display = "block";
+            document.getElementById("activate2").style.display = "block";
+            var seconds_left = Math.floor(Math.random() * (max - min) + min);
+            var interval = setInterval(function () {
+                --seconds_left;
+                if (timeDoubler === "yes") {
+                    --seconds_left
+                }
+                if (seconds_left <= 0) {
+                    document.getElementById("activationButton2").style.display = "block";
+                    clearInterval(interval);
+                }
+            }, 1000);
+
+        }
+
+        function activate2() {
+            document.getElementById("arrows2").style.display = "block";
+            document.getElementById("activate3").style.display = "block";
+            var seconds_left = Math.floor(Math.random() * (max - min) + min);
+            var interval = setInterval(function () {
+                --seconds_left;
+                if (timeDoubler === "yes") {
+                    --seconds_left
+                }
+                if (seconds_left <= 0) {
+                    document.getElementById("activationButton3").style.display = "block";
+                    clearInterval(interval);
+                }
+            }, 1000);
+        }
+
+        function activate3() {
+            document.getElementById("activate_back").style.display = "none";
+            var redirect = '/marketstation/{{room}}';
+            var redirect2 = '/markettemplate/{{room}}';
+            {
+                $.ajax({
+                    type: 'POST',
+                    url: redirect,
+                    data: {
+                        itemID: idTemp,
+                        activated: "yes",
+                    }
+                });
+                if (selectable_current === "yes"){
+                    sationselect = "ON";
+                    document.getElementById("activate").style.display = "none";
+                    document.getElementById("activate2").style.display = "none";
+                    document.getElementById("activate3").style.display = "none";
+                    document.getElementById("arrows0").style.display = "none";
+                    document.getElementById("arrows1").style.display = "none";
+                    document.getElementById("arrows2").style.display = "none";
+                    document.getElementById("marketloadselector").style.display = "block";
+
+                    textset1 = "NO";
+                    textset2 = "NO";
+
+                    var texttoset = "SELECT A STATION TO DEPLOY UPGRADE.";
+                    text_set(texttoset, "background_upper2");
+
+                    var texttoset2 = "";
+                    text_set(texttoset2, "background_lower2");
+
+                } else {
+                    if ( self !== top ) {
+                        parent.document.getElementById("hider_div").style.display = "block";
+                    }
+                    stationlock = "OFF";
+                    sationnotext = "ON";
+                    textset1 = "NO";
+                    textset2 = "NO";
+
+                    var texttoset = "";
+                    text_set(texttoset, "background_upper2");
+
+                    var texttoset2 = "";
+                    text_set(texttoset2, "background_lower2");
+
+                    document.getElementById("activate2").style.display = "none";
+                    document.getElementById("activate").style.display = "none";
+                    document.getElementById("activate3").style.display = "none";
+                    document.getElementById("arrows0").style.display = "none";
+                    document.getElementById("arrows1").style.display = "none";
+                    document.getElementById("arrows2").style.display = "none";
+                    document.getElementById("itemtext").innerHTML = itemTextPurchased;
+                    document.getElementById("activate4").style.display = "block";
+                    window.setTimeout(function () {
+                        $(location).attr('href', redirect2)
+                    }, 5000);
+                }
+            }
+        }
+        //  Activate ends here
+    </script>
+
+{% endblock %}
