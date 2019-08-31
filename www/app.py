@@ -3308,12 +3308,15 @@ def set_logger_file():
     # logger.basicConfig(filename=file_log, filemode='a', level=getattr(logging, "DEBUG"),
     #                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     # logging.config.fileConfig('logging.conf')
-    logger.setLevel(logging.DEBUG)
+    #logger.setLevel(logging.DEBUG)
+    logger.setLevel(logging.ERROR)
+    logging.getLogger('socketio').setLevel(logging.ERROR)
+    logging.getLogger('engineio').setLevel(logging.ERROR)
     fil_log = os.path.join(log_dir, "track.log")
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     ch = logging.FileHandler(fil_log, mode='w')
     ch.setFormatter(formatter)
-    ch.setLevel(logging.DEBUG)
+    #ch.setLevel(logging.DEBUG)
     logger.addHandler(ch)
 
 

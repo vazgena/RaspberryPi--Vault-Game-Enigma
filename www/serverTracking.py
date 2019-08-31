@@ -21,6 +21,7 @@ debug = False
 
 locations_room = {}
 
+connection = None
 
 # databace connection
 def dataconnect():
@@ -33,7 +34,7 @@ def dataconnect():
 
 
 def run_once():
-	connection = dataconnect()
+	global connection
 	c = connection.cursor()
 	try:
 		track_trunk = "TRUNCATE TABLE trackers"
@@ -42,11 +43,10 @@ def run_once():
 		c.execute(track_trunk)
 	except InternalError:
 		pass
-	connection.close()
 
 
 def init_locations():
-	connection = dataconnect()
+	global connection
 	c = connection.cursor()
 	for room in [1, 2]:
 		select_locations_sql = "SELECT * FROM station_position WHERE room=%s;"
@@ -62,7 +62,6 @@ def init_locations():
 			"stations": list_stations,
 		}
 
-	connection.close()
 
 
 def loop():
@@ -116,7 +115,7 @@ def loop():
 
 
 def new_loop():
-	connection = dataconnect()
+	global connection
 	c = connection.cursor()
 	get_locations = "SELECT mac, station FROM trackers;"
 	c.execute(get_locations)
@@ -214,7 +213,6 @@ def new_loop():
 	if not debug:
 		sql_request_remove = "DELETE FROM trackers_value WHERE timestamp < %s;"
 		c.execute(sql_request_remove, delta_time)
-	connection.close()
 
 
 def mse(x, locations, distances):
@@ -244,10 +242,10 @@ def optimization(initial_location, locations, distances):
 
 
 if __name__ == "__main__":
-
+	connection = dataconnect()
 	if not debug:
 		run_once()
 	init_locations()
 	while True:
-		# loop()
+		#loop()
 		new_loop()
