@@ -2428,7 +2428,7 @@ def ipaddresses():
 # bleraw accepts raw BLE data sent from the PI's showing the signal strength station
 #then stores the data to trackers
 @app.route('/bleraw', methods=['GET', 'POST'])
-def bledata():
+def bleraw():
     if request.method != 'POST':
         return "mac not accepted"
 
@@ -2440,7 +2440,7 @@ def bledata():
     if 'tx_power' in request.form:
         tx_power = request.form['tx_power']
     if tx_power is not None:
-        tx_power = int( tx_power)
+        tx_power = int( float(tx_power))
 
     room = request.form['room']
 
@@ -2448,9 +2448,9 @@ def bledata():
     c = connection.cursor()
     try:
         insert_sql = "INSERT INTO trackers_raw(moment, rssi, tx_power, beacon_mac, room, station) "\
-                                        "VALUES (%s  ,   %s,       %s,         %s,   %s, %s) "
-            c.execute(insert_sql, (from_unixtime(ts), int(rssi), tx_power, bt_addr, room, station_name ))
-    except iexception as e:
+                                        "VALUES (from_unixtime(%s)  ,   %s,       %s,         %s,   %s, %s) "
+        c.execute(insert_sql, (ts, int(float(rssi)), tx_power, bt_addr, room, station_name ))
+    except Exception as e:
         print( "Occured exception " , e)
 
     connection.close()
