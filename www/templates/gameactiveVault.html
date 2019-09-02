@@ -59,6 +59,8 @@
         }
 
         function reset_server() {
+            $con= confirm("Are you sure you want to reset the server? ")
+            if ( ! $con) return;
             $('#resettext').text("Server Resetting Please Wait");
             var reset_site = "/resetserver";
 
