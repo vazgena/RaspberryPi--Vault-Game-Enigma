@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # sudo apt install python-bluez
 # sudo pip3 install paho-mqtt
 # sudo pip3 install beacontools
@@ -24,7 +25,7 @@ bleData = {}
 howManyIterations = 1
 loop = None
 
-address = "http://10.255.1.254:8080/bledata"
+address = "http://10.255.1.254:8080/bleraw"
 
 
 async def run_execute(function, *args, **kwargs):
@@ -50,40 +51,29 @@ def callback(bt_addr, rssi, packet, properties):
     try:
         packet_expanded = str(packet)
         power_match = re.search('(?<=tx_power: )-?\d+', packet_expanded)
-        if power_match is None:
-            return
-        power_str = power_match.group(0)
-        power_val = float(power_str)
+        power_val = None
+        if power_match is not None:
+            power_str = power_match.group(0)
+            power_val = float(power_str)
         rssi_val = float(rssi)
-
-        # TODO: hotfix
-        power_val = min(power_val, -power_val, -1)
-        rssi_val = min(rssi_val, -rssi_val,  -.5)
-
-        distance = computeDistance(power_val, rssi_val)
-        bleData.setdefault(bt_addr, []).append(distance)
 
         if "gamine" in packet_expanded:
             try:
-                if len(bleData[bt_addr]) >= howManyIterations:
-                    data = {'station': station,
-                            'bt_addr': bt_addr,
-                            'avg': str(distance),
-                            'room': room,
-                            'packet_data': str(packet),
-                            'properties': str(properties)
-                            }
+                data = {'station': station,
+                        'bt_addr': bt_addr,
+                        'rssi': rssi_val,
+                            'room': room
+                }
+                if power_val:
+                    data['tx_power'] = power_val
 
-                    asyncio.run_coroutine_threadsafe(run_execute(requests.post, url=address, data=data), loop)
+                asyncio.run_coroutine_threadsafe(
+                    run_execute(requests.post, url=address, data=data), loop)
 
-                    bleData.pop(bt_addr, None)
-            except:
-                bleData.pop(bt_addr, None)
-                pass
-        else:
-            pass
-    except:
-        pass
+            except Exception as e:
+                print("occured exception in callback -> if gamine", e)
+    except Exception as e:
+        print("Occured exception in callback ", e)
 
 
 if __name__ == "__main__":
