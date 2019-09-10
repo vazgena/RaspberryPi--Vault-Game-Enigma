@@ -23,6 +23,8 @@ locations_room = {}
 
 connection = None
 
+lastMinutesKeptNumber  = 1
+
 # databace connection
 def dataconnect():
 	return connect(
@@ -116,6 +118,7 @@ def loop():
 
 def new_loop():
 	global connection
+	global lastMinutesKeptNumber
 	c = connection.cursor()
 	get_locations = "SELECT mac, station FROM trackers;"
 	c.execute(get_locations)
@@ -209,7 +212,7 @@ def new_loop():
 												mac, location, mean_value_str))
 		except:
 			pass
-	delta_time = datetime.now() - timedelta(minutes=5)
+	delta_time = datetime.now() - timedelta(minutes=lastMinutesKeptNumber)
 	if not debug:
 		sql_request_remove = "DELETE FROM trackers_value WHERE timestamp < %s;"
 		c.execute(sql_request_remove, delta_time)

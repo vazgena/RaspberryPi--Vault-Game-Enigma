@@ -30,8 +30,8 @@ dbuser = 'game'
 dbpass = 'h95d3T7SXFta'
 
 
-#use_rssi = True
-use_rssi = False
+use_rssi = True
+#use_rssi = False
 
 rssi_buffer = {}
 
@@ -2481,8 +2481,9 @@ def bledata():
         macstat = str(bt_addr) + "," + str(station_name)
 
         if 'rssi' in request.form and use_rssi:
-            rssi = request.form['rssi_window']
-            avg2 = computeDistance(float(rssi), rssi_buffer[station_name][bt_addr])
+            rssi = request.form['rssi']
+            # avg2 = computeDistance(float(rssi), rssi_buffer[station_name][bt_addr])
+            avg2 = computeDistance(float(rssi), -60)
             avg = avg2
 
         try:
