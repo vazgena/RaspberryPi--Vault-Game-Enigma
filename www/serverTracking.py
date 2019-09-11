@@ -19,6 +19,8 @@ debug = False
 
 locations_room = {}
 
+MISC_VALUE = 100
+
 
 # databace connection
 def dataconnect():
@@ -143,7 +145,7 @@ def new_loop():
 				listed_value = list(c.fetchall())
 				values = [value[0] for value in listed_value]
 				if len(values) < n:
-					value_array[i, :] = 100
+					value_array[i, :] = MISC_VALUE
 					continue
 				value_array[i, :] = values
 
@@ -168,10 +170,15 @@ def new_loop():
 				for i, loc in enumerate(stat):
 					try:
 						index_dist = mac_map[mac].index(loc)
+						if value_array[index_dist, -1] == MISC_VALUE:
+							continue
 						indexs_locs.append(i)
 						indexs_dist.append(index_dist)
 					except:
 						pass
+
+				if not indexs_locs:
+					continue
 
 				dist_select = mean_values[indexs_dist, n_2]
 				locs_select = locs[indexs_locs]

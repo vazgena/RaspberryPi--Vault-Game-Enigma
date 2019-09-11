@@ -24,7 +24,7 @@ from config_station import station, room
 
 bleData = {}
 bleFilter = {}
-n_iters = 30
+n_iters = 15
 howManyIterations = 1
 loop = None
 
@@ -140,7 +140,8 @@ def callback(bt_addr, rssi, packet, properties):
                             'packet_data': str(packet),
                             'properties': str(properties),
                             'rssi': float(rssi),
-                            'rssi_window': rssi_window
+                            'rssi_window': rssi_window,
+                            'rssi_filter': rssi_filter,
                             }
 
                     asyncio.run_coroutine_threadsafe(run_execute(requests.post, url=address, data=data), loop)

@@ -29,6 +29,8 @@ socketio = SocketIO(app)
 dbuser = 'game'
 dbpass = 'h95d3T7SXFta'
 
+meter_to_feet = 3.281
+
 
 use_rssi = True
 #use_rssi = False
@@ -2481,10 +2483,26 @@ def bledata():
         macstat = str(bt_addr) + "," + str(station_name)
 
         if 'rssi' in request.form and use_rssi:
+            # rssi = request.form['rssi_window']
             rssi = request.form['rssi']
-            # avg2 = computeDistance(float(rssi), rssi_buffer[station_name][bt_addr])
-            avg2 = computeDistance(float(rssi), -60)
+            avg2 = computeDistance(float(rssi), rssi_buffer[station_name][bt_addr])
+            # avg2 = computeDistance(float(rssi), -60)
             avg = avg2
+
+        if 'rssi_filter' in request.form:
+            try:
+                ts = time.time()
+                timestamp = datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
+                kalman_value = request.form['rssi_filter']
+                sql_request = "INSERT INTO temp_calibration (mac, station, tx_power, timestamp) VALUES (%s, %s, %s, %s);"
+                c.execute(sql_request, (bt_addr, station_name, kalman_value, timestamp))
+                delta_time = datetime.now() - timedelta(minutes=1)
+                sql_request_remove = "DELETE FROM temp_calibration WHERE timestamp < %s;"
+                c.execute(sql_request_remove, delta_time)
+            except:
+                # TODO: add log error
+                pass
+
 
         try:
             update_sql = "INSERT INTO trackers (macstat, mac, station, signal_avg, room, packet_data, properties) " \
@@ -2497,6 +2515,7 @@ def bledata():
             # logger.debug(update_sql % (macstat, bt_addr, station_name, avg, room, packet_data, properties, macstat,
             #                        bt_addr, station_name, avg, room, timestamp, packet_data, properties))
         except InternalError as e:
+            # TODO: add log error
             pass
         connection.close()
         return "mac accepted"
@@ -3352,17 +3371,17 @@ def set_logger_file():
     logger.addHandler(ch)
 
 
-def computeDistance(rssi, txPower=-60):
+def computeDistance(rssi, txPower=-65, k=meter_to_feet):
     if rssi == 0:
         return -1  # if we cannot determine accuracy, return -1.
 
     ratio = rssi / txPower
 
     if ratio <= 1.0:
-        return math.pow(ratio, 10)
+        return math.pow(ratio, 10)*k
     else:
         # return math.pow(ratio, 10)
-        return 0.89976 * math.pow(ratio, 9) + 0.111
+        return (0.89976 * math.pow(ratio, 9) + 0.111)*k
 
 
 def init_buffer():
@@ -3393,7 +3412,7 @@ def init_buffer():
     if np.sum(map_rssi != 0) > 0:
         map_rssi[map_rssi == 0] = np.mean(map_rssi[map_rssi != 0])
     else:
-        map_rssi[map_rssi == 0] = -60
+        map_rssi[map_rssi == 0] = -65
 
     for i, station in enumerate(station_list):
         for j, mac in enumerate(tracker_list):
