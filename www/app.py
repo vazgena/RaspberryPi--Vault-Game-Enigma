@@ -30,7 +30,8 @@ dbuser = 'game'
 dbpass = 'h95d3T7SXFta'
 
 
-use_rssi = False
+use_rssi = True
+#use_rssi = False
 
 rssi_buffer = {}
 
@@ -2424,6 +2425,37 @@ def ipaddresses():
         return "ip accepted"
     return "ip not accepted"
 
+# bleraw accepts raw BLE data sent from the PI's showing the signal strength station
+#then stores the data to trackers
+@app.route('/bleraw', methods=['GET', 'POST'])
+def bleraw():
+    if request.method != 'POST':
+        return "mac not accepted"
+
+    ts = time.time()
+    station_name = request.form['station']
+    bt_addr = request.form['bt_addr']
+    rssi = request.form['rssi']
+    tx_power = None
+    if 'tx_power' in request.form:
+        tx_power = request.form['tx_power']
+    if tx_power is not None:
+        tx_power = int( float(tx_power))
+
+    room = request.form['room']
+
+    connection = data_connect()
+    c = connection.cursor()
+    try:
+        insert_sql = "INSERT INTO trackers_raw(moment, rssi, tx_power, beacon_mac, room, station) "\
+                                        "VALUES (from_unixtime(%s)  ,   %s,       %s,         %s,   %s, %s) "
+        c.execute(insert_sql, (ts, int(float(rssi)), tx_power, bt_addr, room, station_name ))
+    except Exception as e:
+        print( "Occured exception " , e)
+
+    connection.close()
+    return "accepted"
+
 
 # bledata accepts the BLE data sent from the PI's showing the signal strength station then stores the data to trackers
 @app.route('/bledata', methods=['GET', 'POST'])
@@ -2449,8 +2481,9 @@ def bledata():
         macstat = str(bt_addr) + "," + str(station_name)
 
         if 'rssi' in request.form and use_rssi:
-            rssi = request.form['rssi_window']
-            avg2 = computeDistance(float(rssi), float(rssi_buffer[station_name][bt_addr]))
+            rssi = request.form['rssi']
+            # avg2 = computeDistance(float(rssi), rssi_buffer[station_name][bt_addr])
+            avg2 = computeDistance(float(rssi), -60)
             avg = avg2
 
         try:
@@ -2735,6 +2768,7 @@ def save_volume():
 
 @app.route('/blecalibration', methods=['GET', 'POST'])
 def ble_calibration():
+    return ""
     if request.method == 'POST':
         ts = time.time()
         timestamp = datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
@@ -2749,6 +2783,7 @@ def ble_calibration():
         sql_request_remove = "DELETE FROM temp_calibration WHERE timestamp < %s;"
         c.execute(sql_request_remove, delta_time)
         connection.close()
+    return ""
 
 
 @socketio.on('hackCheck')
@@ -3305,12 +3340,15 @@ def set_logger_file():
     # logger.basicConfig(filename=file_log, filemode='a', level=getattr(logging, "DEBUG"),
     #                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     # logging.config.fileConfig('logging.conf')
-    logger.setLevel(logging.DEBUG)
+    #logger.setLevel(logging.DEBUG)
+    logger.setLevel(logging.ERROR)
+    logging.getLogger('socketio').setLevel(logging.ERROR)
+    logging.getLogger('engineio').setLevel(logging.ERROR)
     fil_log = os.path.join(log_dir, "track.log")
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     ch = logging.FileHandler(fil_log, mode='w')
     ch.setFormatter(formatter)
-    ch.setLevel(logging.DEBUG)
+    #ch.setLevel(logging.DEBUG)
     logger.addHandler(ch)
 
 
