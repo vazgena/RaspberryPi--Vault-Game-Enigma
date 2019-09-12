@@ -33,6 +33,8 @@ meter_to_feet = 3.281
 
 
 use_rssi = True
+# rssi_name = 'rssi'
+rssi_name = 'rssi_window'
 #use_rssi = False
 
 rssi_buffer = {}
@@ -2482,9 +2484,9 @@ def bledata():
             logger.debug(request.form['packet'])
         macstat = str(bt_addr) + "," + str(station_name)
 
-        if 'rssi' in request.form and use_rssi:
+        if rssi_name in request.form and use_rssi:
             # rssi = request.form['rssi_window']
-            rssi = request.form['rssi']
+            rssi = request.form[rssi_name]
             if bt_addr in rssi_buffer[station_name]:
                 avg2 = computeDistance(float(rssi), rssi_buffer[station_name][bt_addr])
                 # avg2 = computeDistance(float(rssi), -60)

@@ -44,12 +44,12 @@ def scp_update_file(file_name, ip, password='1qaz2wsx', read_folder=BASE_DIR, re
 
 def main():
     ip_list = list(get_station_ip())
-    ip_list = ['192.168.2.200']
+    #ip_list = ['192.168.2.200']
     for file_name in NAME_SCRIPT:
         for ip in ip_list:
             try:
-                scp_update_file(file_name, ip, 'raspberry')
-                # scp_update_file(file_name, ip)
+                # scp_update_file(file_name, ip, 'raspberry')
+                scp_update_file(file_name, ip)
             except BaseException as e:
                 print(e)
 

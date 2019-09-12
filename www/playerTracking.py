@@ -35,7 +35,6 @@ address = "http://192.168.2.183:8080/bledata"
 async def run_execute(function, *args, **kwargs):
     loop = asyncio.get_event_loop()
     result = await loop.run_in_executor(None, lambda pars, kwpars: function(*pars, **kwpars), args, kwargs)
-    print(result)
     return result
 
 
@@ -132,8 +131,8 @@ def callback(bt_addr, rssi, packet, properties):
         distance = computeDistance(power_val, rssi_window)
 
 
-        # if "gamine" in packet_expanded:
-        if True:
+        if "gamine" in packet_expanded:
+        # if True:
             try:
                 if len(bleData[bt_addr]) >= howManyIterations:
                     data = {'station': station,
