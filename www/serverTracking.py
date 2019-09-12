@@ -188,7 +188,7 @@ def new_loop():
 				#Select top station
 				if TOP_STATION:
 					index_sort = np.argsort(dist_select)
-					index_select = index_sort[-TOP_STATION:]
+					index_select = index_sort[:TOP_STATION]
 					dist_select = dist_select[index_select]
 					locs_select = locs_select[index_select, :]
 
