@@ -3429,7 +3429,7 @@ def init_buffer():
             else:
                 map_rssi[i, j] = mean_rssi
     else:
-        map_rssi[map_rssi == 0] = -65
+        map_rssi[:, :] = -65
 
     for i, station in enumerate(station_list):
         for j, mac in enumerate(tracker_list):
