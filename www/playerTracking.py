@@ -28,8 +28,8 @@ n_iters = 15
 howManyIterations = 1
 loop = None
 
-# address = "http://10.255.1.254:8080/bledata"
-address = "http://192.168.2.183:8080/bledata"
+address = "http://10.255.1.254:8080/bledata"
+# address = "http://192.168.2.183:8080/bledata"
 
 
 async def run_execute(function, *args, **kwargs):
