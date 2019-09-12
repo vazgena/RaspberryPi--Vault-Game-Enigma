@@ -10,8 +10,8 @@ import re
 import os
 import sys
 import asyncio
-import math
-import numpy as np
+#import math
+#import numpy as np
 from datetime import datetime, timedelta
 from statistics import median_high, mode
 
@@ -38,17 +38,17 @@ async def run_execute(function, *args, **kwargs):
     return result
 
 
-def computeDistance(txPower, rssi):
-    if rssi == 0:
-        return -1  # if we cannot determine accuracy, return -1.
-
-    ratio = rssi / txPower
-
-    if ratio <= 1.0:
-        return np.power(ratio, 10)
-    else:
-        # return math.pow(ratio, 10)
-        return 0.89976 * np.power(ratio, 9.) + 0.111
+# def computeDistance(txPower, rssi):
+#     if rssi == 0:
+#         return -1  # if we cannot determine accuracy, return -1.
+#
+#     ratio = rssi / txPower
+#
+#     if ratio <= 1.0:
+#         return np.power(ratio, 10)
+#     else:
+#         # return math.pow(ratio, 10)
+#         return 0.89976 * np.power(ratio, 9.) + 0.111
 
 
 class KalmanFilter:
@@ -128,7 +128,8 @@ def callback(bt_addr, rssi, packet, properties):
 
         power_val = -60
 
-        distance = computeDistance(power_val, rssi_window)
+        distance = None
+        #distance = computeDistance(power_val, rssi_window)
 
 
         if "gamine" in packet_expanded:
