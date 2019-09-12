@@ -28,12 +28,14 @@ n_iters = 15
 howManyIterations = 1
 loop = None
 
-address = "http://10.255.1.254:8080/bledata"
+# address = "http://10.255.1.254:8080/bledata"
+address = "http://192.168.2.183:8080/bledata"
 
 
 async def run_execute(function, *args, **kwargs):
     loop = asyncio.get_event_loop()
     result = await loop.run_in_executor(None, lambda pars, kwpars: function(*pars, **kwpars), args, kwargs)
+    print(result)
     return result
 
 
@@ -44,10 +46,10 @@ def computeDistance(txPower, rssi):
     ratio = rssi / txPower
 
     if ratio <= 1.0:
-        return np.pow(ratio, 10)
+        return np.power(ratio, 10)
     else:
         # return math.pow(ratio, 10)
-        return 0.89976 * np.pow(ratio, 9.) + 0.111
+        return 0.89976 * np.power(ratio, 9.) + 0.111
 
 
 class KalmanFilter:
@@ -130,7 +132,8 @@ def callback(bt_addr, rssi, packet, properties):
         distance = computeDistance(power_val, rssi_window)
 
 
-        if "gamine" in packet_expanded:
+        # if "gamine" in packet_expanded:
+        if True:
             try:
                 if len(bleData[bt_addr]) >= howManyIterations:
                     data = {'station': station,
@@ -143,17 +146,16 @@ def callback(bt_addr, rssi, packet, properties):
                             'rssi_window': rssi_window,
                             'rssi_filter': rssi_filter,
                             }
-
                     asyncio.run_coroutine_threadsafe(run_execute(requests.post, url=address, data=data), loop)
 
                     # bleData.pop(bt_addr, None)
-            except:
+            except BaseException as e:
                 # bleData.pop(bt_addr, None)
-                pass
+                print(e)
         else:
             pass
-    except:
-        pass
+    except BaseException as e:
+        print(e)
 
 
 if __name__ == "__main__":

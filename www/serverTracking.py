@@ -14,10 +14,12 @@ dbpass = 'h95d3T7SXFta'
 n = 3
 # target value, counting from the end. affects lag, -2 recommended
 n_2 = -2  # int(np.floor(n/2)) #
-triangulate = False
+triangulate = True
 debug = False
+TOP_STATION = 4
 
 locations_room = {}
+bounds_room = {}
 
 MISC_VALUE = 100
 
@@ -182,10 +184,18 @@ def new_loop():
 
 				dist_select = mean_values[indexs_dist, n_2]
 				locs_select = locs[indexs_locs]
+
+				#Select top station
+				if TOP_STATION:
+					index_sort = np.argsort(dist_select)
+					index_select = index_sort[-TOP_STATION:]
+					dist_select = dist_select[index_select]
+					locs_select = locs_select[index_select, :]
+
 				# Trilateration
 				# initial_location = locs_select.mean(axis=0)
 				initial_location = locs[stat.index(location)]
-				x = optimization(initial_location, locs_select, dist_select)
+				x = optimization(initial_location, locs_select, dist_select, bounds_room[room])
 
 				new_dist = cdist(x.reshape((1, 2)), locs)[0, :]
 
@@ -225,14 +235,13 @@ def new_loop():
 def mse(x, locations, distances):
 	c_dist = cdist(x.reshape((1, 2)), locations)
 	error_dist = distances - c_dist
-	error_dist /= distances**3
-	error_dist[error_dist > 0] = error_dist[error_dist > 0]/2
+	error_dist /= distances
+	# error_dist[error_dist > 0] = error_dist[error_dist > 0]/2
 	mse = np.square(error_dist).mean()
 	return mse
 
 
-def optimization(initial_location, locations, distances):
-	bnds = ((0, None), (0, None))
+def optimization(initial_location, locations, distances, bnds=((0, None), (0, None))):
 	result = minimize(
 		mse,  # The error function
 		initial_location,  # The initial guess
@@ -248,11 +257,21 @@ def optimization(initial_location, locations, distances):
 	return location
 
 
+def compute_bounds():
+	for key in locations_room:
+		max_x = 0
+		max_y = 0
+		max_val = locations_room[key]['locations'].max(axis=0)
+		bounds_room[key] = ((0, max_val[0]), (0, max_val[1]))
+
+
+
 if __name__ == "__main__":
 
 	if not debug:
 		run_once()
 	init_locations()
+	compute_bounds()
 	while True:
 		# loop()
 		new_loop()

@@ -8,7 +8,7 @@
 import os
 import re
 import time
-import math
+# import math
 from datetime import datetime, timedelta
 import logging
 import logging.config
@@ -2485,9 +2485,12 @@ def bledata():
         if 'rssi' in request.form and use_rssi:
             # rssi = request.form['rssi_window']
             rssi = request.form['rssi']
-            avg2 = computeDistance(float(rssi), rssi_buffer[station_name][bt_addr])
-            # avg2 = computeDistance(float(rssi), -60)
-            avg = avg2
+            if bt_addr in rssi_buffer[station_name]:
+                avg2 = computeDistance(float(rssi), rssi_buffer[station_name][bt_addr])
+                # avg2 = computeDistance(float(rssi), -60)
+            else:
+                avg2 = computeDistance(float(rssi), -65)
+            avg = float(avg2)
 
         if 'rssi_filter' in request.form:
             try:
@@ -3378,10 +3381,10 @@ def computeDistance(rssi, txPower=-65, k=meter_to_feet):
     ratio = rssi / txPower
 
     if ratio <= 1.0:
-        return math.pow(ratio, 10)*k
+        return np.power(ratio, 10)*k
     else:
         # return math.pow(ratio, 10)
-        return (0.89976 * math.pow(ratio, 9) + 0.111)*k
+        return (0.89976 * np.power(ratio, 9) + 0.111)*k
 
 
 def init_buffer():
@@ -3397,6 +3400,7 @@ def init_buffer():
     tracker_list = [x[0] for x in c.fetchall()]
 
     map_rssi = np.zeros((len(station_list), len(tracker_list)))
+    map_rssi[:, :] = np.nan
 
     sql_get_rssi = "SELECT * FROM tracker_calibration;"
     c.execute(sql_get_rssi)
@@ -3409,8 +3413,19 @@ def init_buffer():
         i = station_list.index(station)
         j = tracker_list.index(mac)
         map_rssi[i, j] = tx_power
-    if np.sum(map_rssi != 0) > 0:
-        map_rssi[map_rssi == 0] = np.mean(map_rssi[map_rssi != 0])
+
+    if np.sum(np.logical_not(np.isnan(map_rssi))) > 0:
+        mean_row = np.nanmean(map_rssi, axis=1)
+        mean_column = np.nanmean(map_rssi, axis=0)
+        mean_rssi = np.nanmean(map_rssi)
+
+        for i, j in zip(*np.where(np.isnan(map_rssi))):
+            if not np.isnan(mean_column[j]):
+                map_rssi[i, j] = mean_column[j]
+            elif not np.isnan(mean_row[i]):
+                map_rssi[i, j] = mean_row[i]
+            else:
+                map_rssi[i, j] = mean_rssi
     else:
         map_rssi[map_rssi == 0] = -65
 
