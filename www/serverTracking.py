@@ -16,7 +16,7 @@ n = 3
 n_2 = -2  # int(np.floor(n/2)) #
 triangulate = True
 debug = False
-TOP_STATION = 4
+TOP_STATION = 3
 
 locations_room = {}
 bounds_room = {}

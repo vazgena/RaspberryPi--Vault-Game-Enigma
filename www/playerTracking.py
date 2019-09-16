@@ -24,7 +24,7 @@ from config_station import station, room
 
 bleData = {}
 bleFilter = {}
-n_iters = 15
+n_iters = 8
 howManyIterations = 1
 loop = None
 
