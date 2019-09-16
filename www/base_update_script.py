@@ -392,6 +392,28 @@ def create_temp_calibration_table():
     connection.close()
 
 
+def create_table_distance():
+    connection = data_connect()
+    con = connection.cursor()
+
+    sql_command = """
+    CREATE TABLE `distance_value` (
+                     `id` int(11) NOT NULL AUTO_INCREMENT,
+                     `mac` varchar(255) NOT NULL,
+                     `station` varchar(100) NOT NULL,
+                     `tx_power` float(53) NOT NULL,
+                     `timestamp` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                     `distance` float(53) NOT NULL,
+                     PRIMARY KEY (`id`)
+                   );
+    
+    """
+
+    con.execute(sql_command)
+    connection.close()
+
+
+
 
 if __name__ == "__main__":
 
@@ -413,7 +435,8 @@ if __name__ == "__main__":
     # update_icon_defense()
     # init_table_position()
     # add_position()
-    create_calibration_table()
-    create_temp_calibration_table()
+    # create_calibration_table()
+    # create_temp_calibration_table()
+    create_table_distance()
     pass
 

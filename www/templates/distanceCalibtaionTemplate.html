@@ -1,0 +1,121 @@
+{% block body %}
+    <head>
+        <meta name="viewport" content="user-scalable=no, width=device-width" />
+    </head>
+    <script src="/static/js/jquery1.8.2.min.js"></script>
+    <script src="/static/js/in_house.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/hack.js"></script>
+    <script src="/static/js/curved_text.js"></script>
+
+    <link rel='stylesheet prefetch' href='/static/css/roboto.css'>
+    <link rel='stylesheet prefetch' href='/static/css/font-awesome.min.css'>
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/inhouse.css?version=.01.7" rel="stylesheet">
+
+    <div id="background_upper2">
+
+    </div>
+
+    <div id="background_lower2">
+
+    </div>
+
+    <div id="wrapper">
+        <div id="main_loader" >
+            <div>
+               <label class="volume" id="label_stations">Station: </label>
+            <select name="stations" for="label_stations" id="stations">
+                {% for i in stationListed %}
+                <option value="{{i[0]}}">{{i[1]}}</option>
+                {% endfor %}
+            </select>
+            </div>
+            <div>
+             <label class="volume" id="label_treckers">tracker: </label>
+            <select name="treckers" for="label_treckers" id="treckers">
+                {% for i in treckersListed %}
+                <option value="{{i[0]}}">{{i[1]}}</option>
+                {% endfor %}
+            </select>
+            </div>
+
+             <div>
+             <label class="volume" id="val_label">Value: </label>
+            <label for="new_val_label" id="new_val">None</label>
+            </div>
+
+             <div>
+             <label class="volume" id="dist_label">Distance: </label>
+            <input for="new_val_label" id="dist_val" type="number">
+            </div>
+
+            <div>
+            <button onclick="save_value()">Save value</button>
+            </div>
+
+        </div>
+        <div id="station_load">
+
+        </div>
+    </div>
+
+    <div id="currencyCheck">
+
+    </div>
+
+    <div id="hackCheck">
+
+    </div>
+
+    <div id="hack_load">
+
+    </div>
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
+<script type="text/javascript">
+
+        var socket = io();
+
+        var select_station = document.getElementById('stations');
+        var select_tracker = document.getElementById('treckers');
+
+
+        $(document).ready(function(){
+            $(window).on('touchmove',function(e){e.preventDefault();});
+        });
+
+        if (self !== top) {
+            document.body.style.backgroundImage = "none";
+            document.body.style.background = "none transparent";
+        }
+
+        var old_calibration = "";
+
+        function success_calibration_data(data) {
+            var cur_val = data['current_val'];
+            var new_val = data['new_val'];
+            var cur_val_label = document.getElementById('curent_val');
+            var new_val_label = document.getElementById('new_val');
+            cur_val_label.innerHTML = cur_val;
+            new_val_label.innerHTML = new_val;
+        }
+
+        function save_value(){
+            socket.emit('calibration', {'station': select_station.value, 'tracker': select_tracker.value, 'save_value': true});
+        }
+
+        socket.on('calibration', success_calibration_data);
+
+
+        setInterval(calibration_load,1000);
+
+        function calibration_load(){
+            socket.emit('calibration', {'station': select_station.value, 'tracker': select_tracker.value, 'old_value': old_calibration});
+        }
+
+
+
+</script>
+
+{% endblock %}
