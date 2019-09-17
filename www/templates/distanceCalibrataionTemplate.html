@@ -47,11 +47,19 @@
 
              <div>
              <label class="volume" id="dist_label">Distance: </label>
-            <input for="new_val_label" id="dist_val" type="number">
+            <input for="new_val_label" id="distance" type="number">
             </div>
 
             <div>
             <button onclick="save_value()">Save value</button>
+            </div>
+
+            <div>
+            <button onclick="coefficient_calculation()">Define a formula</button>
+            </div>
+
+            <div>
+            <button onclick="drop_table()">Clear table</button>
             </div>
 
         </div>
@@ -79,6 +87,7 @@
 
         var select_station = document.getElementById('stations');
         var select_tracker = document.getElementById('treckers');
+        var select_distance = document.getElementById('distance');
 
 
         $(document).ready(function(){
@@ -93,25 +102,35 @@
         var old_calibration = "";
 
         function success_calibration_data(data) {
-            var cur_val = data['current_val'];
-            var new_val = data['new_val'];
-            var cur_val_label = document.getElementById('curent_val');
-            var new_val_label = document.getElementById('new_val');
-            cur_val_label.innerHTML = cur_val;
-            new_val_label.innerHTML = new_val;
+            var cur_val = data['new_val'];
+             var cur_val_label = document.getElementById('new_val');
+             cur_val_label.innerHTML = cur_val;
         }
 
         function save_value(){
-            socket.emit('calibration', {'station': select_station.value, 'tracker': select_tracker.value, 'save_value': true});
+            socket.emit('calibrationDistance', {'station': select_station.value, 'tracker': select_tracker.value,
+             'save_value': true, 'distance':  select_distance.value});
         }
 
-        socket.on('calibration', success_calibration_data);
+        function coefficient_calculation(){
+            socket.emit('calibrationDistance', {'station': select_station.value, 'tracker': select_tracker.value,
+             'coefficient_calculation': true, 'distance':  select_distance.value});
+        }
+
+        function drop_table(){
+            $con= confirm("Are you sure you want to delete the data? ")
+            if ( ! $con) return;
+            socket.emit('calibrationDistance', {'station': select_station.value, 'tracker': select_tracker.value,
+             'drop_table': true, 'distance':  select_distance.value});
+        }
+
+        socket.on('calibrationDistance', success_calibration_data);
 
 
         setInterval(calibration_load,1000);
 
         function calibration_load(){
-            socket.emit('calibration', {'station': select_station.value, 'tracker': select_tracker.value, 'old_value': old_calibration});
+            socket.emit('calibrationDistance', {});
         }
 
 

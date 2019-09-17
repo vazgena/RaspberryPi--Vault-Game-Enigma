@@ -2358,6 +2358,26 @@ def calibration_template():
     return render_template('calibrationTemplate.html', stationListed=stationListed, treckersListed=treckersListed)
 
 
+@app.route('/distancetemplate', methods=['GET', 'POST'])
+def distance_template():
+    stationListed = []
+    treckersListed = []
+    connection = data_connect()
+    c = connection.cursor()
+    sql_get_station = "SELECT * FROM stationList ORDER BY room, name;"
+    c.execute(sql_get_station)
+    station_list = list(c.fetchall())
+    sql_get_tracker = "SELECT * FROM TrackerNames ORDER BY name;"
+    c.execute(sql_get_tracker)
+    tracker_list = list(c.fetchall())
+    connection.close()
+    for tracker in tracker_list:
+        treckersListed.append([tracker[1], tracker[2]])
+    for station in station_list:
+        stationListed.append([station[1], ' '.join([str(station[5]), str(station[2])])])
+    return render_template('distanceCalibrataionTemplate.html', stationListed=stationListed, treckersListed=treckersListed)
+
+
 # function to check if assist is assisting said station
 def time_doubler_check(station):
     connection = data_connect()
@@ -2790,24 +2810,24 @@ def save_volume():
     return ""
 
 
-@app.route('/blecalibration', methods=['GET', 'POST'])
-def ble_calibration():
-    return ""
-    if request.method == 'POST':
-        ts = time.time()
-        timestamp = datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
-        station_name = request.form['station']
-        bt_addr = request.form['bt_addr']
-        avg = request.form['kalman']
-        connection = data_connect()
-        c = connection.cursor()
-        sql_request = "INSERT INTO temp_calibration (mac, station, tx_power, timestamp) VALUES (%s, %s, %s, %s);"
-        c.execute(sql_request, (bt_addr, station_name, avg, timestamp))
-        delta_time = datetime.now() - timedelta(minutes=1)
-        sql_request_remove = "DELETE FROM temp_calibration WHERE timestamp < %s;"
-        c.execute(sql_request_remove, delta_time)
-        connection.close()
-    return ""
+# @app.route('/blecalibration', methods=['GET', 'POST'])
+# def ble_calibration():
+#     return ""
+#     if request.method == 'POST':
+#         ts = time.time()
+#         timestamp = datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
+#         station_name = request.form['station']
+#         bt_addr = request.form['bt_addr']
+#         avg = request.form['kalman']
+#         connection = data_connect()
+#         c = connection.cursor()
+#         sql_request = "INSERT INTO temp_calibration (mac, station, tx_power, timestamp) VALUES (%s, %s, %s, %s);"
+#         c.execute(sql_request, (bt_addr, station_name, avg, timestamp))
+#         delta_time = datetime.now() - timedelta(minutes=1)
+#         sql_request_remove = "DELETE FROM temp_calibration WHERE timestamp < %s;"
+#         c.execute(sql_request_remove, delta_time)
+#         connection.close()
+#     return ""
 
 
 @socketio.on('hackCheck')
@@ -3356,6 +3376,53 @@ def handle_calibration(message):
     emit('calibration', response)
 
 
+@socketio.on('calibrationDistance')
+def handle_calibration(message):
+    mac = message.get('tracker', None)
+    station = message.get('station', None)
+    distance = message.get('distance', None)
+
+    connection = data_connect()
+    c = connection.cursor()
+
+    sql_get_new_valibrate = "SELECT * FROM temp_calibration WHERE station=%s AND mac = %s ORDER BY timestamp DESC LIMIT 1;"
+    c.execute(sql_get_new_valibrate, (station, mac))
+    result = list(c.fetchall())
+
+    if not result:
+        new_val = None
+    else:
+        new_val = result[0][3]
+
+    if message.get('save_value', False) and new_val is not None:
+        # TODO: check values
+        sql_request = "INSERT INTO distance_value (mac, station, tx_power, distance) VALUES (%s, %s, %s, %s);"
+        c.execute(sql_request, (mac, station, new_val, distance))
+        rssi_buffer[station][mac] = new_val
+        connection.close()
+        return
+
+    if message.get('drop_table', False):
+        # TODO: test code
+        print('drop_table')
+        sql_request = "TRUNCATE TABLE distance_value;"
+        c.execute(sql_request)
+        connection.close()
+        return
+
+    if message.get('coefficient_calculation', False):
+        # TODO: test code
+        print('coefficient_calculation')
+        # TODO: compute coefficient
+        connection.close()
+        return
+
+    connection.close()
+    response = {"new_val": str(new_val)}
+    emit('calibrationDistance', response)
+
+
+
 def set_logger_file():
     log_dir = "./log"
     if not os.path.exists(log_dir):
@@ -3386,6 +3453,7 @@ def computeDistance(rssi, txPower=-65, k=meter_to_feet):
         return np.power(ratio, 10)*k
     else:
         # return math.pow(ratio, 10)
+        # TODO: get coef from table?
         return (0.89976 * np.power(ratio, 9) + 0.111)*k
 
 
