@@ -130,7 +130,7 @@
         setInterval(calibration_load,1000);
 
         function calibration_load(){
-            socket.emit('calibrationDistance', {});
+            socket.emit('calibrationDistance', {'station': select_station.value, 'tracker': select_tracker.value});
         }
 
 

@@ -17,6 +17,7 @@ from pymysql import InternalError, connect
 from random import choice, sample
 
 import numpy as np
+from scipy.optimize import curve_fit
 
 from flask_socketio import SocketIO, emit
 
@@ -29,7 +30,17 @@ socketio = SocketIO(app)
 dbuser = 'game'
 dbpass = 'h95d3T7SXFta'
 
-meter_to_feet = 3.281
+# Metric number system
+# meter_to_feet = 3.281
+# A = 0.89976
+# B = 9.
+# C = 0.111
+
+# number system in foot
+meter_to_feet = 1
+A = 2.9579865198620396
+B = 8.992263513792887
+C = 0.35547355086408083
 
 
 use_rssi = True
@@ -3412,6 +3423,7 @@ def handle_calibration(message):
 
     if message.get('coefficient_calculation', False):
         # TODO: test code
+        compute_coef()
         print('coefficient_calculation')
         # TODO: compute coefficient
         connection.close()
@@ -3454,7 +3466,7 @@ def computeDistance(rssi, txPower=-65, k=meter_to_feet):
     else:
         # return math.pow(ratio, 10)
         # TODO: get coef from table?
-        return (0.89976 * np.power(ratio, 9) + 0.111)*k
+        return (A * np.power(ratio, B) + C)*k
 
 
 def init_buffer():
@@ -3506,6 +3518,42 @@ def init_buffer():
                 rssi_buffer[station] = {mac: tx_power}
             else:
                 rssi_buffer[station][mac] = tx_power
+
+
+def func(x, a, b, c):
+    return (a * np.power(x, b) + c)
+
+
+def compute_coef():
+    sql_request = "SELECT distance_value.distance, distance_value.tx_power, tracker_calibration.tx_power FROM distance_value " \
+                  "LEFT JOIN tracker_calibration ON distance_value.mac=tracker_calibration.mac;"
+    connection = data_connect()
+    c = connection.cursor()
+    c.execute(sql_request)
+    rssi_list = list(c.fetchall())
+    connection.close()
+    xdata = np.zeros((len(rssi_list),))
+    ydata = np.zeros((len(rssi_list),))
+    for i, row in enumerate(rssi_list):
+        xdata[i] = row[1]/row[2]
+        ydata[i] = row[0]
+    p0 = (0.89976, 9, 0.111)
+    popt, pcov = curve_fit(func, xdata, ydata, p0=p0, maxfev=10000)
+    a, b, c = popt
+
+    sql_request = "INSERT INTO coefficient (a, b, c) VALUES (%s, %s, %s);"
+    connection = data_connect()
+    c = connection.cursor()
+    c.execute(sql_request, (a, b, c))
+    connection.close()
+    A = a
+    B = b
+    C = c
+    print(a, b, c)
+
+
+def load_coef():
+    sql_request = ""
 
 
 

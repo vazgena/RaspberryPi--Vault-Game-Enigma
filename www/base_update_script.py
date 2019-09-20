@@ -413,6 +413,25 @@ def create_table_distance():
     connection.close()
 
 
+def create_table_coef():
+    connection = data_connect()
+    con = connection.cursor()
+
+    sql_command = """
+    CREATE TABLE `coefficient` (
+                     `id` int(11) NOT NULL AUTO_INCREMENT,
+                     `timestamp` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                     `a` float(53) NOT NULL,
+                     `b` float(53) NOT NULL,
+                     `c` float(53) NOT NULL,
+                     PRIMARY KEY (`id`)
+                   );
+
+    """
+
+    con.execute(sql_command)
+    connection.close()
+
 
 
 if __name__ == "__main__":
@@ -438,5 +457,6 @@ if __name__ == "__main__":
     # create_calibration_table()
     # create_temp_calibration_table()
     create_table_distance()
+    create_table_coef()
     pass
 
