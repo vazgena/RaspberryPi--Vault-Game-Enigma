@@ -3553,7 +3553,20 @@ def compute_coef():
 
 
 def load_coef():
-    sql_request = ""
+    try:
+        sql_request = "SELECT a, b, c FROM coefficient ORDER BY timestamp DESC LIMIT 1;"
+        connection = data_connect()
+        c = connection.cursor()
+        c.execute(sql_request)
+        coef_rows = list(c.fetchall())
+        connection.close()
+        if coef_rows:
+            A = coef_rows[0][0]
+            B = coef_rows[0][1]
+            C = coef_rows[0][1]
+    except:
+        pass
+
 
 
 
@@ -3562,4 +3575,5 @@ if __name__ == '__main__':
     # app.run(host='0.0.0.0', port=8080, debug=True, threaded=True)
     set_logger_file()
     init_buffer()
+    load_coef()
     socketio.run(app, host='0.0.0.0', port=8080, debug=True)
