@@ -3540,7 +3540,6 @@ def compute_coef():
     p0 = (0.89976, 9, 0.111)
     popt, pcov = curve_fit(func, xdata, ydata, p0=p0, maxfev=10000)
     ak, bk, ck = popt.astype(float)
-
     sql_request = "INSERT INTO coefficient (a, b, c) VALUES (%s, %s, %s);"
     connection = data_connect()
     c = connection.cursor()
