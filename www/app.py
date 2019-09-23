@@ -3521,7 +3521,7 @@ def init_buffer():
 
 
 def func(x, a, b, c):
-    return (a * np.power(x, b) + c)
+    return a * np.power(x, b) + c
 
 
 def compute_coef():
@@ -3539,17 +3539,17 @@ def compute_coef():
         ydata[i] = row[0]
     p0 = (0.89976, 9, 0.111)
     popt, pcov = curve_fit(func, xdata, ydata, p0=p0, maxfev=10000)
-    a, b, c = popt
+    ak, bk, ck = popt.astype(float)
 
     sql_request = "INSERT INTO coefficient (a, b, c) VALUES (%s, %s, %s);"
     connection = data_connect()
     c = connection.cursor()
-    c.execute(sql_request, (a, b, c))
+    c.execute(sql_request, (float(ak), float(bk), float(ck)))
     connection.close()
-    A = a
-    B = b
-    C = c
-    print(a, b, c)
+    A = ak
+    B = bk
+    C = ck
+    print(ak, bk, ck)
 
 
 def load_coef():
