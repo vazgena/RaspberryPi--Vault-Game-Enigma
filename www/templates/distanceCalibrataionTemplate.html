@@ -110,11 +110,13 @@
         function save_value(){
             socket.emit('calibrationDistance', {'station': select_station.value, 'tracker': select_tracker.value,
              'save_value': true, 'distance':  select_distance.value});
+             alert("Value saved.");
         }
 
         function coefficient_calculation(){
             socket.emit('calibrationDistance', {'station': select_station.value, 'tracker': select_tracker.value,
              'coefficient_calculation': true, 'distance':  select_distance.value});
+             alert(The coefficients were calculated.");
         }
 
         function drop_table(){
