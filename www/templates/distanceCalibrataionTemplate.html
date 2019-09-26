@@ -116,7 +116,7 @@
         function coefficient_calculation(){
             socket.emit('calibrationDistance', {'station': select_station.value, 'tracker': select_tracker.value,
              'coefficient_calculation': true, 'distance':  select_distance.value});
-             alert(The coefficients were calculated.");
+             alert("The coefficients were calculated.");
         }
 
         function drop_table(){

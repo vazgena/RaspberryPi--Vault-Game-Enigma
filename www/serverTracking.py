@@ -257,6 +257,53 @@ def optimization(initial_location, locations, distances, bnds=((0, None), (0, No
 	return location
 
 
+def py_ang(v1, v2):
+	""" Returns the angle in radians between vectors 'v1' and 'v2'    """
+	cosang = np.dot(v1, v2)
+	sinang = np.linalg.norm(np.cross(v1, v2))
+	return np.arctan2(sinang, cosang)
+
+
+def mse_angle(x, locations, distances):
+	pos = x[:2].reshape((1, 2))
+	angle = x[2]
+	dif_pos = locations - pos
+	# TODO: check cos/sin
+	direction_vector = np.array((np.sin(angle), np.cos(angle)))
+	def func_angle(v):
+		return py_ang(v, direction_vector)
+	angles = np.apply_along_axis(dif_pos, 1, func_angle)
+	angles = np.abs(angles)
+	distances_cor = distances.copy()
+	distances_cor[angles > np.pi/2] = distances_cor[angles > np.pi/2] * 1.4
+	c_dist = cdist(pos, locations)
+	error_dist = distances - c_dist
+	error_dist /= distances
+	# error_dist[error_dist > 0] = error_dist[error_dist > 0]/2
+	mse = np.square(error_dist).mean()
+	return mse
+
+
+def optimization_angle(initial_location, locations, distances, bnds=((0, None), (0, None), [0, 2*np.pi])):
+	initial_location_angle = np.zeros((3,))
+	initial_location_angle[:2] = initial_location
+	initial_location_angle[2] = np.pi
+	result = minimize(
+		mse_angle,  # The error function
+		initial_location,  # The initial guess
+		args=(locations, distances),  # Additional parameters for mse
+		method='L-BFGS-B',  # The optimisation algorithm
+		options={
+			'ftol': 1e-5,  # Tolerance
+			'maxiter': 1e+7  # Maximum iterations
+		},
+		bounds=bnds,
+	)
+	location = result.x
+	return location
+
+
+
 def compute_bounds():
 	for key in locations_room:
 		max_x = 0
