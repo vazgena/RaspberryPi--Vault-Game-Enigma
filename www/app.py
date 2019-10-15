@@ -2714,7 +2714,7 @@ def defenses_station(app_id):
                     "VALUES (%s, %s, %s, %s) ON DUPLICATE KEY UPDATE " \
                     "station = %s, room = %s, status = %s, timestamp = %s;"
         c.execute(sql_query, (
-        station_check, room, collected_mine, datetime.now(), station_check, room, collected_mine, datetime.now()))
+            station_check, room, collected_mine, datetime.now(), station_check, room, collected_mine, datetime.now()))
 
         connection.close()
         station_name = station_list[5]
@@ -2810,7 +2810,16 @@ def defenses_template(app_id):
 
 @app.route("/associations", methods=['GET', 'POST'])
 def curent_associations():
-    return render_template('page_associations.html')
+    connection = data_connect()
+    c = connection.cursor()
+    name_trackers = []
+    if request.method == 'GET':
+        row = c.execute("SELECT name FROM game.TrackerNames")
+        for i in range(row):
+            name_trackers.append(c.fetchone()[0])
+        return render_template('page_associations.html', name_tracker = name_trackers)
+    if request.method == "POST":
+        pass
 
 
 @app.route('/setvolume', methods=['GET', 'POST'])
