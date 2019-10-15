@@ -2808,6 +2808,11 @@ def defenses_template(app_id):
     return render_template('defensetemplate.html', room=room)
 
 
+@app.route("/associations", methods=['GET', 'POST'])
+def curent_associations():
+    return render_template('page_associations.html')
+
+
 @app.route('/setvolume', methods=['GET', 'POST'])
 def save_volume():
     if request.method == 'POST':
