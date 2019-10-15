@@ -21,7 +21,6 @@ from scipy.optimize import curve_fit
 
 from flask_socketio import SocketIO, emit
 
-
 logger = logging.getLogger(__name__)
 
 # Variables
@@ -42,11 +41,10 @@ A = 2.9579865198620396
 B = 8.992263513792887
 C = 0.35547355086408083
 
-
 use_rssi = True
 # rssi_name = 'rssi'
 rssi_name = 'rssi_window'
-#use_rssi = False
+# use_rssi = False
 
 rssi_buffer = {}
 
@@ -220,10 +218,12 @@ def admin_start_vault():
         c.execute(trackers_value_update)
         trackers_temp = "TRUNCATE TABLE temp_calibration"
         c.execute(trackers_temp)
-        #os.system("python3 resettrackers.py")
+        # os.system("python3 resettrackers.py")
     # Close database connection.
     connection.close()
     return redirect(url_for('admin_vault'))
+
+
 # Reset End
 
 
@@ -561,7 +561,6 @@ def bombstation(app_id):
             play_add_sql = "INSERT INTO audiomanager (whattoplay, room) VALUES (%s, %s)"
             c.execute(play_add_sql, ("blastlaunch", room))
 
-
     timetodetonatebomb = "-1"
     stationsbombedsql = 'SELECT * FROM bombsDeployed WHERE room = %s'
     c.execute(stationsbombedsql, attack_room)
@@ -589,7 +588,8 @@ def bombstation(app_id):
                            height_list=height_list, x_list=x_list,
                            y_list=y_list, image_list=image_list, bh_list=bh_list,
                            bw_list=bw_list, br_list=br_list, color_list=color_list,
-                           color_selected_list=color_selected_list, station=station, timetodetonatebomb=timetodetonatebomb)
+                           color_selected_list=color_selected_list, station=station,
+                           timetodetonatebomb=timetodetonatebomb)
 
 
 # Blast station change locations template
@@ -893,13 +893,14 @@ def camera_station(app_id, room):
         time_bloks = max([row[7] for row in rows_bloks])
         time_now = datetime.now()
         time_left_sec = 300 - int((time_now - time_bloks).total_seconds())
-        timer_message = "YOUR CAMERAS HAVE BEEN SHUT DOWN. {0}:{1:02d} UNTIL THEY ARE BACK ONLINE."\
-            .format(time_left_sec//60, time_left_sec%60)
+        timer_message = "YOUR CAMERAS HAVE BEEN SHUT DOWN. {0}:{1:02d} UNTIL THEY ARE BACK ONLINE." \
+            .format(time_left_sec // 60, time_left_sec % 60)
     # Close database connection.
     connection.close()
     return render_template('cameraStation.html', cams_available=cams_available,
                            time_doubler=time_doubler, message_bomb=message_bomb, station=station,
                            timer_message=timer_message)
+
 
 # # Test code
 # # Watch station data
@@ -1429,7 +1430,6 @@ def market(app_id):
                     c.execute(funding1, (room, int(how_many_hacks) - 1, room, int(how_many_hacks) - 1))
                     how_many_hacks -= 1
 
-
     for row in marketapplett:
         row.append(re.sub(r"(?<!\\)'", "\\'", row[1]))
         # unlock flag
@@ -1744,7 +1744,6 @@ def mine_this(app_id):
                            color_selected_list=color_selected_list)
 
 
-
 # count_hack = 0
 # # Harvest station data
 # @app.route('/minethis/<app_id>', methods=['GET', 'POST'])
@@ -2017,6 +2016,7 @@ def audio_check(room):
 
     connection.close()
     return render_template('audiocheck.html', tracks=tracks)
+
 
 # hacked buttons
 @app.route('/hack_load/')
@@ -2386,7 +2386,8 @@ def distance_template():
         treckersListed.append([tracker[1], tracker[2]])
     for station in station_list:
         stationListed.append([station[1], ' '.join([str(station[5]), str(station[2])])])
-    return render_template('distanceCalibrataionTemplate.html', stationListed=stationListed, treckersListed=treckersListed)
+    return render_template('distanceCalibrataionTemplate.html', stationListed=stationListed,
+                           treckersListed=treckersListed)
 
 
 # function to check if assist is assisting said station
@@ -2460,8 +2461,9 @@ def ipaddresses():
         return "ip accepted"
     return "ip not accepted"
 
+
 # bleraw accepts raw BLE data sent from the PI's showing the signal strength station
-#then stores the data to trackers
+# then stores the data to trackers
 @app.route('/bleraw', methods=['GET', 'POST'])
 def bleraw():
     if request.method != 'POST':
@@ -2475,18 +2477,18 @@ def bleraw():
     if 'tx_power' in request.form:
         tx_power = request.form['tx_power']
     if tx_power is not None:
-        tx_power = int( float(tx_power))
+        tx_power = int(float(tx_power))
 
     room = request.form['room']
 
     connection = data_connect()
     c = connection.cursor()
     try:
-        insert_sql = "INSERT INTO trackers_raw(moment, rssi, tx_power, beacon_mac, room, station) "\
-                                        "VALUES (from_unixtime(%s)  ,   %s,       %s,         %s,   %s, %s) "
-        c.execute(insert_sql, (ts, int(float(rssi)), tx_power, bt_addr, room, station_name ))
+        insert_sql = "INSERT INTO trackers_raw(moment, rssi, tx_power, beacon_mac, room, station) " \
+                     "VALUES (from_unixtime(%s)  ,   %s,       %s,         %s,   %s, %s) "
+        c.execute(insert_sql, (ts, int(float(rssi)), tx_power, bt_addr, room, station_name))
     except Exception as e:
-        print( "Occured exception " , e)
+        print("Occured exception ", e)
 
     connection.close()
     return "accepted"
@@ -2538,7 +2540,6 @@ def bledata():
             except:
                 # TODO: add log error
                 pass
-
 
         try:
             update_sql = "INSERT INTO trackers (macstat, mac, station, signal_avg, room, packet_data, properties) " \
@@ -2663,7 +2664,6 @@ def reset_server():
     return "not rebooted"
 
 
-
 # Defense station data
 @app.route('/mainstation/<app_id>', methods=['GET', 'POST'])
 def defenses_station(app_id):
@@ -2711,22 +2711,22 @@ def defenses_station(app_id):
         station_list = list(c.fetchall())[0]
 
         sql_query = "INSERT INTO station_defence (station, room, status, timestamp) " \
-                         "VALUES (%s, %s, %s, %s) ON DUPLICATE KEY UPDATE " \
-                         "station = %s, room = %s, status = %s, timestamp = %s;"
-        c.execute(sql_query, (station_check, room, collected_mine, datetime.now(), station_check, room, collected_mine, datetime.now()))
+                    "VALUES (%s, %s, %s, %s) ON DUPLICATE KEY UPDATE " \
+                    "station = %s, room = %s, status = %s, timestamp = %s;"
+        c.execute(sql_query, (
+        station_check, room, collected_mine, datetime.now(), station_check, room, collected_mine, datetime.now()))
 
         connection.close()
         station_name = station_list[5]
 
-
         response = render_template('defenseStation.html', time_doubler=time_doubler,
-                               collected_mine=collected_mine, is_available=is_available,
-                               stationListed=names, station=station,
-                               message_bomb=message_bomb, room=room,
-                               width_list=width_list, height_list=height_list, x_list=x_list,
-                               y_list=y_list, image_list=image_list, bh_list=bh_list,
-                               bw_list=bw_list, br_list=br_list, color_list=color_list,
-                               station_name=station_name, init_station_name='Yes', volume=volume
+                                   collected_mine=collected_mine, is_available=is_available,
+                                   stationListed=names, station=station,
+                                   message_bomb=message_bomb, room=room,
+                                   width_list=width_list, height_list=height_list, x_list=x_list,
+                                   y_list=y_list, image_list=image_list, bh_list=bh_list,
+                                   bw_list=bw_list, br_list=br_list, color_list=color_list,
+                                   station_name=station_name, init_station_name='Yes', volume=volume
                                    )
         return response
 
@@ -2746,13 +2746,13 @@ def defenses_station(app_id):
                 is_available = "Yes"
                 connection.close()
             return render_template('defenseStation.html', time_doubler=time_doubler,
-                                       collected_mine=collected_mine, volume=volume,
-                                       stationListed=names, station=station,
-                                       message_bomb=message_bomb, room=room,
-                                       width_list=width_list, height_list=height_list, x_list=x_list,
-                                       y_list=y_list, image_list=image_list, bh_list=bh_list,
-                                       bw_list=bw_list, br_list=br_list, color_list=color_list,
-                                       station_name=station_name, is_available=is_available, init_station_name='No')
+                                   collected_mine=collected_mine, volume=volume,
+                                   stationListed=names, station=station,
+                                   message_bomb=message_bomb, room=room,
+                                   width_list=width_list, height_list=height_list, x_list=x_list,
+                                   y_list=y_list, image_list=image_list, bh_list=bh_list,
+                                   bw_list=bw_list, br_list=br_list, color_list=color_list,
+                                   station_name=station_name, is_available=is_available, init_station_name='No')
 
     defense_list_sql = 'SELECT * FROM station_defence WHERE room = %s;'
     c.execute(defense_list_sql, room)
@@ -2954,8 +2954,8 @@ def handle_hack(message):
     # close database and render the page
     connection.close()
     response = render_template('currency.html', hacksAvailable=hacks_available,
-                           opCurrency=opcurrency, currencys=currencies,
-                           bombs=bombs, timeToDetonate=timetodetonate, stationlist2=stationlist2)
+                               opCurrency=opcurrency, currencys=currencies,
+                               bombs=bombs, timeToDetonate=timetodetonate, stationlist2=stationlist2)
     if 'old_value' in message:
         if message['old_value'] == response:
             return
@@ -3003,8 +3003,8 @@ def handle_camearstation(message):
     # Close database connection.
     connection.close()
     response = render_template('cameraStation.html', cams_available=cams_available,
-                           time_doubler=time_doubler, message_bomb=message_bomb, station=station,
-                           timer_message=timer_message)
+                               time_doubler=time_doubler, message_bomb=message_bomb, station=station,
+                               timer_message=timer_message)
     if 'old_value' in message:
         if message['old_value'] == response:
             return
@@ -3082,17 +3082,18 @@ def handle_masterstation(message):
     # Close database connection.
     connection.close()
     response = render_template('masterStation.html', room=room, spelled=spelled,
-                           stationListed=station_listed, time_doubler=time_doubler,
-                           doublerStationActive=doubler_station_active,
-                           message_bomb=message_bomb,
-                           width_list=width_list, height_list=height_list, x_list=x_list,
-                           y_list=y_list, image_list=image_list, bh_list=bh_list,
-                           bw_list=bw_list, br_list=br_list, color_list=color_list,
-                           color_selected_list=color_selected_list, station=station)
+                               stationListed=station_listed, time_doubler=time_doubler,
+                               doublerStationActive=doubler_station_active,
+                               message_bomb=message_bomb,
+                               width_list=width_list, height_list=height_list, x_list=x_list,
+                               y_list=y_list, image_list=image_list, bh_list=bh_list,
+                               bw_list=bw_list, br_list=br_list, color_list=color_list,
+                               color_selected_list=color_selected_list, station=station)
     if 'old_value' in message:
         if message['old_value'] == response:
             return
     emit('masterStation', response)
+
 
 @socketio.on('mainstation_old')
 def handle_mainstation(message):
@@ -3138,12 +3139,12 @@ def handle_mainstation(message):
             color_list.append(i[16])
     connection.close()
     response = render_template('mainstation.html', room=room, spelled=spelled,
-                           message_bomb=message_bomb, stationListed=station_listed,
-                           time_doubler=time_doubler, width_list=width_list,
-                           height_list=height_list, x_list=x_list,
-                           y_list=y_list, image_list=image_list, bh_list=bh_list,
-                           bw_list=bw_list, br_list=br_list, color_list=color_list,
-                           color_selected_list=color_selected_list, station=station)
+                               message_bomb=message_bomb, stationListed=station_listed,
+                               time_doubler=time_doubler, width_list=width_list,
+                               height_list=height_list, x_list=x_list,
+                               y_list=y_list, image_list=image_list, bh_list=bh_list,
+                               bw_list=bw_list, br_list=br_list, color_list=color_list,
+                               color_selected_list=color_selected_list, station=station)
     if 'old_value' in message:
         if message['old_value'] == response:
             return
@@ -3210,9 +3211,9 @@ def handle_audio_station(message):
     connection.close()
 
     response = render_template('audiostation.html', room=room, station=station,
-                           message_bomb_20_sec=message_bomb_20_sec,
-                           time_doubler=time_doubler, message_bomb=message_bomb,
-                           message_out=message_out)
+                               message_bomb_20_sec=message_bomb_20_sec,
+                               time_doubler=time_doubler, message_bomb=message_bomb,
+                               message_out=message_out)
     if 'old_value' in message:
         if message['old_value'] == response:
             return
@@ -3336,13 +3337,13 @@ def handle_defence_station(message):
     # Close database connection.
     connection.close()
     response = render_template('defenseStation.html', time_doubler=time_doubler,
-                           collected_mine=collected_mine, volume=volume,
-                           stationListed=names, station=station,
-                           message_bomb=message_bomb, room=room,
-                           width_list=width_list, height_list=height_list, x_list=x_list,
-                           y_list=y_list, image_list=image_list, bh_list=bh_list,
-                           bw_list=bw_list, br_list=br_list, color_list=color_list,
-                           station_name=station_name, is_available=is_available, init_station_name='No')
+                               collected_mine=collected_mine, volume=volume,
+                               stationListed=names, station=station,
+                               message_bomb=message_bomb, room=room,
+                               width_list=width_list, height_list=height_list, x_list=x_list,
+                               y_list=y_list, image_list=image_list, bh_list=bh_list,
+                               bw_list=bw_list, br_list=br_list, color_list=color_list,
+                               station_name=station_name, is_available=is_available, init_station_name='No')
     if 'old_value' in message:
         if message['old_value'] == response:
             return
@@ -3355,7 +3356,6 @@ def handle_calibration(message):
     station = message['station']
     # TODO: add save val
 
-
     current_val = rssi_buffer[station][mac]
 
     connection = data_connect()
@@ -3364,7 +3364,6 @@ def handle_calibration(message):
     sql_get_new_valibrate = "SELECT * FROM temp_calibration WHERE station=%s AND mac = %s ORDER BY timestamp DESC LIMIT 1;"
     c.execute(sql_get_new_valibrate, (station, mac))
     result = list(c.fetchall())
-
 
     if not result:
         new_val = None
@@ -3434,7 +3433,6 @@ def handle_calibration(message):
     emit('calibrationDistance', response)
 
 
-
 def set_logger_file():
     log_dir = "./log"
     if not os.path.exists(log_dir):
@@ -3443,7 +3441,7 @@ def set_logger_file():
     # logger.basicConfig(filename=file_log, filemode='a', level=getattr(logging, "DEBUG"),
     #                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     # logging.config.fileConfig('logging.conf')
-    #logger.setLevel(logging.DEBUG)
+    # logger.setLevel(logging.DEBUG)
     logger.setLevel(logging.ERROR)
     logging.getLogger('socketio').setLevel(logging.ERROR)
     logging.getLogger('engineio').setLevel(logging.ERROR)
@@ -3451,7 +3449,7 @@ def set_logger_file():
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     ch = logging.FileHandler(fil_log, mode='w')
     ch.setFormatter(formatter)
-    #ch.setLevel(logging.DEBUG)
+    # ch.setLevel(logging.DEBUG)
     logger.addHandler(ch)
 
 
@@ -3462,11 +3460,11 @@ def computeDistance(rssi, txPower=-65, k=meter_to_feet):
     ratio = rssi / txPower
 
     if ratio <= 1.0:
-        return np.power(ratio, 10)*k
+        return np.power(ratio, 10) * k
     else:
         # return math.pow(ratio, 10)
         # TODO: get coef from table?
-        return (A * np.power(ratio, B) + C)*k
+        return (A * np.power(ratio, B) + C) * k
 
 
 def init_buffer():
@@ -3535,7 +3533,7 @@ def compute_coef():
     xdata = np.zeros((len(rssi_list),))
     ydata = np.zeros((len(rssi_list),))
     for i, row in enumerate(rssi_list):
-        xdata[i] = row[1]/row[2]
+        xdata[i] = row[1] / row[2]
         ydata[i] = row[0]
     p0 = (0.89976, 9, 0.111)
     popt, pcov = curve_fit(func, xdata, ydata, p0=p0, maxfev=10000)
@@ -3565,8 +3563,6 @@ def load_coef():
             C = coef_rows[0][1]
     except:
         pass
-
-
 
 
 # create an instance of the Flask
