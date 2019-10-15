@@ -1936,7 +1936,7 @@ def mine_that(app_id):
                                        bw_list=bw_list, br_list=br_list, color_list=color_list,
                                        color_selected_list=color_selected_list)
 
-    station_list_sql = 'SELECT * FROM stationList WHERE room = %s;'
+    station_list_sql = 'SELECT * FROM stationList WHERE room = %s AND is_visible = TRUE;'
     c.execute(station_list_sql, atkroom)
     station_list = list(c.fetchall())
     for i in station_list:
