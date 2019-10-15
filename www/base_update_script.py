@@ -222,8 +222,37 @@ def update_24_07_2019():
 def add_column_station():
     connection = data_connect()
     con = connection.cursor()
-    query = "ALTER TABLE stationList ADD lay_bomb BOOLEAN NOT NULL DEFAULT TRUE"
+
+    query = "ALTER TABLE stationList " \
+            "ADD COLUMN lay_bomb BOOLEAN NOT NULL DEFAULT TRUE"
     con.execute(query)
+    connection.close()
+
+
+def update_11_10_2019():
+    connection = data_connect()
+    con = connection.cursor()
+
+    #  oh 1 small change - can we remove the blast station as an option for the Charge and Steal station - meaning
+    #  stations charge and steal no longer have the blast (middle) station as an option the light can't light up there
+    #  anyway so it can't be there
+    query = "ALTER TABLE stationList " \
+            "ADD COLUMN is_visible BOOLEAN NOT NULL DEFAULT TRUE"
+    con.execute(query)
+
+    fixes = [
+        ('stationList', 14, ('is_visible',), (False,)),
+        ('stationList', 5, ('is_visible',), (False,))
+    ]
+    update_rows(con, fixes)
+
+    # trackers heap fixes
+    query = "ALTER TABLE TrackerNames " \
+            "ADD COLUMN created datetime NOT NULL DEFAULT CURRENT_TIMESTAMP, " \
+            "ADD COLUMN master_name varchar(4) DEFAULT '', " \
+            "ADD COLUMN angle_clockwise int(11) DEFAULT '0'"
+    con.execute(query)
+
     connection.close()
 
 
@@ -456,7 +485,8 @@ if __name__ == "__main__":
     # add_position()
     # create_calibration_table()
     # create_temp_calibration_table()
-    create_table_distance()
-    create_table_coef()
+    # create_table_distance()
+    # create_table_coef()
+    update_11_10_2019()
     pass
 
