@@ -280,7 +280,10 @@ def player_check_vault():
     c = connection.cursor()
     player_wins = "No one "
     try:
-        get_location_sql = "SELECT * FROM playerLocation ORDER BY mac DESC"
+        get_location_sql = "SELECT * FROM playerLocation, TrackerNames " \
+                           "WHERE playerLocation.mac = TrackerNames.mac AND " \
+                           "TrackerNames.master_name = '' " \
+                           "ORDER BY playerLocation.mac DESC"
         c.execute(get_location_sql)
         get_location = list(c.fetchall())
         for l in get_location:

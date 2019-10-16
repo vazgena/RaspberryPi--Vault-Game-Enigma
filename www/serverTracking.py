@@ -5,6 +5,7 @@ from scipy.spatial.distance import cdist
 from scipy.optimize import minimize
 from pymysql import InternalError, connect
 from datetime import datetime, timedelta
+import copy
 
 
 dbuser = 'game'
@@ -118,15 +119,18 @@ def loop():
 
 
 def new_loop():
+
+	# get temporary list of worked trackers (need running app.py) !!!
 	connection = dataconnect()
 	c = connection.cursor()
 	get_locations = "SELECT mac, station FROM trackers;"
+
 	c.execute(get_locations)
 	listed_trackers = list(c.fetchall())
 
 	mac_map = {}
 
-	for k in listed_trackers:
+	for k in listed_trackers:  # all trackers!!!
 		mac = k[0]
 		station = k[1]
 		if mac not in mac_map:
@@ -135,14 +139,15 @@ def new_loop():
 			continue
 		mac_map[mac].append(station)
 
-	sql_query = "SELECT value FROM trackers_value WHERE mac=%s AND station=%s ORDER BY timestamp DESC LIMIT %s;"
-
+	mac_location = {}
+	mac_mean_value = {}
 	for mac in mac_map:
 		try:
 			value_array = np.zeros((len(mac_map[mac]), n))
 			for i, station in enumerate(mac_map[mac]):
 				if station in ['BMB1', 'BMB2']:
 					continue
+				sql_query = "SELECT value FROM trackers_value WHERE mac=%s AND station=%s ORDER BY timestamp DESC LIMIT %s;"
 				c.execute(sql_query, (mac, station, n))
 				listed_value = list(c.fetchall())
 				values = [value[0] for value in listed_value]
@@ -156,7 +161,58 @@ def new_loop():
 			mean_value = mean_values[j, n_2]
 			location = mac_map[mac][j]
 
-			if triangulate:
+			mac_mean_value[mac] = mean_value
+			mac_location[mac] = location
+		except:
+			pass
+
+		# !!!INJECTION!!!
+		# Keep only one tracker from heap. Store only minimal value of distance!
+	# mac_map_new = copy.deepcopy(mac_map)
+	# for mac in mac_map:
+		try:
+			sql_query_minimal = "SELECT * FROM TrackerNames WHERE mac=%s;"
+			c.execute(sql_query_minimal, mac)
+			listed_result = list(c.fetchall())[0]  # mac is unique!
+			if listed_result[4] != '':  # is slave tracker
+
+				# slave data
+				mac_slave = mac
+				location_slave = mac_location[mac_slave]
+				mean_value_slave = mac_mean_value[mac_slave]
+
+				# get master for current slave
+				name_master = listed_result[4]
+				sql_master_query = "SELECT mac FROM TrackerNames WHERE name=%s;"
+				c.execute(sql_master_query, name_master)
+				listed_mac = list(c.fetchall())
+				mac_master = listed_mac[0][0]
+
+				# get master data
+				# location_master = mac_location[mac_master] -- station name
+				mean_value_master = mac_mean_value[mac_master]
+
+				# update master
+				# mac_location[mac_master] = location_slave if (location_slave < location_master) else location_master
+				mac_location.pop(mac_slave, None)
+				mac_mean_value[mac_master] = mean_value_slave if (mean_value_slave < mean_value_master) else mean_value_master
+				mac_mean_value.pop(mac_slave, None)
+
+				# remove slave
+				# mac_map_new.pop(mac_slave, None)
+				mac_map.pop(mac_slave, None)
+		except:
+			pass
+	# !!!END OF INJECTION!!!
+
+	# Here are only MASTER trackers!!! Not any slave!
+	# for mac in mac_map_new:
+		# print(mac)
+		try:
+			location = mac_location[mac]
+			mean_value = mac_mean_value[mac]
+
+			if triangulate:  # trilateration!
 				location_first = location
 				mean_value_first = mean_value
 
@@ -195,8 +251,9 @@ def new_loop():
 				# Trilateration
 				# initial_location = locs_select.mean(axis=0)
 				initial_location = locs[stat.index(location)]
+				#x = optimization_angle(initial_location, locs_select, dist_select, bounds_room[room]) -- with angle
 				x = optimization(initial_location, locs_select, dist_select, bounds_room[room])
-
+				x = x[:2]
 				new_dist = cdist(x.reshape((1, 2)), locs)[0, :]
 
 				j = np.argmin(new_dist)
@@ -267,27 +324,28 @@ def py_ang(v1, v2):
 def mse_angle(x, locations, distances):
 	pos = x[:2].reshape((1, 2))
 	angle = x[2]
+	k = x[3]
 	dif_pos = locations - pos
 	# TODO: check cos/sin
-	direction_vector = np.array((np.sin(angle), np.cos(angle)))
+	direction_vector = np.array((np.cos(angle), np.sin(angle)))
 	def func_angle(v):
 		return py_ang(v, direction_vector)
 	angles = np.apply_along_axis(dif_pos, 1, func_angle)
 	angles = np.abs(angles)
 	distances_cor = distances.copy()
-	distances_cor[angles > np.pi/2] = distances_cor[angles > np.pi/2] * 1.4
+	distances_cor[angles > np.pi/2] *= k
 	c_dist = cdist(pos, locations)
-	error_dist = distances - c_dist
+	error_dist = distances_cor - c_dist
 	error_dist /= distances
-	# error_dist[error_dist > 0] = error_dist[error_dist > 0]/2
 	mse = np.square(error_dist).mean()
 	return mse
 
 
-def optimization_angle(initial_location, locations, distances, bnds=((0, None), (0, None), [0, 2*np.pi])):
-	initial_location_angle = np.zeros((3,))
+def optimization_angle(initial_location, locations, distances, bnds=((0, None), (0, None), (0, 2*np.pi), (1, 2))):
+	initial_location_angle = np.zeros((4,))
 	initial_location_angle[:2] = initial_location
 	initial_location_angle[2] = np.pi
+	initial_location_angle[3] = 1.5
 	result = minimize(
 		mse_angle,  # The error function
 		initial_location,  # The initial guess
@@ -306,11 +364,14 @@ def optimization_angle(initial_location, locations, distances, bnds=((0, None), 
 
 def compute_bounds():
 	for key in locations_room:
-		max_x = 0
-		max_y = 0
 		max_val = locations_room[key]['locations'].max(axis=0)
-		bounds_room[key] = ((0, max_val[0]), (0, max_val[1]))
+		bounds_room[key] = ((0., max_val[0]), (0., max_val[1]))
 
+
+def compute_bounds_angles():
+	for key in locations_room:
+		max_val = locations_room[key]['locations'].max(axis=0)
+		bounds_room[key] = ((0., max_val[0]), (0., max_val[1]), (0., 2*np.pi), (1., 2.))
 
 
 if __name__ == "__main__":
@@ -318,7 +379,9 @@ if __name__ == "__main__":
 	if not debug:
 		run_once()
 	init_locations()
-	compute_bounds()
+
+	compute_bounds()  # without angle optimization!!!
+	# compute_bounds_angles()  # with angle optimization!!!
 	while True:
 		# loop()
 		new_loop()
