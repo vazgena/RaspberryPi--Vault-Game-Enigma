@@ -2814,13 +2814,59 @@ def curent_associations():
     connection = data_connect()
     c = connection.cursor()
     name_trackers = []
+    name_trackers2 = []
+    full_trackers = []
     if request.method == 'GET':
         row = c.execute("SELECT name FROM game.TrackerNames")
         for i in range(row):
             name_trackers.append(c.fetchone()[0])
-        return render_template('page_associations.html', name_tracker = name_trackers)
+        row2 = c.execute("SELECT master_name FROM game.TrackerNames")
+        for i in range(row2):
+            name_trackers2.append(c.fetchone()[0])
+        for i in range(row2):
+            if name_trackers2[i] == '':
+                full_trackers.append(name_trackers[i] + " " + name_trackers2[i])
+            else:
+                full_trackers.append(name_trackers2[i] + " " + name_trackers[i])
+        delite = []
+        for i in range(len(name_trackers2)):
+            if name_trackers2[i] != '' and name_trackers2[i] != ' ':
+                delite.append(name_trackers2[i])
+            # full_trackers.remove(name_trackers2[i])
+        full_trackers = [x.strip(' ') for x in full_trackers]
+        for i in range(len(delite)):
+            a = delite[i]
+            full_trackers.remove(a)
+        return render_template('page_associations.html', full_trackers=full_trackers, name_tracker = name_trackers)
     if request.method == "POST":
-        pass
+        font_and_toil = request.form
+        if "tail" in font_and_toil:
+            c.execute("UPDATE game.TrackerNames SET master_name = '" + font_and_toil["font"] +
+                      "' WHERE name= '" + font_and_toil["tail"] + "';")
+        if "delite" in font_and_toil:
+            split_font_and_tail = font_and_toil["delite"].split()
+            c.execute("UPDATE game.TrackerNames SET master_name = ' ' WHERE name= '" + split_font_and_tail[1] + "';")
+        row = c.execute("SELECT name FROM game.TrackerNames")
+        for i in range(row):
+            name_trackers.append(c.fetchone()[0])
+        row2 = c.execute("SELECT master_name FROM game.TrackerNames")
+        for i in range(row2):
+            name_trackers2.append(c.fetchone()[0])
+        for i in range(row2):
+            if name_trackers2[i] == '':
+                full_trackers.append(name_trackers[i] + " " + name_trackers2[i])
+            else:
+                full_trackers.append(name_trackers2[i] + " " + name_trackers[i])
+        delite = []
+        for i in range(len(name_trackers2)):
+            if name_trackers2[i] != '' and name_trackers2[i] != ' ':
+                delite.append(name_trackers2[i])
+            # full_trackers.remove(name_trackers2[i])
+        full_trackers = [x.strip(' ') for x in full_trackers]
+        for i in range(len(delite)):
+            a = delite[i]
+            full_trackers.remove(a)
+        return render_template('page_associations.html', full_trackers=full_trackers, name_tracker = name_trackers)
 
 
 @app.route('/setvolume', methods=['GET', 'POST'])

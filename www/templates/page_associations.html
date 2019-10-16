@@ -3,50 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <title>associations</title>
+    <script src="/static/js/jquery1.8.2.min.js"></script>
+    <script src="/static/js/in_house.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/hack.js"></script>
+    <script src="/static/js/curved_text.js"></script>
+    <link rel='stylesheet prefetch' href='/static/css/roboto.css'>
+    <link rel='stylesheet prefetch' href='/static/css/font-awesome.min.css'>
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/inhouse.css?version=.01.7" rel="stylesheet">
 </head>
 <body>
-    <div id="div1" style="margin-left: 35%; display: none; position: absolute; top: 0; bottom: 0; left: 0;
-                right: 0; width: 400px; height: 200px; margin: auto;">
-        <select style="margin-left: 40px; margin-top: 5px;" name="pets" id="Front">
-            <option value="">Font</option>
-            {% for i in name_tracker %}
-                <option value="{{i}}">{{i}}</option>
-            {% endfor %}
-        </select>
-        <select  style="margin-left: 40px; margin-top: 40px;" name="pets" id="Toil">
-            <option value="">Toil</option>
-            {% for i in name_tracker %}
-                <option value="{{i}}">{{i}}</option>
-            {% endfor %}
-        </select>
-        <p></p>
-        <button style="margin-left: 45px; margin-top: 40px; background-color: white; box-shadow: 0px 2px 2px 0px #000000">Ok</button>
-        <button onmousedown="noviewDiv1()" style="margin-left: 50px; background-color: white; box-shadow: 0px 2px 2px 0px #000000">Cancel</button>
+    <div id="div1" style="margin-left: 2%; display: none; position: absolute; top: 0;  left: 0;
+                 width: 400px; height: 200px; ">
+
+        <form action="/associations" method="POST">
+            <select style="margin-left: 15px; margin-top: 5px;" name="font" id="Front">
+                {% for i in name_tracker %}
+                    <option value="{{i}}">{{i}}</option>
+                {% endfor %}
+            </select>
+            <select  style="margin-left: 40px; margin-top: 40px;" name="tail" id="Toil">
+                {% for i in name_tracker %}
+                    <option value="{{i}}">{{i}}</option>
+                {% endfor %}
+            </select>
+            <p></p>
+            <input style="margin-top: 40px; margin-left: 10px;  background-color: white; box-shadow: 0px 2px 2px 0px #000000" value="Add" type="submit">
+            <button onmousedown="noviewDiv1()" style="margin-left: 50px; background-color: white; box-shadow: 0px 2px 2px 0px #000000">Cancel</button>
+        </form>
+
     </div>
-    <div id="div2" style=" margin-right: 35%;display: none;position: absolute; top: 0; bottom: 0; left: 0;
-                right: 0; width: 300px; height: 200px; margin: auto;">
+    <div id="div2" style=" margin-left: 5%;display: none;position: absolute; top: 0;  left: 0;
+                 width: 300px; height: 200px; ">
         <p align="center" style="margin-top: 40px;">Are you sure you want to delete the association?</p>
-        <button style="margin-left: 70px; margin-top: 40px; background-color: white; box-shadow: 0px 2px 2px 0px #000000">Ok</button>
+        <button type="submit" form="main_form"  style="margin-left: 40px; margin-top: 40px; background-color: white; box-shadow: 0px 2px 2px 0px #000000">Ok</button>
         <button onmousedown="noviewDiv2()" style="margin-left: 70px; background-color: white; box-shadow: 0px 2px 2px 0px #000000">Cancel</button>
     </div>
 
-    <div id="main" style="display: block; position: absolute; top: 0; bottom: 0; left: 0;
-                right: 0; width: 600px; height: 400px; margin: auto;">
+    <div id="main" style=" margin-left: 5%; display: block; position: fixed; top: 0;  left: 0;
+                 width: 600px; height: 400px; ">
         <h1 align="center"><font size="6" face="monaco">Current associations</font></h1>
-        <div style="display: inline-block; width: 600px; height: 200px; margin: auto;
-                    background-color: white; overflow: scroll; border:2px solid black;">
-            {% for i in name_tracker %}
-                {{i}}<br>
-            {% endfor %}
-        </div>
-        <p></p>
-        <button onclick="window.location.href='/trackernames'" style="margin-left: 80px; background-color: white; box-shadow: 0px 2px 2px 0px #000000" >
-            Find new trackers...</button>
-        <button onmousedown="viewDiv1()" style="margin-left: 40px; background-color: white; box-shadow: 0px 2px 2px 0px #000000">
+            <form style=" margin-left: 25%;" id = "main_form" action="/associations" method="POST">
+                <p><select style="width: 300px;" size="7" name = "delite">
+                {% for i in full_trackers %}
+                    <option value="{{i}}">{{i}}</option>
+                {% endfor %}
+                </select></p>
+            </form>
+<!--        <button onclick="window.location.href='/trackernames'" style="margin-left: 80px; background-color: white; box-shadow: 0px 2px 2px 0px #000000" >-->
+<!--            Find new trackers...</button>-->
+        <button onmousedown="viewDiv1()" style="margin-top: 40px; margin-left: 120px; background-color: white; box-shadow: 0px 2px 2px 0px #000000">
             Add...</button>
-        <button style="margin-left: 40px; background-color: white; box-shadow: 0px 2px 2px 0px #000000">
+        <button onmousedown="viewDiv3()" style="margin-left: 40px; background-color: white; box-shadow: 0px 2px 2px 0px #000000">
             Edit...</button>
-        <button onmousedown="viewDiv2()" style="margin-left: 40px; background-color: white; box-shadow: 0px 2px 2px 0px #000000">
+        <button onmousedown="viewDiv2()"  style="margin-left: 40px; background-color: white; box-shadow: 0px 2px 2px 0px #000000">
             Delete...</button>
     </div>
     <script>
@@ -54,6 +65,10 @@
         document.getElementById("div1").style.display = "block";
         document.getElementById("main").style.display = "none";
         };
+    function viewDiv3(){
+        document.getElementById("div1").style.display = "block";
+        document.getElementById("main").style.display = "none";
+    };
     function viewDiv2(){
         document.getElementById("div2").style.display = "block";
         document.getElementById("main").style.display = "none";
