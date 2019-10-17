@@ -95,6 +95,7 @@ def add_id_trackers():
     c = connection.cursor()
     tracker_list = []
     tracker_list_temp = []
+
     if request.method == 'POST':
         if request.form['mac']:
             if request.form['mac'] != "Name Not Added Yet":
@@ -2520,6 +2521,7 @@ def bledata():
         bt_addr = request.form['bt_addr']
         avg = request.form['avg']
         room = request.form['room']
+        player_timestamp = request.form['tracker_timestamp']
         if 'packet_data' in request.form:
             packet_data = request.form['packet_data']
             properties = request.form['properties']
@@ -2556,13 +2558,19 @@ def bledata():
                 pass
 
         try:
+            # renew trackers list
             update_sql = "INSERT INTO trackers (macstat, mac, station, signal_avg, room, packet_data, properties) " \
                          "VALUES (%s, %s, %s, %s, %s, %s, %s) ON DUPLICATE KEY UPDATE " \
                          "macstat = %s, mac = %s, station = %s, signal_avg = %s, room = %s, timestamp = %s, packet_data = %s, properties = %s;"
             c.execute(update_sql, (macstat, bt_addr, station_name, avg, room, packet_data, properties, macstat,
                                    bt_addr, station_name, avg, room, timestamp, packet_data, properties))
-            insert_sql = "INSERT INTO trackers_value (mac, station, value) VALUES (%s, %s, %s);"
-            c.execute(insert_sql, (bt_addr, station_name, float(avg)))
+
+            insert_sql = "INSERT INTO trackers_value (mac, station, value, tracker_timestamp, tracker_rssi) VALUES (%s, %s, %s, %s, %s);"
+            # c.execute(insert_sql, (bt_addr, station_name, float(avg)))
+
+            player_rssi = request.form['rssi']
+            c.execute(insert_sql, (bt_addr, station_name, float(avg), player_timestamp, player_rssi))
+
             # logger.debug(update_sql % (macstat, bt_addr, station_name, avg, room, packet_data, properties, macstat,
             #                        bt_addr, station_name, avg, room, timestamp, packet_data, properties))
         except InternalError as e:
@@ -2837,8 +2845,7 @@ def removal_of_tail_elements_from_the_front(name_trackers2, full_trackers):
 
 
 # addition to association function
-def update_TrackerNames(c,  font_and_toil):
-    name_trackers3 = []
+def update_TrackerNames(c, name_trackers3, font_and_toil):
     row3 = c.execute("SELECT master_name FROM game.TrackerNames")
     for i in range(row3):
         name_trackers3.append(c.fetchone()[0])
@@ -2856,7 +2863,6 @@ def data_from_TrackerNames(c, name_column):
     for i in range(row):
         name_trackers.append(c.fetchone()[0])
     return name_trackers
-
 
 @app.route("/associations", methods=['GET', 'POST'])
 def curent_associations():
@@ -3649,6 +3655,7 @@ def compute_coef():
     p0 = (0.89976, 9, 0.111)
     popt, pcov = curve_fit(func, xdata, ydata, p0=p0, maxfev=10000)
     ak, bk, ck = popt.astype(float)
+
     sql_request = "INSERT INTO coefficient (a, b, c) VALUES (%s, %s, %s);"
     connection = data_connect()
     c = connection.cursor()

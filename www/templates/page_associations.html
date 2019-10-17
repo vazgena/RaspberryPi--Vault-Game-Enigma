@@ -29,11 +29,8 @@
             </select>
             <select  style="margin-left: 40px; margin-top: 40px;" name="tail" id="Toil">
                 {% for i in name_tracker %}
-                    {% if i != name_tracker[0] %}
-                        <option value="{{i}}">{{i}}</option>
-                    {% endif %}
+                    <option value="{{i}}">{{i}}</option>
                 {% endfor %}
-                        <option value="{{name_tracker[0]}}">{{name_tracker[0]}}</option>
             </select>
             <p></p>
             <input style="margin-top: 40px; margin-left: 10px;  background-color: white; box-shadow: 0px 2px 2px 0px #000000" value="Add" type="submit">
@@ -48,39 +45,12 @@
         <button onmousedown="noviewDiv2()" style="margin-left: 70px; background-color: white; box-shadow: 0px 2px 2px 0px #000000">Cancel</button>
     </div>
 
-    <div id="div3" style="margin-left: 2%; display: none; position: absolute; top: 0;  left: 0;
-                 width: 400px; height: 200px; ">
-
-        <form action="/associations" method="POST">
-            Front(master) - Back(slave)
-            <select style="margin-left: 15px; margin-top: 5px;" name="font" id="Front2">
-                <option id="options1" ></option>
-                {% for i in name_tracker %}
-                    <option value="{{i}}">{{i}}</option>
-                {% endfor %}
-            </select>
-            <select  style="margin-left: 40px; margin-top: 40px;" name="tail" id="Toil2">
-                <option id="options2" ></option>
-                {% for i in name_tracker %}
-                    {% if i != name_tracker[0] %}
-                        <option value="{{i}}">{{i}}</option>
-                    {% endif %}
-                {% endfor %}
-                        <option value="{{name_tracker[0]}}">{{name_tracker[0]}}</option>
-            </select>
-            <p></p>
-            <input style="margin-top: 40px; margin-left: 10px;  background-color: white; box-shadow: 0px 2px 2px 0px #000000" value="Add" type="submit">
-            <button onmousedown="noviewDiv3()" style="margin-left: 50px; background-color: white; box-shadow: 0px 2px 2px 0px #000000">Cancel</button>
-        </form>
-
-    </div>
-
     <div id="main" style=" margin-left: 5%; display: block; position: fixed; top: 0;  left: 0;
                  width: 600px; height: 400px; ">
         <h1 align="center"><font size="6" face="monaco">Current associations</font></h1>
-            <form  style=" margin-left: 25%;" id = "main_form"   action="/associations" method="POST">
+            <form style=" margin-left: 25%;" id = "main_form" action="/associations" method="POST">
                 <p>Front - Back</p>
-                <p><select style="width: 300px;" size="7" id="selectId" onchange="change()" name = "delete">
+                <p><select style="width: 300px;" size="7" name = "delite">
                 {% for i in full_trackers %}
                     <option value="{{i}}">{{i}}</option>
                 {% endfor %}
@@ -90,7 +60,7 @@
 <!--            Find new trackers...</button>-->
         <button onmousedown="viewDiv1()" style="margin-top: 40px; margin-left: 120px; background-color: white; box-shadow: 0px 2px 2px 0px #000000">
             Create...</button>
-        <button   onclick="viewDiv3()"  style="margin-left: 40px; background-color: white; box-shadow: 0px 2px 2px 0px #000000">
+        <button onmousedown="viewDiv3()" style="margin-left: 40px; background-color: white; box-shadow: 0px 2px 2px 0px #000000">
             Edit...</button>
         <button onmousedown="viewDiv2()"  style="margin-left: 40px; background-color: white; box-shadow: 0px 2px 2px 0px #000000">
             Delete...</button>
@@ -100,33 +70,20 @@
         document.getElementById("div1").style.display = "block";
         document.getElementById("main").style.display = "none";
         };
+    function viewDiv3(){
+        document.getElementById("div1").style.display = "block";
+        document.getElementById("main").style.display = "none";
+    };
     function viewDiv2(){
         document.getElementById("div2").style.display = "block";
         document.getElementById("main").style.display = "none";
-        };
-    function viewDiv3(){
-        document.getElementById("div3").style.display = "block";
-        document.getElementById("main").style.display = "none";
-
-    };
-    function change() {
-        var select = document.getElementById("selectId");
-        var value2 = select.options[select.selectedIndex].value;
-        let arr = value2.split(' ')
-        document.getElementById("options1").innerHTML = arr[0];
-        document.getElementById("options2").innerHTML = arr[1];
-    }
-
-    function noviewDiv1(){
-        document.getElementById("div1").style.display = "none";
-        document.getElementById("main").style.display = "block";
         };
     function noviewDiv2(){
         document.getElementById("div2").style.display = "none";
         document.getElementById("main").style.display = "block";
         };
-    function noviewDiv3(){
-        document.getElementById("div3").style.display = "none";
+    function noviewDiv1(){
+        document.getElementById("div1").style.display = "none";
         document.getElementById("main").style.display = "block";
         };
     </script>
