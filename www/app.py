@@ -2480,31 +2480,31 @@ def ipaddresses():
 # then stores the data to trackers
 @app.route('/bleraw', methods=['GET', 'POST'])
 def bleraw():
-    if request.method != 'POST':
-        return "mac not accepted"
+#    if request.method != 'POST':
+#        return "mac not accepted"
+#
+#    ts = time.time()
+#    station_name = request.form['station']
+#    bt_addr = request.form['bt_addr']
+#    rssi = request.form['rssi']
+#    tx_power = None
+#    if 'tx_power' in request.form:
+#        tx_power = request.form['tx_power']
+#    if tx_power is not None:
+#        tx_power = int(float(tx_power))
 
-    ts = time.time()
-    station_name = request.form['station']
-    bt_addr = request.form['bt_addr']
-    rssi = request.form['rssi']
-    tx_power = None
-    if 'tx_power' in request.form:
-        tx_power = request.form['tx_power']
-    if tx_power is not None:
-        tx_power = int(float(tx_power))
+#    room = request.form['room']
 
-    room = request.form['room']
+#    connection = data_connect()
+#    c = connection.cursor()
+#    try:
+#        insert_sql = "INSERT INTO trackers_raw(moment, rssi, tx_power, beacon_mac, room, station) " \
+#                     "VALUES (from_unixtime(%s)  ,   %s,       %s,         %s,   %s, %s) "
+#        c.execute(insert_sql, (ts, int(float(rssi)), tx_power, bt_addr, room, station_name))
+#    except Exception as e:
+#        print("Occured exception ", e)
 
-    connection = data_connect()
-    c = connection.cursor()
-    try:
-        insert_sql = "INSERT INTO trackers_raw(moment, rssi, tx_power, beacon_mac, room, station) " \
-                     "VALUES (from_unixtime(%s)  ,   %s,       %s,         %s,   %s, %s) "
-        c.execute(insert_sql, (ts, int(float(rssi)), tx_power, bt_addr, room, station_name))
-    except Exception as e:
-        print("Occured exception ", e)
-
-    connection.close()
+#    connection.close()
     return "accepted"
 
 
@@ -2520,7 +2520,7 @@ def bledata():
         bt_addr = request.form['bt_addr']
         avg = request.form['avg']
         room = request.form['room']
-        player_timestamp = request.form['tracker_timestamp']
+        # player_timestamp = request.form['tracker_timestamp']
         if 'packet_data' in request.form:
             packet_data = request.form['packet_data']
             properties = request.form['properties']
@@ -2564,15 +2564,18 @@ def bledata():
             c.execute(update_sql, (macstat, bt_addr, station_name, avg, room, packet_data, properties, macstat,
                                    bt_addr, station_name, avg, room, timestamp, packet_data, properties))
 
-            insert_sql = "INSERT INTO trackers_value (mac, station, value, tracker_timestamp, tracker_rssi) VALUES (%s, %s, %s, %s, %s);"
+            #insert_sql = "INSERT INTO trackers_value (mac, station, value, tracker_timestamp, tracker_rssi) VALUES (%s, %s, %s, %s, %s);"
+            insert_sql = "INSERT INTO trackers_value (mac, station, value) VALUES (%s, %s, %s);"
             # c.execute(insert_sql, (bt_addr, station_name, float(avg)))
 
-            player_rssi = request.form['rssi']
-            c.execute(insert_sql, (bt_addr, station_name, float(avg), player_timestamp, player_rssi))
+            # player_rssi = request.form['rssi']
+            # player_timestamp = request.form['tracker_timestamp']
+            #c.execute(insert_sql, (bt_addr, station_name, float(avg), player_timestamp, player_rssi))
+            c.execute(insert_sql, (bt_addr, station_name, float(avg)))
 
             # logger.debug(update_sql % (macstat, bt_addr, station_name, avg, room, packet_data, properties, macstat,
             #                        bt_addr, station_name, avg, room, timestamp, packet_data, properties))
-        except InternalError as e:
+        except BaseException as e:
             # TODO: add log error
             pass
         connection.close()
@@ -2879,7 +2882,7 @@ def curent_associations():
                 name_trackers.pop(i - sum)
                 sum = sum + 1
         for i in name_trackers2:
-            if i != "" and i != " ":
+            if i != "" and i != " " and i in name_trackers:
                 name_trackers.remove(i)
         row2 = c.execute("SELECT " + "master_name" + " FROM game.TrackerNames")
         name_trackers5 = data_from_TrackerNames(c, "name")

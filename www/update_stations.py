@@ -15,7 +15,7 @@ jobs = []
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
 # NAME_SCRIPT = ["playerTracking.py", "ipadress.py", 'color_local.py', 'startup.py']
-NAME_SCRIPT = ["playerTracking.py"]
+NAME_SCRIPT = ["startup.py"]
 
 
 # database connection

@@ -24,6 +24,6 @@ def startprgm(i):
     else:
         pass
 
-for i in range(4):
+for i in range(3):
     t = Thread(target=startprgm, args=(i,))
     t.start()
