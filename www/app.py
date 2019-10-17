@@ -2845,7 +2845,8 @@ def removal_of_tail_elements_from_the_front(name_trackers2, full_trackers):
 
 
 # addition to association function
-def update_TrackerNames(c, name_trackers3, font_and_toil):
+def update_TrackerNames(c,  font_and_toil):
+    name_trackers3 = []
     row3 = c.execute("SELECT master_name FROM game.TrackerNames")
     for i in range(row3):
         name_trackers3.append(c.fetchone()[0])
@@ -2863,6 +2864,7 @@ def data_from_TrackerNames(c, name_column):
     for i in range(row):
         name_trackers.append(c.fetchone()[0])
     return name_trackers
+
 
 @app.route("/associations", methods=['GET', 'POST'])
 def curent_associations():
