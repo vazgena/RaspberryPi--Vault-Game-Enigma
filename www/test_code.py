@@ -216,10 +216,95 @@ def test_trilateration():
                     pass
 
 
+def test_beacons_pair():
+    init_locations()
+    n_step = 60
+    k = 1.1
+
+    # for Gaussian distribution
+    mu = 0  # unbiased
+    sigma = 2  # ft.
+    dx = 0.3  # ft. bias of back beacon
+
+    macs = ["80:7d:3a:b7:70:ee", "30:ae:a4:27:ff:36"]
+
+    # mySQL work presets
+    connection = data_connect()
+    c = connection.cursor()
+    insert_trackers_value_sql = "INSERT INTO trackers_value " \
+                 "(mac, station, value, tracker_timestamp) " \
+                 "VALUES " \
+                 "(%s, %s, %s, %s), " \
+                 "(%s, %s, %s, %s);"
+    update_trackers_sql = "INSERT INTO trackers (macstat, mac, station, signal_avg, room) " \
+                          "VALUES (%s, %s, %s, %s, %s) "\
+                          "ON DUPLICATE KEY UPDATE " \
+                          "macstat = %s, mac = %s, station = %s, signal_avg = %s, room = %s, timestamp = %s;"
+
+    while True:
+        # room = choice((1, 2))  # uniform!
+        room = 1
+        time_start = time.time()
+        locations = locations_room[room]['locations']
+
+        # room coordinates
+        x_min = 0
+        y_min = 0
+        x_max = locations.max(axis=0)[0]
+        y_max = locations.max(axis=0)[1]
+        x_mid = (x_min + x_max) / 2
+        y_mid = (y_min + y_max) / 2
+
+        # use unbiased Gaussian distribution
+        x = np.random.normal(mu, sigma, 2) + x_mid
+        y = np.random.normal(mu, sigma, 2) + y_mid
+
+        point1 = np.array([[x[0], y[0]]])
+        point2 = np.array([[x[1] + dx, y[1]]])
+        print(point1, point2)
+
+        dists1 = cdist(point1, locations)[0, :]
+        dists2 = cdist(point2, locations)[0, :]
+
+        min_dist_i_1 = np.argmin(dists1)
+        min_dist_i_2 = np.argmin(dists2)
+
+        print("Front beacon: " + locations_room[room]['stations'][min_dist_i_1], dists1[min_dist_i_1])
+        print("Back beacon: " + locations_room[room]['stations'][min_dist_i_2], dists2[min_dist_i_2])
+
+        while time_start + n_step > time.time():
+            for i, dist1, dist2 in zip(range(len(dists1)), dists1, dists2):
+                try:
+                    avg1 = float(dist1*k)
+                    avg2 = float(dist2*k)
+
+                    station = locations_room[room]['stations'][i]
+                    ts = time.time()
+                    tracker_timestamp = datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
+
+                    # renew trackers list
+                    # front
+                    macstat = str(macs[0]) + "," + str(station)
+                    c.execute(update_trackers_sql, (macstat, macs[0], station, avg1, room,
+                                                    macstat, macs[0], station, avg1, room, tracker_timestamp))
+                    # back
+                    macstat = str(macs[1]) + "," + str(station)
+                    c.execute(update_trackers_sql, (macstat, macs[1], station, avg2, room, macstat,
+                                                    macs[1], station, avg2, room, tracker_timestamp))
+
+                    # trackers_value
+                    c.execute(insert_trackers_value_sql,
+                              (macs[0], station, avg1, tracker_timestamp,  # front (C1)
+                               macs[1], station, avg2, tracker_timestamp))  # back (C2)
+                except Exception as e:
+                    print('test_beacons_pair(): ' + str(e))
+                    # pass
+        c.fetchall()
 
 
 if __name__ == "__main__":
     # test_audio_volume()
     # test_fake_bomb()
     # test_track_log()
-    test_trilateration()
+    # test_trilateration()
+    test_beacons_pair()

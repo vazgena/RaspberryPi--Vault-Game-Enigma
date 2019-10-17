@@ -161,8 +161,15 @@ def new_loop():
 			mean_value = mean_values[j, n_2]
 			location = mac_map[mac][j]
 
-			mac_mean_value[mac] = mean_value
-			mac_location[mac] = location
+			if mac in mac_mean_value:  # filled by slave!
+				mean_value_slave = mac_mean_value[mac]
+				if mean_value_slave > mean_value:
+					mac_mean_value[mac] = mean_value
+					mac_location[mac] = location
+			else:
+				mac_mean_value[mac] = mean_value
+				mac_location[mac] = location
+
 		except:
 			pass
 
@@ -190,17 +197,26 @@ def new_loop():
 
 				# get master data
 				# location_master = mac_location[mac_master] -- station name
-				mean_value_master = mac_mean_value[mac_master]
+				if mac_master in mac_mean_value:
+					mean_value_master = mac_mean_value[mac_master]
+					if mean_value_slave < mean_value_master:
+						mac_mean_value[mac_master] = mean_value_slave
+						mac_location[mac_master] = location_slave
+				else:
+					mac_mean_value[mac_master] = mean_value_slave
+					mac_location[mac_master] = location_slave
 
 				# update master
 				# mac_location[mac_master] = location_slave if (location_slave < location_master) else location_master
-				mac_location.pop(mac_slave, None)
-				mac_mean_value[mac_master] = mean_value_slave if (mean_value_slave < mean_value_master) else mean_value_master
-				mac_mean_value.pop(mac_slave, None)
+				# mac_location.pop(mac_slave, None)
+				# mac_mean_value[mac_master] = mean_value_slave if (mean_value_slave < mean_value_master) else mean_value_master
+				# mac_mean_value.pop(mac_slave, None)
 
 				# remove slave
 				# mac_map_new.pop(mac_slave, None)
-				mac_map.pop(mac_slave, None)
+				# mac_map.pop(mac_slave, None)
+
+				continue  # no work for slave
 		except:
 			pass
 	# !!!END OF INJECTION!!!

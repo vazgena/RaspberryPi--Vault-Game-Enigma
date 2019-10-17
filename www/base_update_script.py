@@ -265,6 +265,16 @@ def update_16_10_2019():
 
     connection.close()
 
+def update_17_10_2019():
+    connection = data_connect()
+    con = connection.cursor()
+
+    # trackers heap fixes
+    query = "ALTER TABLE TrackerNames MODIFY master_name varchar(300)"
+    con.execute(query)
+
+    connection.close()
+
 def update_24_07_2019_2():
     connection = data_connect()
     con = connection.cursor()
@@ -498,5 +508,6 @@ if __name__ == "__main__":
     # create_table_coef()
     # update_11_10_2019()
     update_16_10_2019()
+    update_17_10_2019()
     pass
 

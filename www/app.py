@@ -284,6 +284,14 @@ def player_check_vault():
                            "WHERE playerLocation.mac = TrackerNames.mac AND " \
                            "TrackerNames.master_name = '' " \
                            "ORDER BY playerLocation.mac DESC"
+        get_slaves_sql = "SELECT master_name, name FROM playerLocation, TrackerNames " \
+                           "WHERE playerLocation.mac = TrackerNames.mac AND " \
+                           "TrackerNames.master_name <> '' " \
+                           "ORDER BY playerLocation.mac DESC"
+
+        c.execute(get_slaves_sql)
+        get_slaves_location = dict(c.fetchall())
+
         c.execute(get_location_sql)
         get_location = list(c.fetchall())
         for l in get_location:
@@ -299,6 +307,8 @@ def player_check_vault():
                 get_name_list = list(c.fetchall())
                 for i in get_name_list:
                     mac_sql = i[0]
+                    if get_slaves_location and (not get_slaves_location[mac_sql] is None):
+                        mac_sql += ' (paired with {0})'.format(get_slaves_location[mac_sql])
                 location = l[2]
                 ble_signal = l[3]
                 inner_location.append(mac_sql)
