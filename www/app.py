@@ -5,6 +5,7 @@
 
 
 # imports
+import json
 import os
 import re
 import time
@@ -2892,6 +2893,8 @@ def curent_associations():
             else:
                 full_trackers.append(name_trackers2[i] + " " + name_trackers5[i])
         full_trackers = removal_of_tail_elements_from_the_front(name_trackers2, full_trackers)
+        full_trackers = sorted(full_trackers)
+        full_trackers.sort(key=lambda s: len(s.split()), reverse=True)
         return render_template('page_associations.html', full_trackers=full_trackers, name_tracker=name_trackers)
     if request.method == "POST":
         font_and_toil = request.form
@@ -2902,10 +2905,7 @@ def curent_associations():
                 flag = 0
             else:
                 flag = 1
-        if "delete" in font_and_toil:
-            split_font_and_tail = font_and_toil["delete"].split()
-            if len(split_font_and_tail) == 2:
-                c.execute("UPDATE game.TrackerNames SET master_name = ' ' WHERE name= '" + split_font_and_tail[1] + "';")
+
         name_trackers = data_from_TrackerNames(c, "name")
         name_trackers2 = data_from_TrackerNames(c, "master_name")
         sum = 0
@@ -2924,7 +2924,15 @@ def curent_associations():
             else:
                 full_trackers.append(name_trackers2[i] + " " + name_trackers5[i])
         full_trackers = removal_of_tail_elements_from_the_front(name_trackers2, full_trackers)
-
+        if "delete" in font_and_toil:
+            split_font_and_tail = font_and_toil["delete"].split()
+            if len(split_font_and_tail) == 2:
+                c.execute("UPDATE game.TrackerNames SET master_name = ' ' WHERE name= '" + split_font_and_tail[1] + "';")
+                c.close()
+                return json.dumps({"":""})
+        c.close()
+        full_trackers = sorted(full_trackers)
+        full_trackers.sort(key=lambda s: len(s.split()) ,reverse=True)
         return render_template('page_associations.html', full_trackers=full_trackers, name_tracker=name_trackers,
                                flag=flag)
 
