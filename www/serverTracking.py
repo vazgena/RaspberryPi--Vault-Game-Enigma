@@ -131,14 +131,26 @@ def get_playrers(c):
     return dict_players
 
 
-def tracker_participation(dict_players, tracker):
+def tracker_participation2(dict_players, tracker):
     tracker_participation = False
+    num = 0
     for i in dict_players.values():
         if tracker in i:
-            tracker_participation = True
+            tracker_participation = [list(dict_players.keys())[num], True]
         else:
-            pass
+            num += num
     return tracker_participation
+
+
+def station_synchronization(mac_map, dict_players, tracker_participation):
+    common_stations = []
+    trackers = dict_players[tracker_participation[0]]
+    station1 = set(mac_map[trackers[0]])
+    station2 = set(mac_map[trackers[1]])
+    station2.update(station1)
+    for station in station2:
+        common_stations.append(station)
+    return common_stations
 
 
 def new_loop():
@@ -164,7 +176,9 @@ def new_loop():
     mac_location = {}
     mac_mean_value = {}
     test_dict = {}
-    dict_station_and_distance = {}
+    list_location = []
+    mac_location = {}
+    list_station_and_distance = []
     for mac in mac_map:
         try:
             value_array = np.zeros((len(mac_map[mac]), n))
@@ -179,78 +193,51 @@ def new_loop():
                     value_array[i, :] = MISC_VALUE
                     continue
                 value_array[i, :] = values
-                dict_station_and_distance[station] = min(values)
+                list_station_and_distance.append(min(values))
+                list_location.append(station)
 
-            test_dict[mac] = dict_station_and_distance
+            test_dict[mac] = list_station_and_distance
+            mac_location[mac] = list_location
             dict_station_and_distance = {}
             mean_values = scipy.signal.medfilt(value_array, kernel_size=(1, n))
             j = np.argmin(mean_values[:, n_2])
             mean_value = mean_values[j, n_2]
             location = mac_map[mac][j]
 
-            if mac in mac_mean_value:  # filled by slave!
-                mean_value_slave = mac_mean_value[mac]
-                if mean_value_slave > mean_value:
-                    mac_mean_value[mac] = mean_value
-                    mac_location[mac] = location
-            else:
-                mac_mean_value[mac] = mean_value
-                mac_location[mac] = location
-
+            # if mac in mac_mean_value:  # filled by slave!
+            #     mean_value_slave = mac_mean_value[mac]
+            #     if mean_value_slave > mean_value:
+            #         mac_mean_value[mac] = mean_value
+            #         mac_location[mac] = location
+            # else:
+            #     mac_mean_value[mac] = mean_value
+            #     mac_location[mac] = location
         except:
             pass
+
 
         # !!!INJECTION!!!
         # Keep only one tracker from heap. Store only minimal value of distance!
         # mac_map_new = copy.deepcopy(mac_map)
-    print()
-    for mac in mac_map:
+    dict_players = get_playrers(c)
+    for mac in dict_players.values():
         try:
-            sql_query_minimal = "SELECT * FROM TrackerNames WHERE mac=%s;"
-            c.execute(sql_query_minimal, mac)
-            listed_result = list(c.fetchall())[0]  # mac is unique!
-            if listed_result[4] != ' ':  # is slave tracker
-
-                # slave data
-                mac_slave = mac
-                location_slave = mac_location[mac_slave]
-                mean_value_slave = mac_mean_value[mac_slave]
-
-                # get master for current slave
-                name_master = listed_result[4]
-                sql_master_query = "SELECT mac FROM TrackerNames WHERE name=%s;"
-                c.execute(sql_master_query, name_master)
-                listed_mac = list(c.fetchall())
-                mac_master = listed_mac[0][0]
-
-                # get master data
-                # location_master = mac_location[mac_master] -- station name
-                if mac_master in mac_mean_value:
-                    mean_value_master = mac_mean_value[mac_master]
-                    if mean_value_slave < mean_value_master:
-                        mac_mean_value[mac_master] = mean_value_slave
-                        mac_location[mac_master] = location_slave
+            master_data = test_dict[mac[0]]
+            slave_data = test_dict[mac[1]]
+            for i in len(master_data):
+                if master_data[i] > slave_data[i]:
+                    master_data[i] = slave_data[i]
                 else:
-                    mac_mean_value[mac_master] = mean_value_slave
-                    mac_location[mac_master] = location_slave
-                print()
-                # update master
-                # mac_location[mac_master] = location_slave if (location_slave < location_master) else location_master
-                # mac_location.pop(mac_slave, None)
-                # mac_mean_value[mac_master] = mean_value_slave if (mean_value_slave < mean_value_master) else mean_value_master
-                # mac_mean_value.pop(mac_slave, None)
+                    pass
 
-                # remove slave
-                # mac_map_new.pop(mac_slave, None)
-                # mac_map.pop(mac_slave, None)
-
-                continue  # no work for slave
         except:
             pass
         # !!!END OF INJECTION!!!
-
+    # dict_players = get_playrers(c)
+    # tracker_participation = tracker_participation2(dict_players, "ec:fe:7e:00:03:9f")
+    # common_stations = station_synchronization(mac_map, dict_players, tracker_participation)
         # Here are only MASTER trackers!!! Not any slave!
-    for mac in mac_map:
+    for mac in dict_players.values():
         # print(mac)
         try:
             location = mac_location[mac]
