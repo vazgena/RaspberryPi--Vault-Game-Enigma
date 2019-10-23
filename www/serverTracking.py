@@ -117,6 +117,30 @@ def loop():
     connection.close()
 
 
+def get_playrers(c):
+    # find out which paired trackers are participating in the game
+    get_players = "SELECT * from game.TrackerNames where master_name != ' ';"
+    c.execute(get_players)
+    listed_players = list(c.fetchall())
+    num = 1
+    dict_players = {}
+    for player in listed_players:
+        c.execute("SELECT mac from game.TrackerNames where name = %s", player[4])
+        dict_players["Player {0}".format(num)] = [c.fetchall()[0][0], player[1]]
+        num += num
+    return dict_players
+
+
+def tracker_participation(dict_players, tracker):
+    tracker_participation = False
+    for i in dict_players.values():
+        if tracker in i:
+            tracker_participation = True
+        else:
+            pass
+    return tracker_participation
+
+
 def new_loop():
     # get temporary list of worked trackers (need running app.py) !!!
     connection = dataconnect()
@@ -137,10 +161,10 @@ def new_loop():
             continue
         mac_map[mac].append(station)
 
-    test_array = np.zeros((40, n))
     mac_location = {}
     mac_mean_value = {}
-    num = 0
+    test_dict = {}
+    dict_station_and_distance = {}
     for mac in mac_map:
         try:
             value_array = np.zeros((len(mac_map[mac]), n))
@@ -155,9 +179,10 @@ def new_loop():
                     value_array[i, :] = MISC_VALUE
                     continue
                 value_array[i, :] = values
-                test_array[num, :] = values
-                num = num + 1
+                dict_station_and_distance[station] = min(values)
 
+            test_dict[mac] = dict_station_and_distance
+            dict_station_and_distance = {}
             mean_values = scipy.signal.medfilt(value_array, kernel_size=(1, n))
             j = np.argmin(mean_values[:, n_2])
             mean_value = mean_values[j, n_2]
@@ -178,7 +203,7 @@ def new_loop():
         # !!!INJECTION!!!
         # Keep only one tracker from heap. Store only minimal value of distance!
         # mac_map_new = copy.deepcopy(mac_map)
-    test_array = np.zeros((40, n))
+    print()
     for mac in mac_map:
         try:
             sql_query_minimal = "SELECT * FROM TrackerNames WHERE mac=%s;"
@@ -301,6 +326,7 @@ def new_loop():
                                                 mac, location, mean_value_str))
         except:
             pass
+    test_dict = {}
     delta_time = datetime.now() - timedelta(minutes=1)
     if not debug:
         sql_request_remove = "DELETE FROM trackers_value WHERE timestamp < %s;"
