@@ -16,7 +16,7 @@ n = 3
 n_2 = -2  # int(np.floor(n/2)) #
 triangulate = True
 debug = False
-TOP_STATION = 3
+TOP_STATION = None
 
 locations_room = {}
 bounds_room = {}
@@ -118,28 +118,21 @@ def loop():
 
 
 def get_playrers(c):
-    # find out which paired trackers are participating in the game
-    get_players = "SELECT * from game.TrackerNames where master_name != ' ';"
+    get_players = "SELECT mac, master_name, name from game.TrackerNames;"
     c.execute(get_players)
     listed_players = list(c.fetchall())
-    num = 1
     dict_players = {}
+    master_players = {}
     for player in listed_players:
-        c.execute("SELECT mac from game.TrackerNames where name = %s", player[4])
-        dict_players["Player {0}".format(num)] = [c.fetchall()[0][0], player[1]]
-        num += num
-    return dict_players
-
-
-def tracker_participation2(dict_players, tracker):
-    tracker_participation = False
-    num = 0
-    for i in dict_players.values():
-        if tracker in i:
-            tracker_participation = [list(dict_players.keys())[num], True]
+        if player[1] in ['', ' '] or player[1] == player[2]:
+            master_name = player[2]
+            master_players[player[2]] = player[0]
         else:
-            num += num
-    return tracker_participation
+            master_name = player[1]
+        if master_name not in dict_players:
+            dict_players[master_name] = list()
+        dict_players[master_name].append(player[0])
+    return dict_players, master_players
 
 
 def station_synchronization(mac_map, dict_players, tracker_participation):
@@ -175,13 +168,11 @@ def new_loop():
 
     mac_location = {}
     mac_mean_value = {}
-    test_dict = {}
-    list_location = []
-    mac_location = {}
-    list_station_and_distance = []
     for mac in mac_map:
         try:
+            list_location = []
             value_array = np.zeros((len(mac_map[mac]), n))
+            good_station_index = []
             for i, station in enumerate(mac_map[mac]):
                 if station in ['BMB1', 'BMB2']:
                     continue
@@ -192,56 +183,47 @@ def new_loop():
                 if len(values) < n:
                     value_array[i, :] = MISC_VALUE
                     continue
+                good_station_index.append(i)
                 value_array[i, :] = values
-                list_station_and_distance.append(min(values))
-                list_location.append(station)
-
-            test_dict[mac] = list_station_and_distance
+            # TODO: remove misc
+            list_location = [mac_map[mac][i] for i in good_station_index]
+            value_array = value_array[good_station_index, :]
             mac_location[mac] = list_location
             dict_station_and_distance = {}
             mean_values = scipy.signal.medfilt(value_array, kernel_size=(1, n))
-            j = np.argmin(mean_values[:, n_2])
-            mean_value = mean_values[j, n_2]
-            location = mac_map[mac][j]
-
-            # if mac in mac_mean_value:  # filled by slave!
-            #     mean_value_slave = mac_mean_value[mac]
-            #     if mean_value_slave > mean_value:
-            #         mac_mean_value[mac] = mean_value
-            #         mac_location[mac] = location
-            # else:
-            #     mac_mean_value[mac] = mean_value
-            #     mac_location[mac] = location
+            mac_mean_value[mac] = mean_values[:, n_2]
         except:
             pass
 
+    players_location = {}
+    players_mean_value = {}
+    players, master_players = get_playrers(c)
+    set_mac = set(mac_map.keys())
+    for player in players:
+        # TODO: mergee distance
+        set_location = set()
+        player_mac = list(set_mac.intersection(players[player]))
+        for mac in player_mac:
+            set_location.update(mac_location[mac])
+        players_location[player] = list(set_location)
+        if len(set_location) == 0 or len(player_mac) == 0:
+            continue
+        player_mean_value = np.zeros((len(players_location[player]), len(player_mac)))*np.nan
+        for j, mac in enumerate(player_mac):
+            for n_value, station in enumerate(mac_location[mac]):
+                i = players_location[player].index(station)
+                player_mean_value[i, j] = mac_mean_value[mac][n_value]
 
-        # !!!INJECTION!!!
-        # Keep only one tracker from heap. Store only minimal value of distance!
-        # mac_map_new = copy.deepcopy(mac_map)
-    dict_players = get_playrers(c)
-    for mac in dict_players.values():
-        try:
-            master_data = test_dict[mac[0]]
-            slave_data = test_dict[mac[1]]
-            for i in len(master_data):
-                if master_data[i] > slave_data[i]:
-                    master_data[i] = slave_data[i]
-                else:
-                    pass
+        mean_values = np.nanmin(player_mean_value, axis=1)
+        players_mean_value[player] = mean_values
 
-        except:
-            pass
-        # !!!END OF INJECTION!!!
-    # dict_players = get_playrers(c)
-    # tracker_participation = tracker_participation2(dict_players, "ec:fe:7e:00:03:9f")
-    # common_stations = station_synchronization(mac_map, dict_players, tracker_participation)
-        # Here are only MASTER trackers!!! Not any slave!
-    for mac in dict_players.values():
-        # print(mac)
         try:
-            location = mac_location[mac]
-            mean_value = mac_mean_value[mac]
+            locations = players_location[player]
+            mean_values = players_mean_value[player]
+
+            j = np.nanargmin(mean_values)
+            mean_value = mean_values[j]
+            location = locations[j]
 
             if triangulate:  # trilateration!
                 location_first = location
@@ -258,9 +240,7 @@ def new_loop():
                 indexs_locs = []
                 for i, loc in enumerate(stat):
                     try:
-                        index_dist = mac_map[mac].index(loc)
-                        if value_array[index_dist, -1] == MISC_VALUE:
-                            continue
+                        index_dist = locations.index(loc)
                         indexs_locs.append(i)
                         indexs_dist.append(index_dist)
                     except:
@@ -269,7 +249,7 @@ def new_loop():
                 if not indexs_locs:
                     continue
 
-                dist_select = mean_values[indexs_dist, n_2]
+                dist_select = mean_values[indexs_dist]
                 locs_select = locs[indexs_locs]
 
                 # Select top station
@@ -303,17 +283,18 @@ def new_loop():
             bmb_check = "SELECT * FROM ignorePlayerList WHERE mac = %s;"
             # TODO: check location/mac
             # c.execute(bmb_check, mac)
+
+            mac = master_players[player]
             c.execute(bmb_check, location)
             row_count = c.rowcount
             if row_count == 0:
                 insert_location_sql = "INSERT INTO playerLocation (mac, location, bleSignal) " \
                                       "VALUES (%s,%s,%s) ON DUPLICATE KEY " \
-                                      "UPDATE mac = %s, location = %s, bleSignal = %s";
+                                      "UPDATE mac = %s, location = %s, bleSignal = %s;"
                 c.execute(insert_location_sql, (mac, location, mean_value_str,
                                                 mac, location, mean_value_str))
         except:
             pass
-    test_dict = {}
     delta_time = datetime.now() - timedelta(minutes=1)
     if not debug:
         sql_request_remove = "DELETE FROM trackers_value WHERE timestamp < %s;"
