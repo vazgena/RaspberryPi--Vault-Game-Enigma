@@ -1,0 +1,111 @@
+{% block body %}
+
+<script src="/static/js/jquery1.8.2.min.js"></script>
+<script src="/static/js/plotly.min.js"></script>
+
+<link rel='stylesheet prefetch' href='/static/css/roboto.css'>
+<link rel='stylesheet prefetch' href='/static/css/font-awesome.min.css'>
+<link href="/static/css/bootstrap.min.css" rel="stylesheet">
+<link href="/static/css/inhouse.css?version=.01.7" rel="stylesheet">
+
+<style>
+    .circle{
+        width: 20px;
+        height: 20px;
+        position: absolute;
+        background-color: #00FF00;
+        border-radius: 25px;
+        margin: 8px 8px;
+    }
+</style>
+
+<body>
+    <p>CPU: <b><span id="cpu"></span> % <span id="indicator1" class="circle"></span></b></p>
+    <p>Memory: <b><span id="used_memory"></span></b> / <b><span id="total_memory"></span> Mb</b> <b><span id="indicator2" class="circle"></span></b></p>
+    <p>SWAP: <b><span id="used_swap_memory"></span></b> / <b><span id="total_swap_memory"></span> Mb</b> <b><span id="indicator3" class="circle"></span></b></p>
+    <form onsubmit="return false" action="" method="post">
+      Information updates every <input id="seconds" type="text" name="name" value="{{ i }}"> second <br>
+      <input type="submit" value="Update" onclick="update()">
+    </form>
+
+    <div class="wrapper">
+        <div id="chart"></div>
+    </div>
+
+</body>
+<head>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
+    <script type="text/javascript" charset="utf-8">
+            var second = 1;
+            var intervalID = 0;
+            var count = 0;
+            var socket = io();
+
+            document.getElementById("seconds").defaultValue = "1";
+            intervalManager(true, update_state, 1000);
+
+            function update(){
+                second = document.getElementById("seconds").value;
+                intervalManager(false);
+                intervalManager(true, update_state, parseFloat(second) * 1000);
+            }
+
+            function update_state(){
+                socket.emit('check_state', {});
+            }
+
+            function getData() {
+                return Math.random();
+            }
+
+            {#Plotly.plot('chart', [{
+                y:[getData()],
+                type:'line'
+            }]);#}
+
+            function intervalManager(flag, animate, time) {
+               if(flag)
+                 intervalID =  setInterval(animate, time);
+               else
+                 clearInterval(intervalID);
+            }
+
+            function indicatorColor(stat){
+                var res = 0;
+                if (stat <= 50){
+                    res = (Math.round((stat /  50) * 255)).toString(16);
+                    return '#' + res.toString() + 'ff00';
+                }
+                else{
+                    res = (255 - Math.round(((stat - 50) / 50) * 255)).toString(16);
+                    return '#ff' + res.toString() + '00';
+                }
+            }
+
+            socket.on('state', function(stats) {
+                $('#cpu').text(stats.cpu);
+                $('#total_memory').text(stats.total_memory);
+                $('#used_memory').text(stats.used_memory);
+                $('#total_swap_memory').text(stats.total_swap_memory);
+                $('#used_swap_memory').text(stats.used_swap_memory);
+                var mem_percent = stats.used_memory / stats.total_memory * 100;
+                console.log(Math.round(mem_percent));
+                var swap_percent = stats.used_swap_memory / stats.total_swap_memory * 100;
+                console.log(Math.round(swap_percent));
+                $('#indicator1').css('background-color', indicatorColor(stats.cpu));
+                $('#indicator2').css('background-color', indicatorColor(mem_percent));
+                $('#indicator3').css('background-color', indicatorColor(swap_percent));
+                {#Plotly.extendTraces('chart', {y: [[getData()]]}, [0]);
+                count++;
+                if (count > 50){
+                    Plotly.relayout('chart', {
+                        xaxis: {
+                            range: [count - 50, count]
+                        }
+                    });
+                }#}
+            });
+    </script>
+</head>
+
+{% endblock %}

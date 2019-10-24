@@ -13,6 +13,7 @@ import time
 from datetime import datetime, timedelta
 import logging
 import logging.config
+import psutil
 from flask import Flask, render_template, redirect, url_for, request, send_from_directory
 from pymysql import InternalError, connect
 from random import choice, sample
@@ -287,8 +288,8 @@ def player_check_vault():
                            "TrackerNames.master_name = '' " \
                            "ORDER BY playerLocation.mac DESC"
         get_slaves_sql = "SELECT master_name, name FROM playerLocation, TrackerNames " \
-                           "WHERE playerLocation.mac = TrackerNames.mac AND " \
-                           "TrackerNames.master_name <> ''"
+                         "WHERE playerLocation.mac = TrackerNames.mac AND " \
+                         "TrackerNames.master_name <> ''"
 
         c.execute(get_slaves_sql)
         get_slaves_location = dict(c.fetchall())
@@ -1722,8 +1723,7 @@ def mine_this(app_id):
                                        bw_list=bw_list, br_list=br_list, color_list=color_list,
                                        color_selected_list=color_selected_list)
 
-    # station_list_sql = 'SELECT * FROM stationList WHERE room = %s;'
-    station_list_sql = 'SELECT * FROM stationList WHERE room = %s AND is_visible = TRUE;'
+    station_list_sql = 'SELECT * FROM stationList WHERE room = %s;'
     c.execute(station_list_sql, room)
     station_list = list(c.fetchall())
     for i in station_list:
@@ -2481,31 +2481,31 @@ def ipaddresses():
 # then stores the data to trackers
 @app.route('/bleraw', methods=['GET', 'POST'])
 def bleraw():
-#    if request.method != 'POST':
-#        return "mac not accepted"
-#
-#    ts = time.time()
-#    station_name = request.form['station']
-#    bt_addr = request.form['bt_addr']
-#    rssi = request.form['rssi']
-#    tx_power = None
-#    if 'tx_power' in request.form:
-#        tx_power = request.form['tx_power']
-#    if tx_power is not None:
-#        tx_power = int(float(tx_power))
+    #    if request.method != 'POST':
+    #        return "mac not accepted"
+    #
+    #    ts = time.time()
+    #    station_name = request.form['station']
+    #    bt_addr = request.form['bt_addr']
+    #    rssi = request.form['rssi']
+    #    tx_power = None
+    #    if 'tx_power' in request.form:
+    #        tx_power = request.form['tx_power']
+    #    if tx_power is not None:
+    #        tx_power = int(float(tx_power))
 
-#    room = request.form['room']
+    #    room = request.form['room']
 
-#    connection = data_connect()
-#    c = connection.cursor()
-#    try:
-#        insert_sql = "INSERT INTO trackers_raw(moment, rssi, tx_power, beacon_mac, room, station) " \
-#                     "VALUES (from_unixtime(%s)  ,   %s,       %s,         %s,   %s, %s) "
-#        c.execute(insert_sql, (ts, int(float(rssi)), tx_power, bt_addr, room, station_name))
-#    except Exception as e:
-#        print("Occured exception ", e)
+    #    connection = data_connect()
+    #    c = connection.cursor()
+    #    try:
+    #        insert_sql = "INSERT INTO trackers_raw(moment, rssi, tx_power, beacon_mac, room, station) " \
+    #                     "VALUES (from_unixtime(%s)  ,   %s,       %s,         %s,   %s, %s) "
+    #        c.execute(insert_sql, (ts, int(float(rssi)), tx_power, bt_addr, room, station_name))
+    #    except Exception as e:
+    #        print("Occured exception ", e)
 
-#    connection.close()
+    #    connection.close()
     return "accepted"
 
 
@@ -2565,13 +2565,13 @@ def bledata():
             c.execute(update_sql, (macstat, bt_addr, station_name, avg, room, packet_data, properties, macstat,
                                    bt_addr, station_name, avg, room, timestamp, packet_data, properties))
 
-            #insert_sql = "INSERT INTO trackers_value (mac, station, value, tracker_timestamp, tracker_rssi) VALUES (%s, %s, %s, %s, %s);"
+            # insert_sql = "INSERT INTO trackers_value (mac, station, value, tracker_timestamp, tracker_rssi) VALUES (%s, %s, %s, %s, %s);"
             insert_sql = "INSERT INTO trackers_value (mac, station, value) VALUES (%s, %s, %s);"
             # c.execute(insert_sql, (bt_addr, station_name, float(avg)))
 
             # player_rssi = request.form['rssi']
             # player_timestamp = request.form['tracker_timestamp']
-            #c.execute(insert_sql, (bt_addr, station_name, float(avg), player_timestamp, player_rssi))
+            # c.execute(insert_sql, (bt_addr, station_name, float(avg), player_timestamp, player_rssi))
             c.execute(insert_sql, (bt_addr, station_name, float(avg)))
 
             # logger.debug(update_sql % (macstat, bt_addr, station_name, avg, room, packet_data, properties, macstat,
@@ -2834,21 +2834,7 @@ def defenses_template(app_id):
 
 
 # addition to association function
-def removal_of_tail_elements_from_the_front(name_trackers2, full_trackers):
-    delite = []
-    for i in range(len(name_trackers2)):
-        if name_trackers2[i] != '' and name_trackers2[i] != ' ':
-            delite.append(name_trackers2[i])
-    full_trackers = [x.strip(' ') for x in full_trackers]
-    for i in range(len(delite)):
-        a = delite[i]
-        full_trackers.remove(a)
-
-    return full_trackers
-
-
-# addition to association function
-def update_TrackerNames(c,  font_and_toil):
+def update_TrackerNames(c, font_and_toil):
     name_trackers3 = []
     row3 = c.execute("SELECT master_name FROM game.TrackerNames")
     for i in range(row3):
@@ -2861,43 +2847,21 @@ def update_TrackerNames(c,  font_and_toil):
                   "' WHERE name= '" + font_and_toil["tail"] + "';")
 
 
-def data_from_TrackerNames(c, name_column):
-    name_trackers = []
-    row = c.execute("SELECT " + name_column + " FROM game.TrackerNames")
-    for i in range(row):
-        name_trackers.append(c.fetchone()[0])
-    return name_trackers
-
-
 @app.route("/associations", methods=['GET', 'POST'])
 def curent_associations():
     connection = data_connect()
     c = connection.cursor()
-    full_trackers = []
-    if request.method == 'GET':
-        name_trackers = data_from_TrackerNames(c, "name")
-        name_trackers2 = data_from_TrackerNames(c, "master_name")
-        sum = 0
-        for i in range(len(name_trackers2)):
-            if name_trackers2[i] != "" and name_trackers2[i] != " ":
-                name_trackers.pop(i - sum)
-                sum = sum + 1
-        for i in name_trackers2:
-            if i != "" and i != " " and i in name_trackers:
-                name_trackers.remove(i)
-        row2 = c.execute("SELECT " + "master_name" + " FROM game.TrackerNames")
-        name_trackers5 = data_from_TrackerNames(c, "name")
-        for i in range(row2):
-            if name_trackers2[i] == '':
-                full_trackers.append(name_trackers5[i] + " " + name_trackers2[i])
-            else:
-                full_trackers.append(name_trackers2[i] + " " + name_trackers5[i])
-        full_trackers = removal_of_tail_elements_from_the_front(name_trackers2, full_trackers)
-        full_trackers = sorted(full_trackers)
-        full_trackers.sort(key=lambda s: len(s.split()), reverse=True)
-        return render_template('page_associations.html', full_trackers=full_trackers, name_tracker=name_trackers)
+    flag = 0
     if request.method == "POST":
         font_and_toil = request.form
+        if "delete" in font_and_toil:
+            split_font_and_tail = font_and_toil["delete"].split()
+            if len(split_font_and_tail) == 2:
+                c.execute(
+                    "UPDATE game.TrackerNames SET master_name = ' ' WHERE name= '" + split_font_and_tail[1] + "';")
+                c.close()
+                return json.dumps({"": ""})
+
         flag = 0
         if "font" in font_and_toil:
             if font_and_toil["tail"] != font_and_toil["font"]:
@@ -2906,35 +2870,25 @@ def curent_associations():
             else:
                 flag = 1
 
-        name_trackers = data_from_TrackerNames(c, "name")
-        name_trackers2 = data_from_TrackerNames(c, "master_name")
-        sum = 0
-        for i in range(len(name_trackers2)):
-            if name_trackers2[i] != "" and name_trackers2[i] != " ":
-                name_trackers.pop(i - sum)
-                sum = sum + 1
-        for i in name_trackers2:
-            if i != "" and i != " ":
-                name_trackers.remove(i)
-        name_trackers5 = data_from_TrackerNames(c, "name")
-        row2 = c.execute("SELECT " + "master_name" + " FROM game.TrackerNames")
-        for i in range(row2):
-            if name_trackers2[i] == '':
-                full_trackers.append(name_trackers5[i] + " " + name_trackers2[i])
-            else:
-                full_trackers.append(name_trackers2[i] + " " + name_trackers5[i])
-        full_trackers = removal_of_tail_elements_from_the_front(name_trackers2, full_trackers)
-        if "delete" in font_and_toil:
-            split_font_and_tail = font_and_toil["delete"].split()
-            if len(split_font_and_tail) == 2:
-                c.execute("UPDATE game.TrackerNames SET master_name = ' ' WHERE name= '" + split_font_and_tail[1] + "';")
-                c.close()
-                return json.dumps({"":""})
-        c.close()
-        full_trackers = sorted(full_trackers)
-        full_trackers.sort(key=lambda s: len(s.split()) ,reverse=True)
-        return render_template('page_associations.html', full_trackers=full_trackers, name_tracker=name_trackers,
-                               flag=flag)
+    c.execute("SELECT name FROM game.TrackerNames;")
+    name_trackers = [row[0] for row in c.fetchall()]
+    c.execute("SELECT master_name FROM game.TrackerNames;")
+    name_trackers2 = [row[0] for row in c.fetchall()]
+
+    used_trackers = set()
+    row_trackers = []
+    for name, master_name in zip(name_trackers, name_trackers2):
+        if master_name not in ['', ' ']:
+            used_trackers.add(name)
+            used_trackers.add(master_name)
+            row_trackers.append(' '.join([master_name, name]))
+    free_trackers = list(set(name_trackers).difference(used_trackers))
+    row_trackers += free_trackers
+    c.close()
+    row_trackers = sorted(row_trackers)
+    row_trackers.sort(key=lambda s: len(s.split()), reverse=True)
+    return render_template('page_associations.html', full_trackers=row_trackers, name_tracker=free_trackers,
+                           flag=flag)
 
 
 @app.route('/setvolume', methods=['GET', 'POST'])
@@ -2948,6 +2902,35 @@ def save_volume():
         c.execute(update_sql, (volume, station))
         connection.close()
     return ""
+
+
+@app.route('/stationstate', methods=['GET', 'POST'])
+def station_state():
+    return render_template('stationStates.html')
+
+
+@socketio.on('check_state')
+def check_cpu(data):
+    megabyte = 1024 * 1024
+    connection = data_connect()
+    c = connection.cursor()
+
+    memory = psutil.virtual_memory()
+    total_memory = float('{:.2f}'.format(memory.total / megabyte))
+    used_memory = float('{:.2f}'.format(memory.used / megabyte))
+    swap_memory = psutil.swap_memory()
+    total_swap = float('{:.2f}'.format(swap_memory.total / megabyte))
+    used_swap = float('{:.2f}'.format(swap_memory.used / megabyte))
+    percent = psutil.cpu_percent(interval=1)
+    sql_request = "INSERT INTO station_states (name, type, total, used, update_time) VALUES (%s, %s, %s, %s, %s)"
+    c.execute(sql_request, ("TEST1", "memory", total_memory, used_memory, datetime.now()))
+    c.execute(sql_request, ("TEST1", "cpu", 100, percent, datetime.now()))
+    c.execute(sql_request, ("TEST1", "swap memory", total_swap, used_swap, datetime.now()))
+    sql_request_remove = "DELETE FROM station_states WHERE update_time < DATE_SUB(NOW(), INTERVAL 2 DAY);"
+    c.execute(sql_request_remove)
+    connection.close()
+    emit('state', {'total_memory': float(total_memory), 'used_memory': float(used_memory), 'cpu': float(percent),
+                   'total_swap_memory': float(total_swap), 'used_swap_memory': float(used_swap)})
 
 
 # @app.route('/blecalibration', methods=['GET', 'POST'])
