@@ -481,6 +481,25 @@ def create_table_coef():
     connection.close()
 
 
+def create_table_station_states():
+    connection = data_connect()
+    con = connection.cursor()
+
+    sql_command = """
+    CREATE TABLE `station_states` (
+                      `id` INT(20) NOT NULL AUTO_INCREMENT,
+                      `name` VARCHAR(20) NOT NULL,
+                      `type` VARCHAR(45) NOT NULL,
+                      `total` FLOAT NOT NULL,
+                      `used` FLOAT NOT NULL,
+                      `update_time` TIMESTAMP NOT NULL,
+                      PRIMARY KEY (`id`));
+    """
+
+    con.execute(sql_command)
+    connection.close()
+
+
 
 if __name__ == "__main__":
 
@@ -507,7 +526,8 @@ if __name__ == "__main__":
     # create_table_distance()
     # create_table_coef()
     # update_11_10_2019()
-    update_16_10_2019()
-    update_17_10_2019()
+    # update_16_10_2019()
+    # update_17_10_2019()
+    create_table_station_states()
     pass
 
