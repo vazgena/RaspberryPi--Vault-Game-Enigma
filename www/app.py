@@ -287,9 +287,8 @@ def player_check_vault():
                            "WHERE playerLocation.mac = TrackerNames.mac AND " \
                            "TrackerNames.master_name = '' " \
                            "ORDER BY playerLocation.mac DESC"
-        get_slaves_sql = "SELECT master_name, name FROM playerLocation, TrackerNames " \
-                         "WHERE playerLocation.mac = TrackerNames.mac AND " \
-                         "TrackerNames.master_name <> ''"
+        get_slaves_sql = "SELECT master_name, name FROM TrackerNames " \
+                         "WHERE TrackerNames.master_name <> '';"
 
         c.execute(get_slaves_sql)
         get_slaves_location = dict(c.fetchall())
@@ -1723,7 +1722,8 @@ def mine_this(app_id):
                                        bw_list=bw_list, br_list=br_list, color_list=color_list,
                                        color_selected_list=color_selected_list)
 
-    station_list_sql = 'SELECT * FROM stationList WHERE room = %s;'
+    # station_list_sql = 'SELECT * FROM stationList WHERE room = %s;'
+    station_list_sql = 'SELECT * FROM stationList WHERE room = %s AND is_visible = TRUE;'
     c.execute(station_list_sql, room)
     station_list = list(c.fetchall())
     for i in station_list:
@@ -2841,7 +2841,7 @@ def update_TrackerNames(c, font_and_toil):
         name_trackers3.append(c.fetchone()[0])
     if "tail" in font_and_toil:
         if font_and_toil["font"] in name_trackers3:
-            c.execute("UPDATE game.TrackerNames SET master_name = ' ' WHERE master_name= '" + font_and_toil[
+            c.execute("UPDATE game.TrackerNames SET master_name = '' WHERE master_name= '" + font_and_toil[
                 "font"] + "';")
         c.execute("UPDATE game.TrackerNames SET master_name = '" + font_and_toil["font"] +
                   "' WHERE name= '" + font_and_toil["tail"] + "';")
@@ -2858,7 +2858,7 @@ def curent_associations():
             split_font_and_tail = font_and_toil["delete"].split()
             if len(split_font_and_tail) == 2:
                 c.execute(
-                    "UPDATE game.TrackerNames SET master_name = ' ' WHERE name= '" + split_font_and_tail[1] + "';")
+                    "UPDATE game.TrackerNames SET master_name = '' WHERE name= '" + split_font_and_tail[1] + "';")
                 c.close()
                 return json.dumps({"": ""})
 
