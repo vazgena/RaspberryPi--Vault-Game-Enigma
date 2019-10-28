@@ -500,6 +500,18 @@ def create_table_station_states():
     connection.close()
 
 
+#  2019_10_28
+def add_calibration_datatime_field():
+    connection = data_connect()
+    con = connection.cursor()
+
+    sql_command = """
+    ALTER TABLE `tracker_calibration` 
+    ADD COLUMN `calibration_datetime` DATETIME NULL AFTER `tx_power`;
+    """
+
+    con.execute(sql_command)
+    connection.close()
 
 if __name__ == "__main__":
 
@@ -528,6 +540,7 @@ if __name__ == "__main__":
     # update_11_10_2019()
     # update_16_10_2019()
     # update_17_10_2019()
-    create_table_station_states()
+    # create_table_station_states()
+    add_calibration_datatime_field()
     pass
 
