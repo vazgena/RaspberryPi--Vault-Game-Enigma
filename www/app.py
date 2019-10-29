@@ -14,7 +14,7 @@ from datetime import datetime, timedelta
 import logging
 import logging.config
 import psutil
-from flask import Flask, render_template, redirect, url_for, request, send_from_directory
+from flask import Flask, render_template, redirect, url_for, request, send_from_directory, jsonify
 from pymysql import InternalError, connect
 from random import choice, sample
 
@@ -2889,6 +2889,51 @@ def curent_associations():
     row_trackers.sort(key=lambda s: len(s.split()), reverse=True)
     return render_template('page_associations.html', full_trackers=row_trackers, name_tracker=free_trackers,
                            flag=flag)
+
+
+@app.route("/calibration_info", methods=['GET', 'POST'])
+def calibration_info():
+    connection = data_connect()
+    c = connection.cursor()
+    if request.method == "POST":
+        selected_tracker = request.form
+        c.execute("SELECT mac FROM game.TrackerNames where name = %s;", selected_tracker["value"])
+        mac_selected_tracker = c.fetchall()
+        if mac_selected_tracker:
+            mac_selected_tracker = mac_selected_tracker[0][0]
+        else:
+            mac_selected_tracker = None
+        c.execute("SELECT tx_power, station, calibration_datetime FROM game.tracker_calibration where mac = %s;", mac_selected_tracker)
+        tx_power_selected_tracker = c.fetchall()
+        if tx_power_selected_tracker:
+            station_selected_tracker = tx_power_selected_tracker[0][1]
+            calibration_datetime = tx_power_selected_tracker[0][2]
+            if not calibration_datetime:
+                calibration_datetime = "None"
+            tx_power_selected_tracker = round(tx_power_selected_tracker[0][0], 2)
+            room_station = station_selected_tracker[-1]
+        else:
+            tx_power_selected_tracker = "None"
+            station_selected_tracker = "None"
+            room_station = "None"
+            calibration_datetime = "None"
+        c.execute("SELECT nameSpelled FROM game.stationList where name = %s;", station_selected_tracker)
+        name_spelled_station = c.fetchall()
+        if name_spelled_station:
+            name_spelled_station = name_spelled_station[0][0]
+        else:
+            name_spelled_station = "None"
+        if not tx_power_selected_tracker:
+            tx_power_selected_tracker = "None"
+        c.close()
+        return jsonify({"tx_power_selected_tracker": tx_power_selected_tracker, "room_station": room_station,
+                        "name_spelled_station": name_spelled_station, "calibration_datetime" : calibration_datetime})
+
+    c.execute("SELECT name FROM game.TrackerNames;")
+    all_trackers = [row[0] for row in c.fetchall()]
+    sort_trackers = sorted(all_trackers)
+    c.close()
+    return render_template('page_calibration_info.html', trackers=sort_trackers)
 
 
 @app.route('/setvolume', methods=['GET', 'POST'])
