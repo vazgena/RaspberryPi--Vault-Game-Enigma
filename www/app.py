@@ -2903,31 +2903,29 @@ def calibration_info():
             mac_selected_tracker = mac_selected_tracker[0][0]
         else:
             mac_selected_tracker = None
-        c.execute("SELECT tx_power, station, calibration_datetime FROM game.tracker_calibration where mac = %s;", mac_selected_tracker)
+        c.execute("SELECT tx_power, station, calibration_datetime FROM game.tracker_calibration where mac = %s;",
+                  mac_selected_tracker)
         tx_power_selected_tracker = c.fetchall()
+        tx_power_selected_trackers = []
+        room_stations = []
+        calibration_datetime = []
+        name_spelled_stations = []
         if tx_power_selected_tracker:
-            station_selected_tracker = tx_power_selected_tracker[0][1]
-            calibration_datetime = tx_power_selected_tracker[0][2]
-            if not calibration_datetime:
-                calibration_datetime = "None"
-            tx_power_selected_tracker = round(tx_power_selected_tracker[0][0], 2)
-            room_station = station_selected_tracker[-1]
+            for data in tx_power_selected_tracker:
+                c.execute("SELECT nameSpelled FROM game.stationList where name = %s;", data[1])
+                name_spelled_station = c.fetchall()[0][0]
+                name_spelled_stations.append(name_spelled_station)
+                tx_power_selected_trackers.append(round(data[0], 2))
+                room_stations.append(data[1][-1])
+                calibration_datetime.append(data[2])
         else:
-            tx_power_selected_tracker = "None"
-            station_selected_tracker = "None"
-            room_station = "None"
-            calibration_datetime = "None"
-        c.execute("SELECT nameSpelled FROM game.stationList where name = %s;", station_selected_tracker)
-        name_spelled_station = c.fetchall()
-        if name_spelled_station:
-            name_spelled_station = name_spelled_station[0][0]
-        else:
-            name_spelled_station = "None"
-        if not tx_power_selected_tracker:
-            tx_power_selected_tracker = "None"
+            tx_power_selected_trackers.append("None")
+            room_stations.append("None")
+            calibration_datetime.append("None")
+            name_spelled_stations.append("None")
         c.close()
-        return jsonify({"tx_power_selected_tracker": tx_power_selected_tracker, "room_station": room_station,
-                        "name_spelled_station": name_spelled_station, "calibration_datetime" : calibration_datetime})
+        return jsonify({"tx_power_selected_tracker": tx_power_selected_trackers, "room_station": room_stations,
+                        "name_spelled_station": name_spelled_stations, "calibration_datetime": calibration_datetime})
 
     c.execute("SELECT name FROM game.TrackerNames;")
     all_trackers = [row[0] for row in c.fetchall()]
