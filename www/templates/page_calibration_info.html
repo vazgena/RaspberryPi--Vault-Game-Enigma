@@ -29,23 +29,11 @@
 
 </div>
 
-<div id="tail" style="margin-top: 300px;  top: 0;  left: 0;
+<div id="wrap" style="margin-top: 300px;  top: 0;  left: 0;
                  width: 750px; height: 300px; ">
 
-    <table style="width: 100%;  margin-top: 8%; margin-left: 45px; table-layout: fixed;">
-        <tr>
-            <th>Name</th>
-            <th>Room</th>
-            <th>Tx power</th>
-            <th>Calibration datetime</th>
-        </tr>
-        <tr>
-            <th id = "name_spelled_station"></th>
-            <th id = "room_station"></th>
-            <th id = "tx_power_selected_tracker"></th>
-            <th id = "calibration_datetime"></th>
-        </tr>
-    </table>
+		        <table style="width: 100%;  margin-top: 8%; margin-left: 45px; table-layout: fixed;" id="table"></table>
+
 
 </div>
 <script>
@@ -60,16 +48,29 @@
                 data: {
                     'value': value_select
                 },
-                success: function(data) {
-                        var name_spelled_station = data["name_spelled_station"]
-                        document.getElementById("name_spelled_station").innerHTML = name_spelled_station;
-                        var room_station = data["room_station"]
-                        document.getElementById("room_station").innerHTML = room_station;
+                success: function generateTable(data){
+                        var count_row = data["tx_power_selected_tracker"].length;
+                        var table = '<table class="simple-little-table">';
                         var tx_power_selected_tracker = data["tx_power_selected_tracker"]
-                        document.getElementById("tx_power_selected_tracker").innerHTML = tx_power_selected_tracker;
+                        var room_station = data["room_station"]
+                        var name_spelled_station = data["name_spelled_station"]
                         var calibration_datetime = data["calibration_datetime"]
-                        document.getElementById("calibration_datetime").innerHTML = calibration_datetime;
-
+                        table += '<tr>';
+                        table += '<td>Name</td>';
+                        table += '<td>room</td>';
+                        table += '<td>tx</td>';
+                        table += '<td>datatime</td>';
+                        table += '</tr>';
+                        for( var i = 0; i < count_row; i++ ){
+                            table += '<tr>';
+                                table += '<td>' + name_spelled_station[i] +  '</td>';
+                                table += '<td>' + room_station[i] +'</td>';
+                                table += '<td>' + tx_power_selected_tracker[i] +'</td>';
+                                table += '<td>' + calibration_datetime[i] +'</td>';
+                            table += '</tr>';
+                        }
+                        table += '</table>';
+                        document.getElementById('table').innerHTML = table;
                     }
             });
     }
