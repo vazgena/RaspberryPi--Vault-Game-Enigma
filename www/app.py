@@ -3527,11 +3527,11 @@ def handle_calibration(message):
 
     if message.get('save_value', False) and new_val is not None and new_val != current_val:
         sql_request = """
-        UPDATE tracker_calibration SET tx_power=%s calibration_time=NOW() WHERE mac=%s AND station=%s;
+        UPDATE tracker_calibration SET tx_power=%s, calibration_datetime=NOW() WHERE mac=%s AND station=%s;
         """
         result = c.execute(sql_request, (new_val, mac, station))
         if result == 0:
-            sql_request = "INSERT INTO tracker_calibration (mac, station, tx_power, calibration_time) VALUES (%s, %s, %s, NOW());"
+            sql_request = "INSERT INTO tracker_calibration (mac, station, tx_power, calibration_datetime) VALUES (%s, %s, %s, NOW());"
             c.execute(sql_request, (mac, station, new_val))
         rssi_buffer[station][mac] = new_val
         connection.close()
