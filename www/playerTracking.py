@@ -12,7 +12,7 @@ import sys
 import asyncio
 #import math
 #import numpy as np
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time
 from statistics import median_high, mode
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -103,6 +103,7 @@ def callback(bt_addr, rssi, packet, properties):
         power_str = power_match.group(0)
         power_val = float(power_str)
         rssi_val = float(rssi)
+        tracker_timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
 
         if rssi_val > -1:
             return
@@ -131,9 +132,8 @@ def callback(bt_addr, rssi, packet, properties):
         distance = None
         #distance = computeDistance(power_val, rssi_window)
 
-
-        if "gamine" in packet_expanded:
-        # if True:
+        #if "gamine" in packet_expanded:  # production!!!
+        if True:  # for local testing only!!!
             try:
                 if len(bleData[bt_addr]) >= howManyIterations:
                     data = {'station': station,
@@ -145,6 +145,7 @@ def callback(bt_addr, rssi, packet, properties):
                             'rssi': float(rssi),
                             'rssi_window': rssi_window,
                             'rssi_filter': rssi_filter,
+                            'tracker_timestamp': tracker_timestamp,
                             }
                     asyncio.run_coroutine_threadsafe(run_execute(requests.post, url=address, data=data), loop)
 

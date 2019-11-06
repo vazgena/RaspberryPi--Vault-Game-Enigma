@@ -10,7 +10,7 @@ html,body{
 #full-size{
   height:100%;
   width:100%;
-  overflow:hidden; /* or overflow:auto; if you want scrollbars */
+  overflow: hidden; /* or overflow:auto; if you want scrollbars */
 }
 
 

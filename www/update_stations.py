@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 
 
 # variables
+production = True
 dbuser = 'game'
 dbpass = 'h95d3T7SXFta'
 station_name = ""
@@ -14,8 +15,10 @@ jobs = []
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
+# UPDATE LIST!!!
 # NAME_SCRIPT = ["playerTracking.py", "ipadress.py", 'color_local.py', 'startup.py']
-NAME_SCRIPT = ["startup.py"]
+# NAME_SCRIPT = ["startup.py"]
+NAME_SCRIPT = ["playerTracking.py"]
 
 
 # database connection
@@ -43,13 +46,23 @@ def scp_update_file(file_name, ip, password='1qaz2wsx', read_folder=BASE_DIR, re
 
 
 def main():
-    ip_list = list(get_station_ip())
-    #ip_list = ['192.168.2.200']
+
+    if production:
+        ip_list = list(get_station_ip())
+    else:
+        ip_list = ['192.168.2.60']
+
     for file_name in NAME_SCRIPT:
+        print(file_name)
         for ip in ip_list:
+            print(ip)
             try:
-                # scp_update_file(file_name, ip, 'raspberry')
-                scp_update_file(file_name, ip)
+                if production:
+                    scp_update_file(file_name, ip)  # production!!!
+                else:
+                    scp_update_file(file_name, ip, 'raspberry')  # for local testing stations only!!!
+                print("Done!")
+
             except BaseException as e:
                 print(e)
 
