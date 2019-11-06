@@ -150,7 +150,11 @@ def new_loop():
     # get temporary list of worked trackers (need running app.py) !!!
     connection = dataconnect()
     c = connection.cursor()
-    get_locations = "SELECT mac, station FROM trackers;"
+    get_locations = "SELECT trackers.mac, trackers.station " \
+                    "FROM trackers " \
+                    "LEFT JOIN TrackerNames " \
+                    "ON trackers.mac = TrackerNames.mac " \
+                    "where not isnull(TrackerNames.name);"
 
     c.execute(get_locations)
     listed_trackers = list(c.fetchall())
