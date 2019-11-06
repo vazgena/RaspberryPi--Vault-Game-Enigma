@@ -53,12 +53,15 @@ def main():
         ip_list = ['192.168.2.60']
 
     for file_name in NAME_SCRIPT:
+        print(file_name)
         for ip in ip_list:
+            print(ip)
             try:
                 if production:
                     scp_update_file(file_name, ip)  # production!!!
                 else:
                     scp_update_file(file_name, ip, 'raspberry')  # for local testing stations only!!!
+                print("Done!")
 
             except BaseException as e:
                 print(e)
