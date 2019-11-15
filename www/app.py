@@ -148,7 +148,7 @@ def add_id_trackers():
 
 
 # Template for adding tracker names
-@app.route('/trackertemplate')
+@app.route('/trackertemplate', methods=['GET', 'POST'])
 def tracker_template():
     return render_template("trackerstemplate.html")
 
@@ -3516,7 +3516,7 @@ def handle_calibration(message):
     connection = data_connect()
     c = connection.cursor()
 
-    sql_get_new_valibrate = "SELECT * FROM temp_calibration WHERE station=%s AND mac = %s ORDER BY timestamp DESC LIMIT 1;"
+    sql_get_new_valibrate = "SELECT * FROM temp_calibration WHERE station=%s AND mac = %s ORDER BY timestamp DESC;"
     c.execute(sql_get_new_valibrate, (station, mac))
     result = list(c.fetchall())
 
