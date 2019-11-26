@@ -36,7 +36,7 @@ address = "http://10.255.1.254:8080/bledata"
 logging.basicConfig(filename='playerTracking.log',
                     filemode='a',
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-logging.info('Logger was configured...')
+logging.warning('Logger was configured...')
 
 
 async def run_execute(function, *args, **kwargs):
@@ -172,11 +172,11 @@ def callback(bt_addr, rssi, packet, properties):
 
 if __name__ == "__main__":
 
-    logging.info('Start playerTracking')
+    logging.error('Start playerTracking')
     try:
         scanner = BeaconScanner(callback)
         scanner.start()
-        logging.info('Scanner was started')
+        logging.error('Scanner was started')
 
         if sys.platform == 'win32':
             loop = asyncio.ProactorEventLoop()
@@ -191,8 +191,8 @@ if __name__ == "__main__":
             # pass
 
         scanner.stop()
-        logging.info('Scanner was stopped')
+        logging.error('Scanner was stopped')
 
     except ModuleNotFoundError as e:
-        logging.error("Scanner error", exc_info=True)
+        logging.exception("Scanner error")
 
