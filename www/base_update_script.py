@@ -513,6 +513,21 @@ def add_calibration_datatime_field():
     con.execute(sql_command)
     connection.close()
 
+
+# 2019_11_21
+def add_rssi_field():
+    connection = data_connect()
+    con = connection.cursor()
+
+    sql_command = """
+    ALTER TABLE `trackers_value` 
+    ADD COLUMN `rssi` float(53) not NULL;
+    """
+
+    con.execute(sql_command)
+    connection.close()
+
+
 if __name__ == "__main__":
 
     # update_09_07_2019()
@@ -541,6 +556,8 @@ if __name__ == "__main__":
     # update_16_10_2019()
     # update_17_10_2019()
     # create_table_station_states()
-    add_calibration_datatime_field()
+#    add_calibration_datatime_field()
+    add_rssi_field()
+
     pass
 
