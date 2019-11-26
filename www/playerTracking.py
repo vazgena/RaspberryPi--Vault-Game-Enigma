@@ -16,7 +16,6 @@ from datetime import datetime, timedelta, time
 from statistics import median_high, mode
 
 import logging
-import logging.config
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -34,26 +33,16 @@ loop = None
 address = "http://10.255.1.254:8080/bledata"
 # address = "http://192.168.2.183:8080/bledata"
 
-logger = logging.getLogger(__name__)
+logging.basicConfig(filename='playerTracking.log',
+                    filemode='a',
+                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logging.info('Logger was configured...')
 
 
 async def run_execute(function, *args, **kwargs):
     loop = asyncio.get_event_loop()
     result = await loop.run_in_executor(None, lambda pars, kwpars: function(*pars, **kwpars), args, kwargs)
     return result
-
-
-def set_logger_file():
-    log_dir = "./log"
-    if not os.path.exists(log_dir):
-        os.mkdir(log_dir)
-
-    logger.basicConfig(filename='playerTracking.log',
-                       filemode='a',
-                       level=getattr(logging, "DEBUG"),
-                       format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    logging.config.fileConfig('logging.conf')
-    logger.setLevel(logging.DEBUG)
 
 
 # def computeDistance(txPower, rssi):
@@ -169,32 +158,41 @@ def callback(bt_addr, rssi, packet, properties):
                     # bleData.pop(bt_addr, None)
             except BaseException as e:
                 # bleData.pop(bt_addr, None)
-                logger.error('requests.post - bt_addr: {0}, for station: {1}, rssi: {2}', bt_addr, station, rssi)
-                logger.error(str(e))
+                logging.error('requests.post - bt_addr: {0}, for station: {1}, rssi: {2}', bt_addr, station, rssi)
+                logging.exception("Exception: ")
                 print(e)
         else:
             pass
     except BaseException as e:
-        logger.error('Try callback - packet_expanded: {0} for bt_addr: {1}, rssi: {2}', packet_expanded, bt_addr, rssi)
-        logger.error(str(e))
+        logging.error('Try callback - packet_expanded: {0} for bt_addr: {1}, rssi: {2}', packet_expanded, bt_addr, rssi)
+        logging.exception("Exception: ")
 
         print(e)
 
 
 if __name__ == "__main__":
 
-    scanner = BeaconScanner(callback)
-    scanner.start()
-
-    if sys.platform == 'win32':
-        loop = asyncio.ProactorEventLoop()
-        asyncio.set_event_loop(loop)
-    else:
-        loop = asyncio.get_event_loop()
-
+    logging.info('Start playerTracking')
     try:
-        loop.run_forever()
-    except KeyboardInterrupt:
-        pass
+        scanner = BeaconScanner(callback)
+        scanner.start()
+        logging.info('Scanner was started')
 
-    scanner.stop()
+        if sys.platform == 'win32':
+            loop = asyncio.ProactorEventLoop()
+            asyncio.set_event_loop(loop)
+        else:
+            loop = asyncio.get_event_loop()
+
+        try:
+            loop.run_forever()
+        except KeyboardInterrupt as e:
+            logging.exception("Exception: ")
+            # pass
+
+        scanner.stop()
+        logging.info('Scanner was stopped')
+
+    except ModuleNotFoundError as e:
+        logging.error("Scanner error", exc_info=True)
+
