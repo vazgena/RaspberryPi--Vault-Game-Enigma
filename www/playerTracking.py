@@ -15,6 +15,9 @@ import asyncio
 from datetime import datetime, timedelta, time
 from statistics import median_high, mode
 
+import logging
+import logging.config
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 if BASE_DIR not in sys.path:
@@ -31,11 +34,26 @@ loop = None
 address = "http://10.255.1.254:8080/bledata"
 # address = "http://192.168.2.183:8080/bledata"
 
+logger = logging.getLogger(__name__)
+
 
 async def run_execute(function, *args, **kwargs):
     loop = asyncio.get_event_loop()
     result = await loop.run_in_executor(None, lambda pars, kwpars: function(*pars, **kwpars), args, kwargs)
     return result
+
+
+def set_logger_file():
+    log_dir = "./log"
+    if not os.path.exists(log_dir):
+        os.mkdir(log_dir)
+
+    logger.basicConfig(filename='playerTracking.log',
+                       filemode='a',
+                       level=getattr(logging, "DEBUG"),
+                       format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    logging.config.fileConfig('logging.conf')
+    logger.setLevel(logging.DEBUG)
 
 
 # def computeDistance(txPower, rssi):
@@ -91,7 +109,6 @@ class KalmanFilter:
         self.check_time()
         filter_x = self.iter_filter(x)
         return filter_x
-
 
 
 def callback(bt_addr, rssi, packet, properties):
@@ -152,10 +169,15 @@ def callback(bt_addr, rssi, packet, properties):
                     # bleData.pop(bt_addr, None)
             except BaseException as e:
                 # bleData.pop(bt_addr, None)
+                logger.error('requests.post - bt_addr: {0}, for station: {1}, rssi: {2}', bt_addr, station, rssi)
+                logger.error(str(e))
                 print(e)
         else:
             pass
     except BaseException as e:
+        logger.error('Try callback - packet_expanded: {0} for bt_addr: {1}, rssi: {2}', packet_expanded, bt_addr, rssi)
+        logger.error(str(e))
+
         print(e)
 
 
