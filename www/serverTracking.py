@@ -299,7 +299,8 @@ def new_loop():
                                                 mac, location, mean_value_str))
         except:
             pass
-    delta_time = datetime.now() - timedelta(minutes=1)
+#    delta_time = datetime.now() - timedelta(minutes=1)
+    delta_time = datetime.now() - timedelta(minutes=3)
     if not debug:
         sql_request_remove = "DELETE FROM trackers_value WHERE timestamp < %s;"
         c.execute(sql_request_remove, delta_time)
