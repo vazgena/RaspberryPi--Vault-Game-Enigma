@@ -2567,18 +2567,19 @@ def bledata():
                                    bt_addr, station_name, avg, room, timestamp, packet_data, properties))
 
             # insert_sql = "INSERT INTO trackers_value (mac, station, value, tracker_timestamp, tracker_rssi) VALUES (%s, %s, %s, %s, %s);"
-            insert_sql = "INSERT INTO trackers_value (mac, station, value) VALUES (%s, %s, %s);"
+            insert_sql = "INSERT INTO trackers_value (mac, station, value, rssi) VALUES (%s, %s, %s, %s);"
             # c.execute(insert_sql, (bt_addr, station_name, float(avg)))
 
-            # player_rssi = request.form['rssi']
+            player_rssi = request.form['rssi']
             # player_timestamp = request.form['tracker_timestamp']
             # c.execute(insert_sql, (bt_addr, station_name, float(avg), player_timestamp, player_rssi))
-            c.execute(insert_sql, (bt_addr, station_name, float(avg)))
+            c.execute(insert_sql, (bt_addr, station_name, float(avg), player_rssi))
 
             # logger.debug(update_sql % (macstat, bt_addr, station_name, avg, room, packet_data, properties, macstat,
             #                        bt_addr, station_name, avg, room, timestamp, packet_data, properties))
         except BaseException as e:
             # TODO: add log error
+            print(e)
             pass
         connection.close()
         return "mac accepted"
