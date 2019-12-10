@@ -287,7 +287,8 @@ def player_check_vault():
         get_location_sql = "SELECT * FROM playerLocation, TrackerNames " \
                            "WHERE playerLocation.mac = TrackerNames.mac AND " \
                            "TrackerNames.master_name = '' " \
-                           "ORDER BY playerLocation.mac DESC"
+                           "ORDER BY TrackerNames.name"
+                           # "ORDER BY playerLocation.mac DESC"
         get_slaves_sql = "SELECT master_name, name FROM TrackerNames " \
                          "WHERE TrackerNames.master_name <> '';"
 
