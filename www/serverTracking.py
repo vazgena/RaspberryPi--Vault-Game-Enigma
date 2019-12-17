@@ -289,7 +289,8 @@ def new_loop():
             # c.execute(bmb_check, mac)
 
             mac = master_players[player]
-            c.execute(bmb_check, location)
+            # c.execute(bmb_check, location)
+            c.execute(bmb_check, mac)
             row_count = c.rowcount
             if row_count == 0:
                 insert_location_sql = "INSERT INTO playerLocation (mac, location, bleSignal) " \
