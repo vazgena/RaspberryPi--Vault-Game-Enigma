@@ -10,7 +10,6 @@ import copy
 dbuser = 'game'
 dbpass = 'h95d3T7SXFta'
 
-# smoothing window size
 n = 3
 # target value, counting from the end. affects lag, -2 recommended
 n_2 = -2  # int(np.floor(n/2)) #
@@ -150,68 +149,37 @@ def new_loop():
     # get temporary list of worked trackers (need running app.py) !!!
     connection = dataconnect()
     c = connection.cursor()
-    get_locations = "SELECT trackers.mac, trackers.station " \
-                    "FROM trackers " \
-                    "LEFT JOIN TrackerNames " \
-                    "ON trackers.mac = TrackerNames.mac " \
-                    "where not isnull(TrackerNames.name) AND trackers.station NOT IN ('BMB1', 'BMB2');"
-
-    c.execute(get_locations)
+    get_score = "SELECT trackers.mac, trackers.station, avg(trackers_value.value) as avg_, avg(trackers_value.rssi) " \
+                "FROM trackers LEFT JOIN TrackerNames ON trackers.mac = TrackerNames.mac, trackers_value " \
+                "where not isnull(TrackerNames.name) AND trackers.station NOT IN ('BMB1', 'BMB2') " \
+                "and trackers_value.mac=trackers.mac " \
+                "and trackers_value.station=trackers.station " \
+                "group by trackers.mac, trackers.station " \
+                "having avg_ > -90;" 
+    #c.execute(get_locations)
+    c.execute(get_score)
     listed_trackers = list(c.fetchall())
 
     mac_map = {}
+    mac_mean_value = {}
     for k in listed_trackers:  # all trackers!!!
         mac = k[0]
         station = k[1]
-        # if mac not in mac_map:
-        #     mac_map[mac] = []
-        # if station in ['BMB1', 'BMB2']:
-        #     continue
-        mac_map[mac].append(station)
+        avg_value = float(k[2])
+        if mac not in mac_map:
+            mac_map[mac] = []
+            mac_mean_value[mac] = []
 
-    mac_location = {}
-    mac_mean_value = {}
-    mac_mean_rssi = {}
-    for mac in mac_map:
-        try:
-            # list_location = []
-            value_array = np.zeros((len(mac_map[mac]), n))
-            rssi_array = np.zeros((len(mac_map[mac]), n))
-            good_station_index = []
-            for i, station in enumerate(mac_map[mac]):
-                # if station in ['BMB1', 'BMB2']:
-                #     continue
-                sql_query = "SELECT value, rssi FROM trackers_value " \
-                            "WHERE mac=%s AND station=%s " \
-                            "ORDER BY timestamp DESC LIMIT %s;"
-                c.execute(sql_query, (mac, station, n))
-                listed_value = list(c.fetchall())
-                values = [value[0] for value in listed_value]
-                rssi = [value[1] for value in listed_value]
-                if len(values) < n:
-                    value_array[i, :] = MISC_VALUE
-                    continue
-                good_station_index.append(i)
-                value_array[i, :] = values
-                rssi_array[i, :] = rssi
-            # TODO: remove misc
-            list_location = [mac_map[mac][i] for i in good_station_index]
-            value_array = value_array[good_station_index, :]
-            rssi_array = rssi_array[good_station_index, :]
-            mac_location[mac] = list_location
-            # dict_station_and_distance = {}
-            mean_values = scipy.signal.medfilt(value_array, kernel_size=(1, n))
-            mean_rssies = scipy.signal.medfilt(rssi_array, kernel_size=(1, n))
-            mac_mean_value[mac] = mean_values[:, n_2]
-            mac_mean_rssi[mac] = mean_rssies[:, n_2]
-        except:
-            pass
+        mac_map[mac].append(station)
+        mac_mean_value[mac].append(avg_value)
+
+    mac_location = mac_map
 
     players_location = {}
     players_mean_value = {}
     players_mean_rssi = {}
     players, master_players = get_playrers(c)
-    set_mac = set(mac_map.keys())
+    set_mac = set(mac_location.keys())
     for player in players:
         # TODO: merge distance
         set_location = set()
@@ -227,13 +195,12 @@ def new_loop():
             for n_value, station in enumerate(mac_location[mac]):
                 i = players_location[player].index(station)
                 player_mean_value[i, j] = mac_mean_value[mac][n_value]
-                player_mean_rssi[i, j] = mac_mean_rssi[mac][n_value]
 
         mean_values = np.nanmin(player_mean_value, axis=1)
         players_mean_value[player] = mean_values
 
         # RSSI type calculation
-        mean_rssies = np.nanmin(player_mean_rssi, axis=1)
+        mean_rssies = np.nanmax(player_mean_rssi, axis=1)
         players_mean_rssi[player] = mean_rssies
 
         try:
@@ -245,13 +212,7 @@ def new_loop():
             mean_value = mean_values[j]
             location = locations[j]
 
-            j_rssi = np.nanargmin(mean_rssies)
-            mean_rssi = mean_rssies[j_rssi]
-            location_rssi = locations[j_rssi]
-
             if triangulate:  # trilateration!
-                # location_first = location
-                # mean_value_first = mean_value
 
                 if location in locations_room["1"]['stations']:
                     room = "1"
