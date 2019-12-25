@@ -3,7 +3,7 @@
 {{ player_wins }} has won the game.
 
 {% for i in playersLocation %}
-    <p>Player <strong>{{ i[0] }}</strong>  is at <strong>{{ i[1] }}</strong> with  a signal of <strong>{{ i[2] }}</strong>.</p>
+    <p>Player <strong>{{ i[0] }}</strong>  is at <strong>{{ i[1] }}</strong>, distance (ft.) <strong>{{ i[2] }}</strong>.</p>
 {% endfor %}
 
 <button onclick="endgame()">End Game</button>
